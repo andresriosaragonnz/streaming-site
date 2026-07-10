@@ -1,0 +1,202 @@
+{
+  "decibel_force": {
+    "name": "decibel_force",
+    "performances": [
+      {
+        "id": "d3b07384-d113-4c90-a5c9-ec87bde32d90",
+        "status": "ready",
+        "artistName": "decibel_force",
+        "eventDate": "20241012",
+        "venueName": "ding_dong_lounge",
+        "performance": "decibel_force-ding_dong_lounge-20241012",
+        "hash": "sha256-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source": "https://vimeo.com/placeholder-decibel-force-20241012",
+        "files": [
+          {
+            "id": "f5b5f4bb-8cb4-498c-843e-c6b7588a91c1",
+            "type": "video",
+            "source": "https://vimeo.com/placeholder-decibel-force-20241012",
+            "duration": 2520,
+            "setlist": [
+              {
+                "id": "e2c388ad-cbef-4b47-b353-066a3ebcfef0",
+                "title": "segment_1",
+                "startTime": 0,
+                "duration": 360,
+                "hash": "sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg1",
+                "status": "public"
+              },
+              {
+                "id": "27855db8-2fcc-4997-bd45-12cf52989c74",
+                "title": "segment_2",
+                "startTime": 360,
+                "duration": 360,
+                "hash": "sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg2",
+                "status": "public"
+              },
+              {
+                "id": "a9fb9cf3-82a0-4742-b883-fa49b38ff7b6",
+                "title": "segment_3",
+                "startTime": 720,
+                "duration": 360,
+                "hash": "sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg3",
+                "status": "public"
+              },
+              {
+                "id": "fd9038e6-2b47-4cf0-a92c-15a0debe8c5b",
+                "title": "segment_4",
+                "startTime": 1080,
+                "duration": 360,
+                "hash": "sha256-4b8efd62bcefa7b4924cfcd17f6b92427ae4ef6e36d59b2bcfcd7fa90bcff2a3",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg4",
+                "status": "public"
+              },
+              {
+                "id": "b0a68f04-dcbf-4c6e-812a-36bce509d7df",
+                "title": "segment_5",
+                "startTime": 1440,
+                "duration": 360,
+                "hash": "sha256-c720ea8fcdb5fc3e3a4e9efcd15bbde62cf8ef4267fdc35bc5fa70bcfe63ad92",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg5",
+                "status": "private"
+              },
+              {
+                "id": "c620e7bf-e737-4d98-bd01-c88fce71cf12",
+                "title": "segment_6",
+                "startTime": 1800,
+                "duration": 360,
+                "hash": "sha256-8a0a0f8b2cd4d97a26ebcfef0e2c38adcbef4b47b353066a3ebcfef04bb529e7",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg6",
+                "status": "private"
+              },
+              {
+                "id": "7bf3b006-2182-411a-874b-5c8e2bdffcae",
+                "title": "segment_7",
+                "startTime": 2160,
+                "duration": 360,
+                "hash": "sha256-9aefd6f8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c9",
+                "performance": "decibel_force-ding_dong_lounge-20241012",
+                "source": "https://vimeo.com/placeholder-decibel-force-20241012-seg7",
+                "status": "private"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "emergency_awesome": {
+    "name": "emergency_awesome",
+    "performances": [
+      {
+        "id": "ae625d97-8c44-486a-aa78-0cb9348e35cf",
+        "status": "ready",
+        "artistName": "emergency_awesome",
+        "eventDate": "20259623",
+        "venueName": "big_fan",
+        "performance": "emergency_awesome-big_fan-20259623",
+        "hash": "sha256-a3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b832",
+        "source": "https://vimeo.com/placeholder-emergency-awesome-20259623",
+        "files": [
+          {
+            "id": "2bc8f427-e4bb-4e2b-bb6f-db0652da24a3",
+            "type": "video",
+            "source": "https://vimeo.com/placeholder-emergency-awesome-20259623",
+            "duration": 1080,
+            "setlist": [
+              {
+                "id": "9bb2efd8-ef45-472d-8b01-38e932cfd7da",
+                "title": "segment_1",
+                "startTime": 0,
+                "duration": 360,
+                "hash": "sha256-cfc4d4f647bc5d290fa8cb3fe12db5c98a5fc8b56f26487e83ac5bde92c10b2b",
+                "performance": "emergency_awesome-big_fan-20259623",
+                "source": "https://vimeo.com/placeholder-emergency-awesome-20259623-seg1",
+                "status": "private"
+              },
+              {
+                "id": "5fa23bc6-0158-4728-ab64-4e9dfd0bb5ee",
+                "title": "segment_2",
+                "startTime": 360,
+                "duration": 360,
+                "hash": "sha256-e9dfd0bb5eec1f2bf2b5fa23bc601584728ab644e9dfd0bb5ee5fa23bc60158",
+                "performance": "emergency_awesome-big_fan-20259623",
+                "source": "https://vimeo.com/placeholder-emergency-awesome-20259623-seg2",
+                "status": "private"
+              },
+              {
+                "id": "c1f2bf2b-c8c2-48df-aa26-ea86234f9a39",
+                "title": "segment_3",
+                "startTime": 720,
+                "duration": 360,
+                "hash": "sha256-b384cb904fdb6aa7cfa34b22eeab49efb384cb904fdb6aa7cfa34b22eeab49ef",
+                "performance": "emergency_awesome-big_fan-20259623",
+                "source": "https://vimeo.com/placeholder-emergency-awesome-20259623-seg3",
+                "status": "private"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "17b8f9e2-9bb5-4f70-a15d-8b1e0cf339b1",
+        "status": "ready",
+        "artistName": "emergency_awesome",
+        "eventDate": "20240820",
+        "venueName": "ding_dong_lounge",
+        "performance": "emergency_awesome-ding_dong_lounge-20240820",
+        "hash": "sha256-4c8996fb92427ae41e4649b934ca495991b7852b855e3b0c44298fc1c149afbf",
+        "source": "https://vimeo.com/placeholder-emergency-awesome-20240820",
+        "files": [
+          {
+            "id": "cd0b68d6-444a-4e2a-8924-a15c345d1fe4",
+            "type": "video",
+            "source": "https://vimeo.com/placeholder-emergency-awesome-20240820",
+            "duration": 1080,
+            "setlist": [
+              {
+                "id": "1db2eb66-419b-4a5f-9bf9-9ffc128bd6ee",
+                "title": "segment_1",
+                "startTime": 0,
+                "duration": 360,
+                "hash": "sha256-9ffc128bd6ee1db2eb66419b4a5f9bf99ffc128bd6ee1db2eb66419b4a5f9b",
+                "performance": "emergency_awesome-ding_dong_lounge-20240820",
+                "source": "https://vimeo.com/placeholder-emergency-awesome-20240820-seg1",
+                "status": "private"
+              },
+              {
+                "id": "2ec482bd-b425-46fe-bdab-de303cf655e0",
+                "title": "segment_2",
+                "startTime": 360,
+                "duration": 360,
+                "hash": "sha256-de303cf655e02ec482bdb42546febdabde303cf655e02ec482bdb42546feb",
+                "performance": "emergency_awesome-ding_dong_lounge-20240820",
+                "source": "https://vimeo.com/placeholder-emergency-awesome-20240820-seg2",
+                "status": "public"
+              },
+              {
+                "id": "cfa34b22-eeab-49ef-b384-cb904fdb6aa7",
+                "title": "segment_3",
+                "startTime": 720,
+                "duration": 360,
+                "hash": "sha256-cb904fdb6aa7cfa34b22eeab49efb384cb904fdb6aa7cfa34b22eeab49efcb9",
+                "performance": "emergency_awesome-ding_dong_lounge-20240820",
+                "source": "https://vimeo.com/placeholder-emergency-awesome-20240820-seg3",
+                "status": "private"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

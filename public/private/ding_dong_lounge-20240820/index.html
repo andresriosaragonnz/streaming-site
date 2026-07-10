@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Review: emergency awesome @ ding dong lounge | Live Archive</title>
+    <link rel="stylesheet" href="/css/main.css" />
+    <script defer src="/js/alpine.js"></script>
+    <script defer src="/js/app.js"></script>
+  </head>
+  <body>
+    
+      <div
+  class="artist-hero"
+  style="background-image: linear-gradient(rgba(4, 7, 20, 0.2), rgba(4, 7, 20, 1)), url('/screenshots/hero/emergency_awesome-ding_dong_lounge-20240820.jpg')"
+>
+  <div class="hero-overlay">
+    <a href="/" class="btn-back">← Back to Archive</a>
+    <h1 class="capitalize-words">Review: emergency awesome @ ding dong lounge</h1>
+    <p class="performance-count">3 Documented</p>
+  </div>
+</div>
+
+      
+      <div style="max-width: 1200px; margin: 1.5rem auto 0 auto; padding: 0 1rem;">
+        <div style="background: #131926; border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 0 4px 4px 0;">
+          <p style="margin: 0; font-size: 0.9rem; opacity: 0.9;">
+            <strong>Curator Dashboard:</strong> Changes made here modify the live compilation index payload state. Private tracks are filtered out during static distribution compilations.
+          </p>
+        </div>
+      </div>
+
+      <main class="performance-grid">
+        <div
+  class="card private-segment-card"
+  x-data="{ 
+    title: 'segment_1', 
+    status: 'public', 
+    id: '1db2eb66-419b-4a5f-9bf9-9ffc128bd6ee',
+    toggleStatus() {
+      this.status = this.status === 'public' ? 'private' : 'public';
+      // TODO: Hook up a fetch() request to your Bun backend route here later to update the database
+      console.log(`Track ${this.id} updated to: ${this.status}`);
+    }
+  }"
+  :class="status === 'private' ? 'status-private-dim' : ''"
+  style="position: relative"
+>
+  <div class="card-thumbnail" style="background-image: url('/screenshots/card/emergency_awesome-ding_dong_lounge-20240820_card_1.jpg')"></div>
+
+  <div
+    class="card-metadata"
+    style="display: flex; flex-direction: column; gap: 0.75rem"
+  >
+    <div
+      class="input-group"
+      style="display: flex; flex-direction: column; gap: 0.25rem"
+    >
+      <label
+        style="
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          opacity: 0.6;
+          font-weight: bold;
+        "
+        >Song Title</label
+      >
+      <input
+        type="text"
+        x-model="title"
+        class="input-dark"
+        style="
+          width: 100%;
+          padding: 0.5rem;
+          border-radius: 4px;
+          border: 1px solid #2a2f45;
+          background: #0b0e14;
+          color: #fff;
+        "
+      />
+    </div>
+
+    <button
+      @click="toggleStatus()"
+      type="button"
+      class="btn-toggle"
+      :class="status === 'public' ? 'btn-public' : 'btn-private'"
+      style="
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        transition: background 0.2s;
+      "
+    >
+      <span x-text="status === 'public' ? '🌐 Public' : '🔒 Private'"></span>
+    </button>
+  </div>
+</div>
+<div
+  class="card private-segment-card"
+  x-data="{ 
+    title: 'segment_2', 
+    status: 'public', 
+    id: '2ec482bd-b425-46fe-bdab-de303cf655e0',
+    toggleStatus() {
+      this.status = this.status === 'public' ? 'private' : 'public';
+      // TODO: Hook up a fetch() request to your Bun backend route here later to update the database
+      console.log(`Track ${this.id} updated to: ${this.status}`);
+    }
+  }"
+  :class="status === 'private' ? 'status-private-dim' : ''"
+  style="position: relative"
+>
+  <div class="card-thumbnail" style="background-image: url('/screenshots/card/emergency_awesome-ding_dong_lounge-20240820_card_1.jpg')"></div>
+
+  <div
+    class="card-metadata"
+    style="display: flex; flex-direction: column; gap: 0.75rem"
+  >
+    <div
+      class="input-group"
+      style="display: flex; flex-direction: column; gap: 0.25rem"
+    >
+      <label
+        style="
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          opacity: 0.6;
+          font-weight: bold;
+        "
+        >Song Title</label
+      >
+      <input
+        type="text"
+        x-model="title"
+        class="input-dark"
+        style="
+          width: 100%;
+          padding: 0.5rem;
+          border-radius: 4px;
+          border: 1px solid #2a2f45;
+          background: #0b0e14;
+          color: #fff;
+        "
+      />
+    </div>
+
+    <button
+      @click="toggleStatus()"
+      type="button"
+      class="btn-toggle"
+      :class="status === 'public' ? 'btn-public' : 'btn-private'"
+      style="
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        transition: background 0.2s;
+      "
+    >
+      <span x-text="status === 'public' ? '🌐 Public' : '🔒 Private'"></span>
+    </button>
+  </div>
+</div>
+<div
+  class="card private-segment-card"
+  x-data="{ 
+    title: 'segment_3', 
+    status: 'private', 
+    id: 'cfa34b22-eeab-49ef-b384-cb904fdb6aa7',
+    toggleStatus() {
+      this.status = this.status === 'public' ? 'private' : 'public';
+      // TODO: Hook up a fetch() request to your Bun backend route here later to update the database
+      console.log(`Track ${this.id} updated to: ${this.status}`);
+    }
+  }"
+  :class="status === 'private' ? 'status-private-dim' : ''"
+  style="position: relative"
+>
+  <div class="card-thumbnail" style="background-image: url('/screenshots/card/emergency_awesome-ding_dong_lounge-20240820_card_1.jpg')"></div>
+
+  <div
+    class="card-metadata"
+    style="display: flex; flex-direction: column; gap: 0.75rem"
+  >
+    <div
+      class="input-group"
+      style="display: flex; flex-direction: column; gap: 0.25rem"
+    >
+      <label
+        style="
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          opacity: 0.6;
+          font-weight: bold;
+        "
+        >Song Title</label
+      >
+      <input
+        type="text"
+        x-model="title"
+        class="input-dark"
+        style="
+          width: 100%;
+          padding: 0.5rem;
+          border-radius: 4px;
+          border: 1px solid #2a2f45;
+          background: #0b0e14;
+          color: #fff;
+        "
+      />
+    </div>
+
+    <button
+      @click="toggleStatus()"
+      type="button"
+      class="btn-toggle"
+      :class="status === 'public' ? 'btn-public' : 'btn-private'"
+      style="
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        transition: background 0.2s;
+      "
+    >
+      <span x-text="status === 'public' ? '🌐 Public' : '🔒 Private'"></span>
+    </button>
+  </div>
+</div>
+
+      </main>
+    
+  </body>
+</html>

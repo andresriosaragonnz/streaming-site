@@ -1,0 +1,394 @@
+{
+  "__drizzle_migrations": {
+    "rawSql": "CREATE TABLE \"__drizzle_migrations\" (\n\t\t\t\tid SERIAL PRIMARY KEY,\n\t\t\t\thash text NOT NULL,\n\t\t\t\tcreated_at numeric\n\t\t\t)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "SERIAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "hash",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "created_at",
+        "type": "numeric",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ]
+  },
+  "artist": {
+    "rawSql": "CREATE TABLE `artist` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`ig` text NOT NULL,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')) NOT NULL\n, `available` integer DEFAULT 1)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "ig",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "available",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "1",
+        "pk": 0
+      }
+    ]
+  },
+  "event": {
+    "rawSql": "CREATE TABLE `event` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`venue_id` text NOT NULL,\n\t`sound_id` text NOT NULL,\n\t`light_id` text NOT NULL,\n\t`sound_system` text NOT NULL,\n\t`status` text DEFAULT 'scheduled' NOT NULL,\n\t`event_date` text NOT NULL,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')) NOT NULL,\n\tFOREIGN KEY (`venue_id`) REFERENCES `venue`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`sound_id`) REFERENCES `sound`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`light_id`) REFERENCES `light`(`id`) ON UPDATE no action ON DELETE cascade\n)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "venue_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "sound_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "light_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "sound_system",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "status",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'scheduled'",
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "event_date",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      }
+    ]
+  },
+  "light": {
+    "rawSql": "CREATE TABLE `light` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`ig` text NOT NULL,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')) NOT NULL\n, `available` integer DEFAULT 1)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "ig",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "available",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "1",
+        "pk": 0
+      }
+    ]
+  },
+  "performance": {
+    "rawSql": "CREATE TABLE `performance` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`event_id` text NOT NULL,\n\t`artist_id` text NOT NULL,\n\t`status` text DEFAULT 'pending' NOT NULL,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')) NOT NULL,\n\tFOREIGN KEY (`event_id`) REFERENCES `event`(`id`) ON UPDATE no action ON DELETE cascade,\n\tFOREIGN KEY (`artist_id`) REFERENCES `artist`(`id`) ON UPDATE no action ON DELETE cascade\n)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "event_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "artist_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "status",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'pending'",
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      }
+    ]
+  },
+  "performance_file": {
+    "rawSql": "CREATE TABLE `performance_file` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`performance_id` text NOT NULL,\n\t`type` text NOT NULL,\n\t`filename` text NOT NULL,\n\t`duration` integer DEFAULT 0,\n\t`hash` text,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')),\n\tFOREIGN KEY (`performance_id`) REFERENCES `performance`(`id`) ON UPDATE no action ON DELETE cascade\n)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "performance_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "type",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "filename",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "duration",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "hash",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      }
+    ]
+  },
+  "sound": {
+    "rawSql": "CREATE TABLE `sound` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`ig` text NOT NULL,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')) NOT NULL\n, `available` integer DEFAULT 1)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "ig",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "available",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "1",
+        "pk": 0
+      }
+    ]
+  },
+  "venue": {
+    "rawSql": "CREATE TABLE `venue` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`name` text NOT NULL,\n\t`address` text NOT NULL,\n\t`ig` text NOT NULL,\n\t`created_at` integer DEFAULT (strftime('%s', 'now')) NOT NULL\n, `available` integer DEFAULT 1)",
+    "columns": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "name",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "address",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "ig",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "created_at",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "strftime('%s', 'now')",
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "available",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "1",
+        "pk": 0
+      }
+    ]
+  }
+}

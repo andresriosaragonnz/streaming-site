@@ -1,0 +1,70 @@
+<div
+  class="card private-segment-card"
+  x-data="{ 
+    title: '{{title}}', 
+    status: '{{status}}', 
+    id: '{{id}}',
+    toggleStatus() {
+      this.status = this.status === 'public' ? 'private' : 'public';
+      // TODO: Hook up a fetch() request to your Bun backend route here later to update the database
+      console.log(`Track ${this.id} updated to: ${this.status}`);
+    }
+  }"
+  :class="status === 'private' ? 'status-private-dim' : ''"
+  style="position: relative"
+>
+  <div class="card-thumbnail" style="background-image: url('{{image}}')"></div>
+
+  <div
+    class="card-metadata"
+    style="display: flex; flex-direction: column; gap: 0.75rem"
+  >
+    <div
+      class="input-group"
+      style="display: flex; flex-direction: column; gap: 0.25rem"
+    >
+      <label
+        style="
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          opacity: 0.6;
+          font-weight: bold;
+        "
+        >Song Title</label
+      >
+      <input
+        type="text"
+        x-model="title"
+        class="input-dark"
+        style="
+          width: 100%;
+          padding: 0.5rem;
+          border-radius: 4px;
+          border: 1px solid #2a2f45;
+          background: #0b0e14;
+          color: #fff;
+        "
+      />
+    </div>
+
+    <button
+      @click="toggleStatus()"
+      type="button"
+      class="btn-toggle"
+      :class="status === 'public' ? 'btn-public' : 'btn-private'"
+      style="
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        transition: background 0.2s;
+      "
+    >
+      <span x-text="status === 'public' ? '🌐 Public' : '🔒 Private'"></span>
+    </button>
+  </div>
+</div>
