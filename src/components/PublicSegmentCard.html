@@ -1,11 +1,4 @@
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
+<div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <div
     class="item-thumbnail"
     :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
@@ -17,9 +10,7 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
+      <span x-text="seg.duration"></span>
     </div>
   </div>
 </div>

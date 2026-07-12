@@ -3,49 +3,201 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>decibel force @ ding dong lounge | Live Archive</title>
-    <link rel="stylesheet" href="/css/main.css" />
+    <title>ding dong lounge - 12 Oct 24 | Live Archive</title>
+    <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
-    
+    <div class="studio-container" x-data="studioWorkspace">
+  <section class="player-column">
+  <div class="meta-workspace-card">
+    <h2>ding dong lounge - 12 Oct 24</h2>
+  </div>
+  <div class="video-player-mock">
+    <!-- Embedded responsive Vimeo player tracking the active store selection -->
+    <template x-if="active.source">
+      <iframe
+        :src="`https://player.vimeo.com/video/${active.source}?autoplay=0&title=0&byline=0&portrait=0`"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: 0;
+        "
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </template>
+
+    <!-- Fallback state if no video source token identifier is provided -->
+    <template x-if="!active.source">
       <div
-  class="artist-hero"
-  style="background-image: linear-gradient(rgba(4, 7, 20, 0.2), rgba(4, 7, 20, 1)), url('/screenshots/hero/decibel_force-ding_dong_lounge-20241012.jpg')"
->
-  <div class="hero-overlay">
-    <a href="/" class="btn-back">← Back to Archive</a>
-    <h1 class="capitalize-words">decibel force @ ding dong lounge</h1>
-    <p class="performance-count">4 Documented</p>
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-size: cover;
+          background-position: center;
+        "
+        :style="active.heroImage ? `background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url(${active.heroImage})` : ''"
+      >
+        <div class="preview-badge">Preview Mock Window</div>
+      </div>
+    </template>
+  </div>
+
+  <div class="meta-workspace-card">
+  <div class="header-row">
+    <div class="studio-controls-group">
+      <div class="input-field-group">
+        <select
+          x-model="active.title"
+          @change="$store.review.syncStore($store.review.currentIndex, active.title)"
+        >
+          <option value="playlist 1">playlist 1</option>
+          <option value="playlist 2">playlist 2</option>
+        </select>
+      </div>
+
+      <button
+        @click="$store.review.toggleStatus($store.review.currentIndex)"
+        type="button"
+        class="btn-public"
+      >
+        <span>Add to playlist</span>
+      </button>
+    </div>
   </div>
 </div>
 
-      <main class="performance-grid">
-        <div>
-  <div class="card-thumbnail" style="background-image: url('/screenshots/card/decibel_force-ding_dong_lounge-20241012_card_1.jpg')"></div>
-  <div class="card-metadata">
-    <h3 class="capitalize-words" id="'song-title">segment 1</h3>
+</section>
+ <!-- src/templates/panels/ReviewSidebar.html -->
+<aside class="playlist-sidebar">
+  <div
+    class="carousel-wrapper"
+    x-data="{ 
+      canScrollLeft: false, 
+      canScrollRight: false,
+      checkScroll() {
+        const el = this.$refs.scrollList;
+        if (!el) return;
+        this.canScrollLeft = el.scrollLeft > 5;
+        this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 5;
+      },
+      scroll(direction) {
+        const el = this.$refs.scrollList;
+        if (!el) return;
+        const scrollAmount = 252;
+        el.scrollBy({ 
+          left: direction === 'left' ? -scrollAmount : scrollAmount, 
+          behavior: 'smooth' 
+        });
+      }
+    }"
+    x-init="
+      $nextTick(() => { checkScroll(); });
+      window.addEventListener('resize', () => checkScroll());
+      
+      if (window.ResizeObserver) {
+        const observer = new ResizeObserver(() => checkScroll());
+        observer.observe($refs.scrollList);
+      }
+    "
+  >
+    <button
+      type="button"
+      class="carousel-nav-btn nav-left"
+      x-show="canScrollLeft"
+      @click="scroll('left')"
+      x-transition
+      x-cloak
+    >
+      ‹
+    </button>
+
+    <div
+      class="sidebar-scroll-list"
+      x-ref="scrollList"
+      @scroll.debounce.50ms="checkScroll()"
+    >
+      <template
+        x-for="(seg, idx) in $store.review.segments"
+        :key="seg.id || idx"
+      >
+        <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
+  <div
+    class="item-thumbnail"
+    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+  ></div>
+
+  <div class="item-meta">
+    <div class="title-text">
+      <!-- FIXED: Linked to the dynamic, reactive title string -->
+      <span x-text="seg.title"></span>
+    </div>
+    <div class="title-text">
+      <span x-text="seg.duration"></span>
+    </div>
   </div>
 </div>
-<div>
-  <div class="card-thumbnail" style="background-image: url('/screenshots/card/decibel_force-ding_dong_lounge-20241012_card_2.jpg')"></div>
-  <div class="card-metadata">
-    <h3 class="capitalize-words" id="'song-title">segment 2</h3>
+<div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
+  <div
+    class="item-thumbnail"
+    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+  ></div>
+
+  <div class="item-meta">
+    <div class="title-text">
+      <!-- FIXED: Linked to the dynamic, reactive title string -->
+      <span x-text="seg.title"></span>
+    </div>
+    <div class="title-text">
+      <span x-text="seg.duration"></span>
+    </div>
   </div>
 </div>
-<div>
-  <div class="card-thumbnail" style="background-image: url('/screenshots/card/decibel_force-ding_dong_lounge-20241012_card_3.jpg')"></div>
-  <div class="card-metadata">
-    <h3 class="capitalize-words" id="'song-title">segment 3</h3>
-  </div>
-</div>
-<div>
-  <div class="card-thumbnail" style="background-image: url('/screenshots/card/decibel_force-ding_dong_lounge-20241012_card_4.jpg')"></div>
-  <div class="card-metadata">
-    <h3 class="capitalize-words" id="'song-title">segment 4</h3>
+<div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
+  <div
+    class="item-thumbnail"
+    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+  ></div>
+
+  <div class="item-meta">
+    <div class="title-text">
+      <!-- FIXED: Linked to the dynamic, reactive title string -->
+      <span x-text="seg.title"></span>
+    </div>
+    <div class="title-text">
+      <span x-text="seg.duration"></span>
+    </div>
   </div>
 </div>
 
-      </main>
-     
+      </template>
+    </div>
+
+    <button
+      type="button"
+      class="carousel-nav-btn nav-right"
+      x-show="canScrollRight"
+      @click="scroll('right')"
+      x-transition
+      x-cloak
+    >
+      ›
+    </button>
+  </div>
+</aside>
+
+</div>
+
+<script type="application/json" id="studio-segments-data">
+  [{"id":"e2c388ad-cbef-4b47-b353-066a3ebcfef0","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592311","status":"public"},{"id":"27855db8-2fcc-4997-bd45-12cf52989c74","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592422","status":"public"},{"id":"a9fb9cf3-82a0-4742-b883-fa49b38ff7b6","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208591977","status":"public"}]
+</script>
+
   </body>
+  <script type="module" src="/js/publicApp.js"></script>
 </html>

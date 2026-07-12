@@ -1,0 +1,34 @@
+/* src/css/components/_hero.css */
+.artist-hero {
+  position: relative;
+  width: 100%;
+  height: 55vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+}
+
+.hero-overlay {
+  width: 100%;
+  padding: 4rem;
+  background: linear-gradient(
+    to top,
+    var(--bg-deep) 0%,
+    rgba(4, 7, 20, 0.5) 70%,
+    transparent 100%
+  );
+}
+
+.hero-overlay h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.performance-count {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
