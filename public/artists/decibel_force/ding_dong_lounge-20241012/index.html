@@ -11,26 +11,70 @@
   <section class="player-column">
   <div class="meta-workspace-card">
     <h2>ding dong lounge - 12 Oct 24</h2>
+    <div class="toggle" @click="$store.review.togleMode()">
+      <input type="checkbox" />
+      <label></label>
+    </div>
   </div>
-  <div class="video-player-mock">
-    <!-- Embedded responsive Vimeo player tracking the active store selection -->
-    <template x-if="active.source">
-      <iframe
-        :src="`https://player.vimeo.com/video/${active.source}?autoplay=0&title=0&byline=0&portrait=0`"
-        style="
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: 0;
-        "
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </template>
 
-    <!-- Fallback state if no video source token identifier is provided -->
+  <div
+    :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
+    style="position: relative; overflow: hidden; border-radius: 12px"
+  >
+    <!-- VIDEO PLAYER MODE (Visible when mode is true) -->
+    <div
+      x-show="$store.review.mode && active.source"
+      style="width: 100%; height: 100%; background: #000"
+    >
+      <video
+        id="r2-stream-player"
+        controls
+        playsinline
+        preload="metadata"
+        style="width: 100%; height: 100%; object-fit: contain; display: block"
+      ></video>
+    </div>
+
+    <!-- MP3 AUDIO PLAYER MODE (Visible when mode is false) -->
+    <div
+      x-show="!$store.review.mode && active.source"
+      style="
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        background-color: #1a1a1a;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      "
+      :style="active.playerImage ? `background-image: url(${active.playerImage})` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+    >
+      <!-- Audio Player Controls Pinned to the Bottom -->
+      <div
+        style="
+          width: 100%;
+          padding: 16px;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-sizing: border-box;
+        "
+      >
+        <audio
+          id="r2-audio-player"
+          controls
+          preload="metadata"
+          style="width: 100%; max-width: 500px"
+        ></audio>
+      </div>
+    </div>
+
+    <!-- Empty Fallback Workspace State -->
     <template x-if="!active.source">
       <div
         style="
@@ -39,35 +83,49 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-size: cover;
-          background-position: center;
+          background-color: #111;
         "
-        :style="active.heroImage ? `background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url(${active.heroImage})` : ''"
       >
-        <div class="preview-badge">Preview Mock Window</div>
+        <div class="preview-badge">No Stream Active</div>
       </div>
     </template>
   </div>
 
-  <div class="meta-workspace-card">
+  <div
+  class="meta-workspace-card"
+  x-data="{ 
+    selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
+  }"
+>
   <div class="header-row">
     <div class="studio-controls-group">
       <div class="input-field-group">
-        <select
-          x-model="active.title"
-          @change="$store.review.syncStore($store.review.currentIndex, active.title)"
-        >
-          <option value="playlist 1">playlist 1</option>
-          <option value="playlist 2">playlist 2</option>
+        <!-- 1. Bind to local component state variable instead of active.title -->
+        <select x-model="selectedPlaylist">
+          <!-- 2. Loop through your state dynamically, or keep them hardcoded -->
+          <template
+            x-for="(list, name) in $store.playlists.playlists"
+            :key="name"
+          >
+            <option :value="name" x-text="name"></option>
+          </template>
         </select>
       </div>
 
+      <!-- 3. Pass the selected playlist target parameter straight to the method -->
       <button
-        @click="$store.review.toggleStatus($store.review.currentIndex)"
+        @click="$store.playlists.addActiveToPlaylist(selectedPlaylist)"
         type="button"
         class="btn-public"
       >
         <span>Add to playlist</span>
+      </button>
+      <button
+        @click="$store.playlists.generateShareLink(selectedPlaylist)"
+        type="button"
+        class="btn-public"
+      >
+        <span>Share playlist</span>
       </button>
     </div>
   </div>
@@ -130,7 +188,7 @@
         <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${seg.id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -146,7 +204,7 @@
 <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${seg.id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -162,7 +220,7 @@
 <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${seg.id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -193,9 +251,8 @@
 </aside>
 
 </div>
-
 <script type="application/json" id="studio-segments-data">
-  [{"id":"e2c388ad-cbef-4b47-b353-066a3ebcfef0","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592311","status":"public"},{"id":"27855db8-2fcc-4997-bd45-12cf52989c74","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592422","status":"public"},{"id":"a9fb9cf3-82a0-4742-b883-fa49b38ff7b6","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208591977","status":"public"}]
+  [{"id":"yIwsfqcdM","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8","status":"public","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/yIwsfqcdM.mp3","playerImage":"/screenshots/hero/d3b07384-d113-4c90-a5c9-ec87bde32d90.jpg"},{"id":"ayxQFAxzZ","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/ayxQFAxzZ/output.m3u8","status":"public","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/ayxQFAxzZ.mp3","playerImage":"/screenshots/hero/d3b07384-d113-4c90-a5c9-ec87bde32d90.jpg"},{"id":"T2Sl2e6zz","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8","status":"public","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/T2Sl2e6zz.mp3","playerImage":"/screenshots/hero/d3b07384-d113-4c90-a5c9-ec87bde32d90.jpg"}]
 </script>
 
   </body>

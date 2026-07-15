@@ -1,0 +1,42 @@
+<section class="player-column">
+  <div class="meta-workspace-card">
+    <h2>{{studioTitle}}</h2>
+  </div>
+
+  <div class="video-player-mock">
+    <!-- Clean HTML5 Native Architecture targeting your R2 Bucket objects directly -->
+    <div
+      x-show="active.source"
+      style="width: 100%; height: 100%; background: #000"
+    >
+      <video
+        id="r2-stream-player"
+        controls
+        playsinline
+        preload="metadata"
+        :poster="active.heroImage"
+        style="width: 100%; height: 100%; object-fit: contain; display: block"
+      ></video>
+    </div>
+
+    <!-- Empty Fallback Workspace State -->
+    <template x-if="!active.source">
+      <div
+        style="
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-size: cover;
+          background-position: center;
+        "
+        :style="active.heroImage ? `background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url(${active.heroImage})` : ''"
+      >
+        <div class="preview-badge">No Stream Active</div>
+      </div>
+    </template>
+  </div>
+
+  {{controls}}
+</section>

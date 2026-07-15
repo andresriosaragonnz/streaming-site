@@ -1,24 +1,41 @@
+// serve.js (Updated for Clean URLs & Query Parameters)
 const http = require("node:http");
-const { DatabaseSync } = require("node:sqlite");
-const db = new DatabaseSync("library.db");
+const fs = require("node:fs");
+const path = require("node:path");
 
-const server = http.createServer((req, res) => {
-  if (req.method === "POST" && req.url === "/publish") {
-    let body = "";
-    req.on("data", (chunk) => (body += chunk));
-    req.on("end", () => {
-      const data = JSON.parse(body);
-      // 1. Update SQLite
-      db.prepare("UPDATE performances SET status = ? WHERE id = ?").run(
-        data.status,
-        data.id,
-      );
+const PORT = 8080;
+const PUBLIC = "./public";
 
-      // 2. Trigger Surgical Rebuild
-      require("../src/update-one").rebuild(data.artistName);
+http
+  .createServer((req, res) => {
+    // 1. Separate the clean pathname from the ?share= query parameters
+    const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+    let urlPath = parsedUrl.pathname;
 
-      res.end("Published");
+    // 2. If the pathname doesn't have an extension, target its index.html
+    if (!path.extname(urlPath)) {
+      urlPath = path.join(urlPath, "index.html");
+    }
+
+    const filePath = path.join(PUBLIC, urlPath);
+
+    fs.readFile(filePath, (err, data) => {
+      console.log(err);
+      if (err) {
+        res.writeHead(404, { "Content-Type": "text/plain" });
+        res.end("404 Not Found");
+      } else {
+        const ext = path.extname(filePath);
+        const contentType =
+          ext === ".css"
+            ? "text/css"
+            : ext === ".js"
+              ? "text/javascript"
+              : "text/html";
+
+        res.writeHead(200, { "Content-Type": contentType });
+        res.end(data);
+      }
     });
-  }
-});
-server.listen(3000);
+  })
+  .listen(PORT, () => console.log(`Serving at http://localhost:${PORT}`));

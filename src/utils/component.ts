@@ -6,7 +6,7 @@ const templateCache: Record<string, string> = {};
 export function loadComponent<T extends object>(fileName: string) {
   if (!templateCache[fileName]) {
     // Bun perfectly supports import.meta.dir natively
-    const filePath = path.join(import.meta.dir, "../components", fileName);
+    const filePath = path.join(process.cwd(), "/src/build/compiler/", fileName);
     templateCache[fileName] = fs.readFileSync(filePath, "utf8");
   }
 

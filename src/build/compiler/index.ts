@@ -1,7 +1,7 @@
 // src/build/compiler.ts
 import { mkdirSync, readdirSync, existsSync, rmSync } from "fs";
 import { join } from "path";
-import { ArtistWorkspaceObject } from "../../templates/types.js";
+import { ArtistWorkspaceObject } from "../types.js";
 import { data } from "./artistData.js";
 import { indexImages } from "./indexImages.js";
 import { compileStylesheets } from "./css.js";
@@ -28,7 +28,6 @@ export function compileArtistEcosystem(artist: ArtistWorkspaceObject): void {
   const rootArtistsDir = join(process.cwd(), "public/artists", artist.artistId);
   rmSync(rootArtistsDir, { recursive: true, force: true });
   const heroFiles = readdirSync(HERO_DIR);
-  const cardFiles = readdirSync(CARD_DIR);
   const filteredHero = heroFiles.filter(
     (image) => image.split("-")[0] === artist.artistName,
   );

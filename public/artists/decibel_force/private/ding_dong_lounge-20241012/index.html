@@ -14,24 +14,22 @@
   </div>
 
   <div class="video-player-mock">
-    <!-- Temporary Vimeo Embed (Proof of Concept - Swapping to R2 later) -->
-    <template x-if="active.source">
-      <iframe
-        :src="`https://player.vimeo.com/video/${active.source}?autoplay=0&preload=auto&title=0&byline=0&portrait=0`"
-        style="
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: 0;
-        "
-        allow="autoplay; fullscreen; picture-in-picture"
-        allowfullscreen
-      ></iframe>
-    </template>
+    <!-- Clean HTML5 Native Architecture targeting your R2 Bucket objects directly -->
+    <div
+      x-show="active.source"
+      style="width: 100%; height: 100%; background: #000"
+    >
+      <video
+        id="r2-stream-player"
+        controls
+        playsinline
+        preload="metadata"
+        :poster="active.heroImage"
+        style="width: 100%; height: 100%; object-fit: contain; display: block"
+      ></video>
+    </div>
 
-    <!-- Fallback layout when no track source token is active -->
+    <!-- Empty Fallback Workspace State -->
     <template x-if="!active.source">
       <div
         style="
@@ -45,7 +43,7 @@
         "
         :style="active.heroImage ? `background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url(${active.heroImage})` : ''"
       >
-        <div class="preview-badge">Preview Mock Window</div>
+        <div class="preview-badge">No Stream Active</div>
       </div>
     </template>
   </div>
@@ -136,7 +134,7 @@
 >
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -161,7 +159,7 @@
 >
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -186,7 +184,7 @@
 >
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -211,82 +209,7 @@
 >
   <div
     class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
-  ></div>
-
-  <div class="item-meta">
-    <div class="title-text">
-      <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
-    </div>
-    <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
-    </div>
-  </div>
-</div>
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
-  ></div>
-
-  <div class="item-meta">
-    <div class="title-text">
-      <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
-    </div>
-    <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
-    </div>
-  </div>
-</div>
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
-  ></div>
-
-  <div class="item-meta">
-    <div class="title-text">
-      <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
-    </div>
-    <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
-    </div>
-  </div>
-</div>
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.performance}-card_${idx}.jpg')`"
+    :style="`background-image: url('/screenshots/card/${id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -321,7 +244,7 @@
 </div>
 
 <script type="application/json" id="studio-segments-data">
-  [{"id":"e2c388ad-cbef-4b47-b353-066a3ebcfef0","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592311","status":"public"},{"id":"27855db8-2fcc-4997-bd45-12cf52989c74","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592422","status":"public"},{"id":"a9fb9cf3-82a0-4742-b883-fa49b38ff7b6","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208591977","status":"public"},{"id":"fd9038e6-2b47-4cf0-a92c-15a0debe8c5b","title":"segment_3","index":"3","startTime":1080,"duration":360,"hash":"sha256-4b8efd62bcefa7b4924cfcd17f6b92427ae4ef6e36d59b2bcfcd7fa90bcff2a3","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208591976","status":"private"},{"id":"b0a68f04-dcbf-4c6e-812a-36bce509d7df","title":"segment_4","index":"4","startTime":1440,"duration":360,"hash":"sha256-c720ea8fcdb5fc3e3a4e9efcd15bbde62cf8ef4267fdc35bc5fa70bcfe63ad92","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208592311","status":"private"},{"id":"c620e7bf-e737-4d98-bd01-c88fce71cf12","title":"segment_5","index":"5","startTime":1800,"duration":360,"hash":"sha256-8a0a0f8b2cd4d97a26ebcfef0e2c38adcbef4b47b353066a3ebcfef04bb529e7","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208591974","status":"private"},{"id":"7bf3b006-2182-411a-874b-5c8e2bdffcae","title":"segment_6","index":"6","startTime":2160,"duration":360,"hash":"sha256-9aefd6f8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c9","performance":"decibel_force-ding_dong_lounge-20241012","source":"1208591975","status":"private"}]
+  [{"0":{"id":"yIwsfqcdM","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Eclipse%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"1":{"id":"ayxQFAxzZ","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Edge%20of%20the%20World%20%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"2":{"id":"T2Sl2e6zz","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Endles%20Thread%20%20%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"3":{"id":"YJkE29oDn","title":"2tF6vB9sZ","index":"3","startTime":1080,"duration":360,"hash":"sha256-4b8efd62bcefa7b4924cfcd17f6b92427ae4ef6e36d59b2bcfcd7fa90bcff2a3","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Mantis%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"private"},"source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8"},{"0":{"id":"yIwsfqcdM","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Eclipse%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"1":{"id":"ayxQFAxzZ","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Edge%20of%20the%20World%20%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"2":{"id":"T2Sl2e6zz","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Endles%20Thread%20%20%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"3":{"id":"YJkE29oDn","title":"2tF6vB9sZ","index":"3","startTime":1080,"duration":360,"hash":"sha256-4b8efd62bcefa7b4924cfcd17f6b92427ae4ef6e36d59b2bcfcd7fa90bcff2a3","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Mantis%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"private"},"source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/ayxQFAxzZ/output.m3u8"},{"0":{"id":"yIwsfqcdM","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Eclipse%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"1":{"id":"ayxQFAxzZ","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Edge%20of%20the%20World%20%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"2":{"id":"T2Sl2e6zz","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Endles%20Thread%20%20%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"3":{"id":"YJkE29oDn","title":"2tF6vB9sZ","index":"3","startTime":1080,"duration":360,"hash":"sha256-4b8efd62bcefa7b4924cfcd17f6b92427ae4ef6e36d59b2bcfcd7fa90bcff2a3","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Mantis%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"private"},"source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8"},{"0":{"id":"yIwsfqcdM","title":"segment_0","index":"0","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Eclipse%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"1":{"id":"ayxQFAxzZ","title":"segment_1","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Edge%20of%20the%20World%20%20-Live%20ant%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"2":{"id":"T2Sl2e6zz","title":"segment_2","index":"2","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Endles%20Thread%20%20%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"public"},"3":{"id":"YJkE29oDn","title":"2tF6vB9sZ","index":"3","startTime":1080,"duration":360,"hash":"sha256-4b8efd62bcefa7b4924cfcd17f6b92427ae4ef6e36d59b2bcfcd7fa90bcff2a3","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/Decibel%20Force%20-%20Mantis%20-Live%20at%20Ding%20dong%2012%20oct%202024/output.m3u8","status":"private"},"source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/YJkE29oDn/output.m3u8"}]
 </script>
 
   </body>

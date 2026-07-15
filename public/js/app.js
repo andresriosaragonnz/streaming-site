@@ -15,7 +15,13 @@ document.addEventListener("alpine:init", () => {
           this.$store.review.segments = JSON.parse(dataEl.textContent);
           this.$store.review.currentIndex = 0;
           console.log("✅ Store successfully hydrated from DOM element data.");
+
+          this.setupHlsPlayback();
         }
+      });
+
+      this.$watch("$store.review.currentIndex", () => {
+        this.$nextTick(() => this.setupHlsPlayback());
       });
     },
 
@@ -30,6 +36,33 @@ document.addEventListener("alpine:init", () => {
         };
       }
       return store.segments[store.currentIndex];
+    },
+
+    setupHlsPlayback() {
+      const video = document.getElementById("r2-stream-player");
+      if (!video || !this.active.source) return;
+
+      if (window.activeHlsInstance) {
+        window.activeHlsInstance.destroy();
+        window.activeHlsInstance = null;
+      }
+
+      const streamUrl = this.active.source;
+
+      if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = streamUrl;
+      } else if (window.Hls && window.Hls.isSupported()) {
+        const hls = new window.Hls({
+          maxMaxBufferLength: 10,
+        });
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+        window.activeHlsInstance = hls;
+      } else {
+        console.error(
+          "❌ HLS.js is not loaded or not supported by this browser.",
+        );
+      }
     },
   }));
 
@@ -61,10 +94,18 @@ document.addEventListener("alpine:init", () => {
 });
 
 // =========================================================================
-// STEP 2: Put your Alpine script loading/injection block right here
+// STEP 2: Sequential Script Loading to Eliminate Race Conditions
 // =========================================================================
-// (Paste the exact code you are using to load/trigger alpine.js below)
-const script = document.createElement("script");
-script.src = "/js/alpine.js";
-script.defer = true;
-document.head.appendChild(script);
+const hlsScript = document.createElement("script");
+hlsScript.src = "https://cdn.jsdelivr.net/npm/hls.js@1";
+
+// Only inject Alpine AFTER hls.js has explicitly loaded and executed
+hlsScript.onload = () => {
+  console.log("📦 HLS.js successfully loaded. Booting Alpine wrapper next...");
+  const script = document.createElement("script");
+  script.src = "/js/alpine.js";
+  script.defer = true;
+  document.head.appendChild(script);
+};
+
+document.head.appendChild(hlsScript);

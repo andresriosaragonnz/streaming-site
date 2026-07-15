@@ -21,8 +21,9 @@ interface Performance {
   id: string;
   performance: string;
   imageURL?: string;
-  venueName?: string;
-  eventDate?: string;
+  venueName: string;
+  eventDate: string;
+  artistName: string;
   segments: PerformanceSegment[];
 }
 
@@ -92,7 +93,7 @@ interface PrivateRenderData {
 interface SegmentCardProps {
   image: string;
   title: string;
-  performance?: string;
+  id?: string;
   duration?: string;
   artist?: string;
   venue?: string;
