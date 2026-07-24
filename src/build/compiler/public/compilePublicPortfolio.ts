@@ -1,65 +1,44 @@
-import { writeFileSync, mkdirSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
-import {
-  ArtistWorkspaceObject,
-  HeroProps,
-  CardProps,
-  LayoutProps,
-  ArtistData,
-} from "../../types.js";
-
+import type { ArtistWorkspaceObject } from "../../types.js";
 import { loadComponent } from "../../../utils/component.js";
-import { dateFromString } from "../../../utils/formatDates.js";
+import type { CardProps, HeroProps, LayoutProps } from "../../types.js";
+import { getArtistFromSegment } from "../utils/getArtistFromSegment.js";
 
+const Menu = loadComponent("Menu.html");
 const Layout = loadComponent<LayoutProps>("BaseLayout.html");
 const Hero = loadComponent<HeroProps>("Hero.html");
-const PerformanceCard = loadComponent<CardProps>(
-  "/public/templates/PublicPerformanceCard.html",
+const PrivatePerformanceCard = loadComponent<CardProps>(
+  "/private/templates/PrivatePerformanceCard.html",
 );
 
 export const compilePublicPortfolio = (
-  artist: ArtistWorkspaceObject,
-  images: any,
+  segments: any,
+  performances: any,
 ): void => {
-  const outputDir = join(process.cwd(), "public/artists", artist.artistId);
+  const artist = getArtistFromSegment(segments);
+  const outputDir = join(process.cwd(), "public/artists", artist.id);
   mkdirSync(outputDir, { recursive: true });
-  const currentImage = images[Math.floor(Math.random() * images.length)];
-  const heroImage = `/screenshots/hero/${currentImage}.jpg`;
-  const gridHtml = (artist.performances || [])
-    .map((p) => {
-      const { eventDate, segments, id, venueName } = p;
-      const date = p.eventDate
-        ? dateFromString(p.eventDate).formated
-        : "Undated Tapes";
-      const availableImageIndices = p.segments.map((segment) => segment.index);
-      const currentCardImage =
-        availableImageIndices[
-          Math.floor(Math.random() * availableImageIndices.length)
-        ];
-      return PerformanceCard({
-        artistName: encodeURIComponent(artist.artistName),
-        image: `/screenshots/card/${id}.jpg`,
-        venue: venueName || "Unknown Venue",
-        date,
-        link: `${venueName}-${eventDate}`,
-      });
-    })
-    .join("");
+  const gridHtml = performances.map(PrivatePerformanceCard).join("");
   const heroHtml = Hero({
-    bgImage: heroImage,
-    title: artist.artistName.replaceAll("_", " "),
-    count: artist.performances ? artist.performances.length : 0,
+    image: artist.image,
+    title: artist.name.replaceAll("_", " "),
+    count: performances ? performances.length : 0,
   });
-
+  const menuHtml = Menu({});
   const htmlContent = Layout({
-    pageTitle: artist.artistName,
+    pageTitle: artist.name,
     bodyContent: `
-      ${heroHtml}
-      <main class="performance-grid">
-        ${gridHtml}
-      </main>
+    ${menuHtml}
+    ${heroHtml}
+    <main class="performance-grid">
+    ${gridHtml}
+    </main>
     `,
   });
+
   const outputPath = join(outputDir, `index.html`);
+  console.log({ outputPath });
   writeFileSync(outputPath, htmlContent, "utf8");
+  return;
 };

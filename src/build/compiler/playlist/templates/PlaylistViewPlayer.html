@@ -1,12 +1,14 @@
 <section class="player-column">
-  <div class="meta-title-card">
-    <div>{{menu}}</div>
-    <div class="meta-title-card-right">
-      <h2>{{studioTitle}}</h2>
-      <div class="toggle" @click="$store.review.togleMode()">
-        <input type="checkbox" />
-        <label></label>
-      </div>
+  <div class="meta-workspace-card">
+    <a
+      :href="active.pageTitleLink"
+      style="text-decoration: none; color: inherit"
+    >
+      <h2 x-text="active.pageTitle"></h2>
+    </a>
+    <div class="toggle" @click="$store.review.togleMode()">
+      <input type="checkbox" />
+      <label></label>
     </div>
   </div>
 

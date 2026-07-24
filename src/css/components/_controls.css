@@ -101,6 +101,22 @@
   color: var(--text-main);
   overflow: hidden;
 }
+.meta-title-card {
+  background: var(--bg-deep);
+  border: 1px solid var(--bg-card);
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.meta-title-card-right {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
 
 .meta-workspace-card {
   background: var(--bg-deep);

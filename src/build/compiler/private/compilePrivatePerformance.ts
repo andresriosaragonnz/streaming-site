@@ -9,7 +9,7 @@ import {
   StudioProps,
   Performance,
 } from "../../types.js";
-
+const Menu = loadComponent("Menu.html");
 const Layout = loadComponent<LayoutProps>(
   "/private/templates/PrivateStudioLayout.html",
 );
@@ -29,25 +29,46 @@ const ControlSection = loadComponent(
   "/private/templates/PrivatePlayerControls.html",
 );
 
-export const compilePrivatePerformance = (
-  artistName: string,
-  artistId: string,
-  performance: Performance,
-): void => {
+export const compilePrivatePerformances = (performances: any): void => {
+  for (const performance of performances) {
+    const { artistName, venueName, eventDate, segments } = performance;
+    const outputDir = join(
+      process.cwd(),
+      "public/artists",
+      artistName,
+      "private",
+      `${venueName}-${eventDate}`,
+    );
+    mkdirSync(outputDir, { recursive: true });
+
+    const cleanVenue = venueName.replaceAll("_", " ");
+    const cleanDate = dateFromString(eventDate);
+
+    const displayTitle = `${cleanVenue} - ${cleanDate.formated}`;
+    const formattedJson = JSON.stringify(segments);
+    const ControlSectionHtml = ControlSection({});
+    const playerHtml = ViewPlayer({
+      studioTitle: displayTitle,
+      controls: ControlSectionHtml,
+    });
+    const cardsHtml = segments.map(SegmentCard).join("");
+    const sidebarHtml = ViewSidebar({ cards: cardsHtml });
+    const dynamicStudioHtml = ViewStudio({
+      jsonSegments: formattedJson,
+      playerPanel: playerHtml,
+      sidebarPanel: sidebarHtml,
+    });
+    const menuHtml = Menu({});
+    const htmlContent = Layout({
+      pageTitle: displayTitle,
+      bodyContent: `${menuHtml}${dynamicStudioHtml}`,
+    });
+    const outputPath = join(outputDir, `index.html`);
+    writeFileSync(outputPath, htmlContent, "utf8");
+  }
+
+  return;
   const { venueName, eventDate, segments, id } = performance;
-  const outputDir = join(
-    process.cwd(),
-    "public/artists",
-    artistId,
-    "private",
-    `${venueName}-${eventDate}`,
-  );
-  mkdirSync(outputDir, { recursive: true });
-
-  const cleanVenue = venueName.replaceAll("_", " ");
-  const cleanDate = dateFromString(eventDate);
-
-  const displayTitle = `${cleanVenue} - ${cleanDate.formated}`;
 
   // Simply serialize the raw collection array directly without regex mutations
   const formattedJson = JSON.stringify(
@@ -57,35 +78,7 @@ export const compilePrivatePerformance = (
     })),
   );
 
-  const ControlSectionHtml = ControlSection({});
-  const playerHtml = ViewPlayer({
-    studioTitle: displayTitle,
-    controls: ControlSectionHtml,
-  });
-  const cardsHtml = segments
-    .map((seg, idx) => {
-      return SegmentCard({
-        image: `/screenshots/card/${artistName}-${venueName}-${eventDate}-card_${idx}.jpg`,
-        title: seg.title.replaceAll("_", " "),
-        id: id,
-        index: seg.index,
-      });
-    })
-    .join("");
-
   const sidebarHtml = ViewSidebar({ cards: cardsHtml });
 
   // Compose all components cleanly
-  const dynamicStudioHtml = ViewStudio({
-    jsonSegments: formattedJson,
-    playerPanel: playerHtml,
-    sidebarPanel: sidebarHtml,
-  });
-
-  const htmlContent = Layout({
-    pageTitle: displayTitle,
-    bodyContent: dynamicStudioHtml,
-  });
-  const outputPath = join(outputDir, `index.html`);
-  writeFileSync(outputPath, htmlContent, "utf8");
 };

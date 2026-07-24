@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Pipeline Roadmap</title>
+
+    <style>
+      /* Baseline Page Layout */
+      body {
+        background-color: #0b0f19;
+        color: #e5e7eb;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 40px 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      /* Central Content Module Container */
+      .pipeline-container {
+        width: 100%;
+        max-width: 650px;
+        background-color: #111827;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        border: 1px solid #1f2937;
+      }
+
+      /* Header Layout Styles */
+      .pipeline-header {
+        margin-bottom: 32px;
+        border-bottom: 1px solid #374151;
+        padding-bottom: 20px;
+      }
+      .pipeline-header h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        color: #ffffff;
+        letter-spacing: -0.025em;
+      }
+      .pipeline-header p {
+        font-size: 0.9rem;
+        color: #9ca3af;
+        margin: 0;
+      }
+
+      /* Core Timeline Stack Layout */
+      .pipeline-stages {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .pipeline-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+      }
+
+      /* Left Indicator Node Stack */
+      .node-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .status-badge {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        font-weight: 700;
+        box-sizing: border-box;
+        transition: all 0.2s ease-in-out;
+      }
+      .connector-wire {
+        width: 2px;
+        height: 40px;
+        background-color: #374151;
+        margin-top: 10px;
+      }
+
+      /* Contextual Variant Designs */
+      .status-done {
+        background-color: #065f46;
+        color: #34d399;
+        border: 2px solid #059669;
+      }
+      .status-pending {
+        background-color: #1f2937;
+        color: #6b7280;
+        border: 2px solid #4b5563;
+      }
+
+      /* Right Text Element Deck Styles */
+      .stage-content {
+        flex: 1;
+        padding-top: 4px;
+      }
+      .stage-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0 0 6px 0;
+        transition: color 0.2s ease;
+      }
+      .stage-title.done {
+        color: #ffffff;
+      }
+      .stage-title.pending {
+        color: #9ca3af;
+      }
+
+      .stage-desc {
+        font-size: 0.925rem;
+        margin: 0;
+        line-height: 1.6;
+      }
+      .stage-desc.done {
+        color: #9ca3af;
+      }
+      .stage-desc.pending {
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="menu">
+      <style>
+        /* Baseline Wrapper (Invisible so it doesn't break main page layouts) */
+        .menu {
+          font-family:
+            system-ui,
+            -apple-system,
+            sans-serif;
+        }
+
+        /* 
+     * PURE CSS DRAWER MECHANICS 
+     */
+
+        /* 1. Hide the structural checkbox completely */
+        #drawer-toggle {
+          display: none;
+        }
+
+        /* 2. Style the trigger button (Hamburger Menu) - NOW FIXED/STICKY */
+        .drawer-trigger {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background-color: #1f2937;
+          color: #ffffff;
+          padding: 10px 16px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          font-size: 0.95rem;
+          border: 1px solid #374151;
+          transition: background-color 0.2s ease;
+          user-select: none;
+
+          /* Sticky/Fixed Positioning */
+          position: fixed;
+          top: 20px;
+          left: 20px;
+          z-index: 30; /* Keeps it above content, but below the dark overlay (40) */
+        }
+        .drawer-trigger:hover {
+          background-color: #374151;
+        }
+
+        /* 3. The dark background overlay */
+        .drawer-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          opacity: 0;
+          pointer-events: none; /* Ignore clicks when hidden */
+          transition: opacity 0.3s ease;
+          z-index: 40;
+        }
+
+        /* 4. The Drawer Panel itself */
+        .drawer-panel {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 280px;
+          height: 100vh;
+          background-color: #111827;
+          border-right: 1px solid #1f2937;
+          box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+          transform: translateX(-100%); /* Push completely off-screen */
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          z-index: 50;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* 5. Trigger the open states when the hidden checkbox is checked */
+        #drawer-toggle:checked ~ .drawer-overlay {
+          opacity: 1;
+          pointer-events: auto;
+        }
+        #drawer-toggle:checked ~ .drawer-panel {
+          transform: translateX(0);
+        }
+
+        /* 
+     * DRAWER INTERIOR STYLING 
+     */
+        .drawer-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 24px 20px;
+          border-bottom: 1px solid #1f2937;
+        }
+        .drawer-header h2 {
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #ffffff;
+        }
+
+        /* Close button inside the drawer */
+        .drawer-close {
+          color: #9ca3af;
+          font-size: 1.5rem;
+          line-height: 1;
+          cursor: pointer;
+          transition: color 0.2s ease;
+        }
+        .drawer-close:hover {
+          color: #ffffff;
+        }
+
+        /* Link list styling */
+        .drawer-links {
+          list-style: none;
+          margin: 0;
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .drawer-link {
+          display: block;
+          padding: 12px 16px;
+          color: #d1d5db;
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 500;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+        }
+        .drawer-link:hover {
+          background-color: #1f2937;
+          color: #ffffff;
+        }
+      </style>
+
+      <!-- 1. The Hidden State Controller -->
+      <input type="checkbox" id="drawer-toggle" />
+
+      <!-- 2. The Open Button -->
+      <label for="drawer-toggle" class="drawer-trigger">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        Menu
+      </label>
+
+      <!-- 3. The Dark Overlay Backdrop (Clicking it closes the drawer) -->
+      <label for="drawer-toggle" class="drawer-overlay"></label>
+
+      <!-- 4. The Drawer Layout Block -->
+      <aside class="drawer-panel">
+        <div class="drawer-header">
+          <h2>Studio Navigation</h2>
+          <label
+            for="drawer-toggle"
+            class="drawer-close"
+            aria-label="Close menu"
+            >&times;</label
+          >
+        </div>
+
+        <!-- JSON Compilation Target -->
+        <ul id="drawer-target" class="drawer-links"></ul>
+      </aside>
+
+      <!-- 5. The Compilation Script -->
+      <script>
+        // JSON Routing Data
+        const menuRoutes = [
+          { title: "Artists view (example)", href: "/artists/decibel_force" },
+          { title: "Roadmap", href: "/roadmap" },
+          { title: "Budget", href: "/budget" },
+        ];
+
+        /**
+         * Maps the JSON routing objects into pure HTML list items.
+         */
+        function compileMenu(items) {
+          const targetContainer = document.getElementById("drawer-target");
+          if (!targetContainer || !items.length) return;
+
+          const compiledHtml = items
+            .map(
+              (item) => `
+        <li>
+          <a href="${item.href}" class="drawer-link">${item.title}</a>
+        </li>
+      `,
+            )
+            .join("\n");
+
+          targetContainer.innerHTML = compiledHtml;
+        }
+
+        // Trigger target compilation immediately when document mounts
+        document.addEventListener("DOMContentLoaded", () => {
+          compileMenu(menuRoutes);
+        });
+      </script>
+    </div>
+    <!-- Static Wrapper Skeleton -->
+    <div class="pipeline-container">
+      <div class="pipeline-header">
+        <h1>Delivery Pipeline</h1>
+        <p>Implementation stages</p>
+      </div>
+
+      <!-- Compile Injection Point -->
+      <div id="pipeline-target" class="pipeline-stages"></div>
+    </div>
+
+    <script>
+      // 1. Core Source Data Matrix
+      const roadmapItems = [
+        {
+          title: "Private view",
+          description:
+            "Create interface for artist to select which songs should be made available to public",
+          status: "done",
+        },
+        {
+          title: "Public view",
+          description: "Create interface for general audience to see videos",
+          status: "done",
+        },
+        {
+          title: "Playlist view",
+          description:
+            "Create interface for general audience to select videos, put them in a playlist and share it",
+          status: "done",
+        },
+        {
+          title: "Audio only view",
+          description:
+            "Make switch for general audience to select audio only stream, and save on data. Specially important on mobile devices",
+          status: "done",
+        },
+        {
+          title: "Implement download",
+          description:
+            "Add the hability for artist to download their own performace videos, stems, mp3 and the source code alogside the data map to rebuild the site if necesary",
+          status: "pending",
+        },
+        {
+          title: "Implement authorization",
+          description:
+            "Use a one time token system to authorize artist to view their private page",
+          status: "pending",
+        },
+        {
+          title: "Implement recovery",
+          description:
+            "Make a script to rebuild the site from a json file that will be distributed to the every artist that downloads their videos from the site",
+          status: "pending",
+        },
+        {
+          title: "Implement 100% organic guarantee",
+          description:
+            "Since we have audio versions of the performances. We will add a traceability tag, that way when an artist get their mp3 from our site they can be authenticated and traced back to a real human performance that is totally unfakable by AI therefore making our files 100% certified organic",
+          status: "pending",
+        },
+        {
+          title: "Implement automatic loading",
+          description:
+            "Test and deploy camera and editing app to automatically upload new videos to the platform that are divided into segments, without needing extra effort from the videographer",
+          status: "pending",
+        },
+
+        {
+          title: "Implement audio recording app",
+          description:
+            "Test and deploy multi track recording app that can run on cheap computers. The objective is build a network of venues that are ready to record multitrack without needing to bring extra gear",
+          status: "pending",
+        },
+        {
+          title: "Improve desing of the website",
+          description:
+            "Make the site pretty but never sacrifice speed and be respectful of the users mobile data usage",
+          status: "pending",
+        },
+        {
+          title: "Launch private site (oct 2026)",
+          description:
+            "Launch private pages to get the artists authorization to make videos public",
+          status: "pending",
+        },
+        {
+          title: "Add educational content (oct 2026)",
+          description:
+            "We believe art aducation is one of the best investment a society can make. We want to gather the experiences and stories from our community so we can learn from each other",
+          status: "pending",
+        },
+        {
+          title: "Launch public streaming site (nov 2026)",
+          description:
+            "Launch version 1.0. Only splinerman's videos. This is to validate the technical design",
+          status: "pending",
+        },
+        {
+          title: "Launch public multi-track recording site (summer 2027)",
+          description:
+            "Make a web site like 'Uber for multitrack recording' where artist can connect to our multitrack recording system via web interface and get their stems automatically recorded and sent to their email",
+          status: "pending",
+        },
+        {
+          title: "Open the site to more videographers (fall 2027)",
+          description:
+            "Invite other videographers to upload live concert videos to the site. We will provide the tools so they can upload videos that are pre-segmented into songs and ready to be streamed",
+          status: "pending",
+        },
+      ];
+
+      /**
+       * 2. Compiles a single JSON block entry into HTML layout tokens.
+       */
+      function renderPipelineRow(item, isLast) {
+        const isDone = item.status === "done";
+
+        const badgeClass = isDone ? "status-done" : "status-pending";
+        const indicatorChar = isDone ? "✓" : "-";
+        const textState = isDone ? "done" : "pending";
+
+        // Drop the line divider element entirely if we hit the final row item
+        const connectorHtml = isLast
+          ? ""
+          : '<div class="connector-wire"></div>';
+
+        return `
+        <div class="pipeline-row">
+          <div class="node-column">
+            <div class="status-badge ${badgeClass}">${indicatorChar}</div>
+            ${connectorHtml}
+          </div>
+          <div class="stage-content">
+            <h3 class="stage-title ${textState}">${item.title}</h3>
+            <p class="stage-desc ${textState}">${item.description}</p>
+          </div>
+        </div>
+      `;
+      }
+
+      /**
+       * 3. Orchestration Compiler Loop Execution
+       */
+      function compilePipeline(items) {
+        const targetContainer = document.getElementById("pipeline-target");
+        if (!targetContainer || !items.length) return;
+
+        const compiledHtml = items
+          .map((item, index) => {
+            const isLast = index === items.length - 1;
+            return renderPipelineRow(item, isLast);
+          })
+          .join("\n");
+
+        targetContainer.innerHTML = compiledHtml;
+      }
+
+      // Trigger target compilation immediately when document mounts
+      document.addEventListener("DOMContentLoaded", () => {
+        compilePipeline(roadmapItems);
+      });
+    </script>
+  </body>
+</html>

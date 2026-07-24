@@ -185,11 +185,11 @@
   }
 
   .sidebar-item-card .item-thumbnail {
-    width: 120px;
+    width: 280px;
   }
 
   .sidebar-item-card .title-text {
-    font-size: 0.95rem;
+    font-size: 1.95rem;
     white-space: normal;
   }
 }

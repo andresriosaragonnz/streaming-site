@@ -3,11 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ding dong lounge - 12 Oct 24 | Live Archive</title>
+    <title>big fan - 12 Oct 24 | Live Archive</title>
     <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
-    <div class="menu">
+    <div class="studio-container" x-data="studioWorkspace">
+  <section class="player-column">
+  <div class="meta-title-card">
+    <div><div class="menu">
   <style>
     /* Baseline Wrapper (Invisible so it doesn't break main page layouts) */
     .menu {
@@ -219,19 +222,23 @@
     });
   </script>
 </div>
-<div class="studio-container" x-data="studioWorkspace">
-  <section class="player-column">
-  <div class="meta-title-card">
-    <div>{{menu}}</div>
+</div>
     <div class="meta-title-card-right">
-      <h2>ding dong lounge - 12 Oct 24</h2>
+      <h2>big fan - 12 Oct 24</h2>
+      <div class="toggle" @click="$store.review.togleMode()">
+        <input type="checkbox" />
+        <label></label>
+      </div>
     </div>
   </div>
 
-  <div class="video-player-mock">
-    <!-- Clean HTML5 Native Architecture targeting your R2 Bucket objects directly -->
+  <div
+    :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
+    style="position: relative; overflow: hidden; border-radius: 12px"
+  >
+    <!-- VIDEO PLAYER MODE (Visible when mode is true) -->
     <div
-      x-show="active.source"
+      x-show="$store.review.mode && active.source"
       style="width: 100%; height: 100%; background: #000"
     >
       <video
@@ -239,9 +246,47 @@
         controls
         playsinline
         preload="metadata"
-        :poster="active.heroImage"
         style="width: 100%; height: 100%; object-fit: contain; display: block"
       ></video>
+    </div>
+
+    <!-- MP3 AUDIO PLAYER MODE (Visible when mode is false) -->
+    <div
+      x-show="!$store.review.mode && active.source"
+      style="
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        background-color: #1a1a1a;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      "
+      :style="active.playerImage ? `background-image: url(${active.playerImage})` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+    >
+      <!-- Audio Player Controls Pinned to the Bottom -->
+      <div
+        style="
+          width: 100%;
+          padding: 16px;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          box-sizing: border-box;
+        "
+      >
+        <audio
+          id="r2-audio-player"
+          controls
+          preload="metadata"
+          style="width: 100%; max-width: 500px"
+        ></audio>
+      </div>
     </div>
 
     <!-- Empty Fallback Workspace State -->
@@ -253,33 +298,49 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          background-size: cover;
-          background-position: center;
+          background-color: #111;
         "
-        :style="active.heroImage ? `background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url(${active.heroImage})` : ''"
       >
         <div class="preview-badge">No Stream Active</div>
       </div>
     </template>
   </div>
 
-  <div class="meta-workspace-card">
+  <div
+  class="meta-workspace-card"
+  x-data="{ 
+    selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
+  }"
+>
   <div class="header-row">
     <div class="studio-controls-group">
       <div class="input-field-group">
-        <input
-          type="text"
-          x-model="active.title"
-          @input="$store.review.syncStore($store.review.currentIndex, active.title)"
-        />
+        <!-- 1. Bind to local component state variable instead of active.title -->
+        <select x-model="selectedPlaylist">
+          <!-- 2. Loop through your state dynamically, or keep them hardcoded -->
+          <template
+            x-for="(list, name) in $store.playlists.playlists"
+            :key="name"
+          >
+            <option :value="name" x-text="name"></option>
+          </template>
+        </select>
       </div>
 
+      <!-- 3. Pass the selected playlist target parameter straight to the method -->
       <button
-        @click="$store.review.toggleStatus($store.review.currentIndex)"
+        @click="$store.playlists.addActiveToPlaylist(selectedPlaylist)"
         type="button"
-        :class="active.status === 'public' ? 'btn-public' : 'btn-private'"
+        class="btn-public"
       >
-        <span x-text="active.status === 'public' ? 'Public' : 'Private'"></span>
+        <span>Add to playlist</span>
+      </button>
+      <button
+        @click="$store.playlists.generateShareLink(selectedPlaylist)"
+        type="button"
+        class="btn-public"
+      >
+        <span>Share playlist</span>
       </button>
     </div>
   </div>
@@ -339,17 +400,10 @@
         x-for="(seg, idx) in $store.review.segments"
         :key="seg.id || idx"
       >
-        <div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
+        <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <div
     class="item-thumbnail"
-    :style="`background-image: url('${seg.cardImage}')`"
+    :style="`background-image: url('/screenshots/card/${seg.id}.jpg')`"
   ></div>
 
   <div class="item-meta">
@@ -358,34 +412,7 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
-    </div>
-  </div>
-</div>
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('${seg.cardImage}')`"
-  ></div>
-
-  <div class="item-meta">
-    <div class="title-text">
-      <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
-    </div>
-    <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
+      <span x-text="seg.duration"></span>
     </div>
   </div>
 </div>
@@ -407,11 +434,10 @@
 </aside>
 
 </div>
-
 <script type="application/json" id="studio-segments-data">
-  [{"id":"yIwsfqcdM","artistId":"decibel_force","title":"segment_0","index":"0","artistName":"decibel_force","eventDate":"20241012","venueName":"ding_dong_lounge","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/yIwsfqcdM.jpg","formattedTitle":"segment 0","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8"},{"id":"ayxQFAxzZ","artistId":"decibel_force","title":"segment_1","artistName":"decibel_force","eventDate":"20241012","venueName":"ding_dong_lounge","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/ayxQFAxzZ.jpg","formattedTitle":"segment 1","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/ayxQFAxzZ/output.m3u8"}]
+  [{"id":"yIwsfqcdM","artistId":"decibel_force","title":"segment_0","index":"0","artistName":"decibel_force","eventDate":"20241012","venueName":"ding_dong_lounge","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/yIwsfqcdM.jpg","formattedTitle":"segment 0","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8"},{"id":"ayxQFAxzZ","artistId":"decibel_force","title":"segment_1","artistName":"decibel_force","eventDate":"20241012","venueName":"ding_dong_lounge","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/ayxQFAxzZ.jpg","formattedTitle":"segment 1","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/ayxQFAxzZ/output.m3u8"},{"id":"T2Sl2e6zz","artistId":"decibel_force","title":"segment_0","index":"0","artistName":"decibel_force","eventDate":"20241012","venueName":"big_fan","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-big_fan-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/T2Sl2e6zz.jpg","formattedTitle":"segment 0","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8"}]
 </script>
 
   </body>
-  <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/publicApp.js"></script>
 </html>
