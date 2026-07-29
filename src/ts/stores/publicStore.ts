@@ -1,6 +1,6 @@
-import { Segment, PlaylistsMap } from "../types";
-import { getActiveSegment, parseSegmentsData } from "../utils/segmentUtils";
-import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils";
+import { Segment, PlaylistsMap } from "../types.js";
+import { parseSegmentsData } from "../utils/segmentUtils.js";
+import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils.js";
 
 export function initAlpineStores(Alpine: any): void {
   // 1. REGISTER publicWorkspace DATA COMPONENT (Watcher & Hydration Hub)
@@ -40,14 +40,6 @@ export function initAlpineStores(Alpine: any): void {
 
     get active(): Segment {
       const store = Alpine.store("review");
-      if (!store || !store.segments || !store.segments[store.currentIndex]) {
-        return {
-          id: "",
-          title: "",
-          cardImage: "/screenshots/card/card-fallback.jpg",
-          status: "public",
-        };
-      }
       return store.segments[store.currentIndex];
     },
   }));
