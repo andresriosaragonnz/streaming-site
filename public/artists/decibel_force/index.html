@@ -8,7 +8,7 @@
   </head>
   <body>
     
-    <div class="menu">
+    <div style="position:fixed;z-index:20;padding:4rem"><div class="menu">
   <style>
     /* Baseline Wrapper (Invisible so it doesn't break main page layouts) */
     .menu {
@@ -220,13 +220,52 @@
     });
   </script>
 </div>
+</div>
+    <div class="artist-hero">
+  <!-- 1. Responsive Picture Stack -->
+  <picture class="hero-picture">
+    <!-- Mobile Portrait (4:5) (< 640px) -->
+    <source
+      type="image/avif"
+      media="(max-width: 639px)"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_mobile.avif"
+    />
+    <source
+      type="image/webp"
+      media="(max-width: 639px)"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_mobile.webp"
+    />
 
-    <div
-  class="artist-hero"
-  id="artist-hero"
-  style="background-image: linear-gradient(rgba(4, 7, 20, 0.2), rgba(4, 7, 20, 1)), url('https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/hero/ayxQFAxzZ.jpg')"
->
-  <div class="hero-overlay" id="artist-hero">
+    <source
+      type="image/avif"
+      media="(max-width: 1023px)"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_tablet.avif"
+    />
+    <source
+      type="image/webp"
+      media="(max-width: 1023px)"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_tablet.webp"
+    />
+
+    <!-- Desktop Master (16:9) (>= 1024px) -->
+    <source type="image/avif" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.avif" />
+    <source type="image/webp" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.webp" />
+
+    <!-- Legacy Fallback JPG -->
+    <img
+      src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.jpg"
+      alt="decibel force"
+      class="hero-img"
+      loading="eager"
+    />
+  </picture>
+
+  <!-- 2. Independent Gradient Overlay for Readability -->
+  <div class="hero-gradient-overlay"></div>
+
+  <!-- 3. Foreground Content Overlay (Aligned to Bottom) -->
+
+  <div class="hero-overlay">
     <a href="/" class="btn-back">← Back to Archive</a>
     <h1 class="capitalize-words">decibel force</h1>
     <p class="performance-count">2 Documented</p>
@@ -235,24 +274,46 @@
 
     <main class="performance-grid">
     <a
-  href="/artists/decibel_force/private/ding_dong_lounge-20241012"
+  href="/artists/decibel_force/ding_dong_lounge-20241012"
   class="card"
   style="text-decoration: none; color: inherit"
 >
-  <div class="card-thumbnail" style="background-image: url('https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/ayxQFAxzZ.jpg')"></div>
+  <picture class="card-thumbnail">
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card.avif" type="image/avif" />
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card.webp" type="image/webp" />
+  <img
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card.jpg"
+    alt="ding dong lounge - 12 Oct 24"
+    loading="lazy"
+    style="width: 100%; height: 100%; object-fit: cover; display: block"
+  />
+</picture>
+
+
   <div class="card-metadata">
-    <h3 class="capitalize-words">ding_dong_lounge</h3>
+    <h3 class="capitalize-words h3">ding dong lounge</h3>
     <p class="date">12 Oct 24</p>
   </div>
 </a>
 <a
-  href="/artists/decibel_force/private/big_fan-20241012"
+  href="/artists/decibel_force/big_fan-20241012"
   class="card"
   style="text-decoration: none; color: inherit"
 >
-  <div class="card-thumbnail" style="background-image: url('https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/T2Sl2e6zz.jpg')"></div>
+  <picture class="card-thumbnail">
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card.avif" type="image/avif" />
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card.webp" type="image/webp" />
+  <img
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card.jpg"
+    alt="big fan - 12 Oct 24"
+    loading="lazy"
+    style="width: 100%; height: 100%; object-fit: cover; display: block"
+  />
+</picture>
+
+
   <div class="card-metadata">
-    <h3 class="capitalize-words">big_fan</h3>
+    <h3 class="capitalize-words h3">big fan</h3>
     <p class="date">12 Oct 24</p>
   </div>
 </a>

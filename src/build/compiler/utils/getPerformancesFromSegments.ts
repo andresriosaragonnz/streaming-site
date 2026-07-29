@@ -1,41 +1,46 @@
-import { dateFromString } from "../../../utils/formatDates.js";
+import { dateFromString } from "./formatDates.js";
 import { getCardImage } from "../utils/getCardImage.js";
-import { getVideoSource } from "../utils/getVideoSource.js";
 import { getRandomIndex } from "../utils/getRandomIndex.js";
 
 const getPerformancesFromSegments = (segments: any) => {
   const performancesIndex = {} as any;
   for (const segment of segments) {
-    const { artistName, venueName, eventDate, id, performance, title } =
-      segment;
-    segment.cardImage = getCardImage(id);
-    segment.formattedTitle = title.replaceAll("_", " ");
-    segment.source = getVideoSource(id);
+    const {
+      artistName,
+      venueName,
+      eventDate,
+      id,
+      performance,
+      heroImage,
+      cardImage,
+      formattedDate,
+    } = segment;
     const currentPerformance = performancesIndex[performance];
     if (currentPerformance) {
-      currentPerformance.images.push(id);
+      currentPerformance.cardImages.push(cardImage);
+      currentPerformance.heroImages.push(heroImage);
       currentPerformance.segments.push(segment);
     } else {
-      const date = eventDate
-        ? dateFromString(eventDate).formated
-        : "Undated Tapes";
-      performancesIndex[segment.performance] = {
+      performancesIndex[performance] = {
         artistName: encodeURIComponent(artistName),
         link: `${venueName}-${eventDate}`,
         venueName: venueName,
         formattedVenueName: venueName.replaceAll("_", " "),
-        date,
         eventDate,
+        formattedDate,
         images: [id],
         segments: [segment],
+        heroImages: [heroImage],
+        cardImages: [cardImage],
       };
     }
   }
   const performances = Object.values(performancesIndex).map(
     (performance: any) => {
-      const { images } = performance;
-      const randomIndex = getRandomIndex(images);
-      performance.image = getCardImage(images[randomIndex]);
+      const { heroImages, cardImages } = performance;
+      const randomIndex = getRandomIndex(heroImages);
+      performance.heroImage = heroImages[randomIndex];
+      performance.cardImage = cardImages[randomIndex];
       return performance;
     },
   );

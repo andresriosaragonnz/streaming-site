@@ -1,15 +1,28 @@
 // public/js/app.js
-
+import { registerCarousel } from "./carousel.js";
 document.addEventListener("alpine:init", () => {
   const Alpine = window.Alpine;
-
+  registerCarousel(Alpine);
   Alpine.data("studioWorkspace", () => ({
     init() {
       this.$nextTick(() => {
         const dataEl = document.getElementById("studio-segments-data");
         if (dataEl) {
-          this.$store.review.segments = JSON.parse(dataEl.textContent);
+          const initialSegments = JSON.parse(dataEl.textContent);
+
+          // Populate segments
+          this.$store.review.segments = initialSegments;
           this.$store.review.currentIndex = 0;
+
+          // Capture initial status snapshot (keyed by ID or array index)
+          this.$store.review.initialStatuses = initialSegments.reduce(
+            (acc, seg, idx) => {
+              acc[seg.id ?? idx] = seg.status;
+              return acc;
+            },
+            {},
+          );
+
           console.log("✅ Private workspace store hydrated successfully.");
 
           if (window.setupMediaPlayback) {
@@ -51,8 +64,33 @@ document.addEventListener("alpine:init", () => {
   // REGISTER DEDICATED PRIVATE ACTIONS REGION
   Alpine.store("review", {
     segments: [],
+    initialStatuses: {},
     mode: true,
     currentIndex: 0,
+    isCommitModalOpen: false,
+
+    openCommitModal() {
+      if (this.hasStatusChanged()) {
+        this.isCommitModalOpen = true;
+      }
+    },
+
+    closeCommitModal() {
+      this.isCommitModalOpen = false;
+    },
+
+    submitCommit() {
+      const changed = this.getChangedSegments();
+      console.log("🚀 Committing changes:", changed);
+
+      // Update initialStatuses snapshot to match new committed values
+      changed.forEach((seg, idx) => {
+        const key = seg.id ?? idx;
+        this.initialStatuses[key] = seg.status;
+      });
+
+      this.closeCommitModal();
+    },
 
     togleMode() {
       this.mode = !this.mode;
@@ -65,6 +103,26 @@ document.addEventListener("alpine:init", () => {
           currentStatus === "public" ? "private" : "public";
         this.broadcastChange(this.segments[targetIdx]);
       }
+    },
+
+    hasStatusChanged() {
+      return this.segments.some((seg, idx) => {
+        const key = seg.id ?? idx;
+        return seg.status !== this.initialStatuses[key];
+      });
+    },
+
+    getPublicSegments() {
+      const changed = this.segments.filter((seg) => seg.status === "public");
+      return changed;
+    },
+
+    getCount() {
+      return `public:${this.segments.filter((seg) => seg.status === "public")?.length}`;
+    },
+
+    getCountPrivate() {
+      return `private:${this.segments.filter((seg) => seg.status === "private").length}`;
     },
 
     syncStore(targetIdx, updatedTitle) {

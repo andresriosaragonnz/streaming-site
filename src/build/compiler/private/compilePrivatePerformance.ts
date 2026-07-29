@@ -1,7 +1,7 @@
 import { writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import { loadComponent } from "../../../utils/component.js";
-import { dateFromString } from "../../../utils/formatDates.js";
+import { dateFromString } from "../utils/formatDates.js";
 import {
   LayoutProps,
   PlayerProps,
@@ -9,7 +9,8 @@ import {
   StudioProps,
   Performance,
 } from "../../types.js";
-const Menu = loadComponent("Menu.html");
+const Menu = loadComponent("/components/Menu.html");
+const Modal = loadComponent("/private/templates/CommitModal.html");
 const Layout = loadComponent<LayoutProps>(
   "/private/templates/PrivateStudioLayout.html",
 );
@@ -46,10 +47,13 @@ export const compilePrivatePerformances = (performances: any): void => {
 
     const displayTitle = `${cleanVenue} - ${cleanDate.formated}`;
     const formattedJson = JSON.stringify(segments);
-    const ControlSectionHtml = ControlSection({});
+    const CommitModalHtml = Modal({});
+    const ControlSectionHtml = ControlSection({ modal: CommitModalHtml });
+    const menuHtml = Menu({});
     const playerHtml = ViewPlayer({
       studioTitle: displayTitle,
       controls: ControlSectionHtml,
+      menu: menuHtml,
     });
     const cardsHtml = segments.map(SegmentCard).join("");
     const sidebarHtml = ViewSidebar({ cards: cardsHtml });
@@ -58,27 +62,13 @@ export const compilePrivatePerformances = (performances: any): void => {
       playerPanel: playerHtml,
       sidebarPanel: sidebarHtml,
     });
-    const menuHtml = Menu({});
     const htmlContent = Layout({
       pageTitle: displayTitle,
-      bodyContent: `${menuHtml}${dynamicStudioHtml}`,
+      bodyContent: `${dynamicStudioHtml}`,
     });
     const outputPath = join(outputDir, `index.html`);
     writeFileSync(outputPath, htmlContent, "utf8");
   }
 
   return;
-  const { venueName, eventDate, segments, id } = performance;
-
-  // Simply serialize the raw collection array directly without regex mutations
-  const formattedJson = JSON.stringify(
-    segments.map((segment) => ({
-      ...segments,
-      source: `https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/${segment.id}/output.m3u8`,
-    })),
-  );
-
-  const sidebarHtml = ViewSidebar({ cards: cardsHtml });
-
-  // Compose all components cleanly
 };

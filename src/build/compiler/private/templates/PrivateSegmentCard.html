@@ -3,13 +3,10 @@
   class="sidebar-item-card"
   :class="[
     $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
+    seg.status === 'private' ? 'sidebar-item-card-private' : 'sidebar-item-card'
   ]"
 >
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('${seg.cardImage}')`"
-  ></div>
+  {{> components/common/SegmentCardImage.html}}
 
   <div class="item-meta">
     <div class="title-text">

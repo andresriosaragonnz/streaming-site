@@ -1,8 +1,20 @@
 <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.id}.jpg')`"
-  ></div>
+  <!-- Responsive Picture replacing background-image -->
+  <picture class="item-thumbnail">
+    <!-- AVIF format (first priority) -->
+    <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
+
+    <!-- WebP format (second priority) -->
+    <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
+
+    <!-- Legacy JPEG Fallback -->
+    <img
+      :src="`${seg.cardImage}.jpg`"
+      :alt="seg.title"
+      loading="lazy"
+      style="width: 100%; height: 100%; object-fit: cover; display: block"
+    />
+  </picture>
 
   <div class="item-meta">
     <div class="title-text">
@@ -10,7 +22,7 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.duration"></span>
+      <span x-text="seg.formatedDuration"></span>
     </div>
   </div>
 </div>

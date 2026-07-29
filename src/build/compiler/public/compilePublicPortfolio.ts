@@ -5,21 +5,20 @@ import { loadComponent } from "../../../utils/component.js";
 import type { CardProps, HeroProps, LayoutProps } from "../../types.js";
 import { getArtistFromSegment } from "../utils/getArtistFromSegment.js";
 
-const Menu = loadComponent("Menu.html");
-const Layout = loadComponent<LayoutProps>("BaseLayout.html");
-const Hero = loadComponent<HeroProps>("Hero.html");
-const PrivatePerformanceCard = loadComponent<CardProps>(
-  "/private/templates/PrivatePerformanceCard.html",
+const Menu = loadComponent("/components/Menu.html");
+const Layout = loadComponent<LayoutProps>("/components/BaseLayout.html");
+const Hero = loadComponent<HeroProps>("/components/Hero.html");
+const PublicPerformanceCard = loadComponent<CardProps>(
+  "/public/templates/PublicPerformanceCard.html",
 );
 
 export const compilePublicPortfolio = (
-  segments: any,
+  artist: any,
   performances: any,
 ): void => {
-  const artist = getArtistFromSegment(segments);
   const outputDir = join(process.cwd(), "public/artists", artist.id);
   mkdirSync(outputDir, { recursive: true });
-  const gridHtml = performances.map(PrivatePerformanceCard).join("");
+  const gridHtml = performances.map(PublicPerformanceCard).join("");
   const heroHtml = Hero({
     image: artist.image,
     title: artist.name.replaceAll("_", " "),
@@ -29,7 +28,7 @@ export const compilePublicPortfolio = (
   const htmlContent = Layout({
     pageTitle: artist.name,
     bodyContent: `
-    ${menuHtml}
+    <div style="position:fixed;z-index:20;padding:4rem">${menuHtml}</div>
     ${heroHtml}
     <main class="performance-grid">
     ${gridHtml}
@@ -38,7 +37,6 @@ export const compilePublicPortfolio = (
   });
 
   const outputPath = join(outputDir, `index.html`);
-  console.log({ outputPath });
   writeFileSync(outputPath, htmlContent, "utf8");
   return;
 };

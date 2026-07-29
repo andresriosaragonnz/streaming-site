@@ -1,61 +1,101 @@
 #!/bin/bash
 
 # Configuration
-INPUT_DIR="./src/static/screenshots"
-OUTPUT_DIR="./public/screenshots"
-FULLSCREEN_DIR="$OUTPUT_DIR/full"
-CARD_DIR="$OUTPUT_DIR/cards"
+INPUT_DIR="./devAssets/images/original"
+OUTPUT_DIR="./devAssets/images/compressed"
 
-# 1. Initialize environment directories
-mkdir -p "$FULLSCREEN_DIR" "$CARD_DIR"
+mkdir -p "$OUTPUT_DIR"
 
 if [ ! -d "$INPUT_DIR" ]; then
     echo "❌ Error: Source directory '$INPUT_DIR' does not exist."
-    echo "Please execute this script from your project's root folder."
     exit 1
 fi
 
-echo "🚀 Starting Pixel-Sampling Guard-Rail Pipeline..."
+echo "🚀 Starting Responsive Multi-Format Generation Pipeline..."
 echo "📂 Source directory: $INPUT_DIR"
+echo "📂 Output directory: $OUTPUT_DIR"
 echo "--------------------------------------------------------"
 
-# 2. Process all image assets
-find -L "$INPUT_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" \) | while read -r img; do
-    filename=$(basename "$img")
-    echo "Analyzing: $filename"
+export_variants() {
+    local src_file="$1"
+    local base_output="$2"
+    local resize_geom="$3"
+    local crop_geom="$4"
 
-    # Step 1: Sample a 1-pixel high line across the frame width at Y=20
-    # Returns 1 if the line has very low brightness (mean < 15%) and low variation (std dev < 5%)
-    IS_LETTERBOX=$(convert "$img" -crop 9999x1+0+20 -format "%[fx:(mean<0.15 && standard_deviation<0.05)?1:0]" info:)
+    if [ -n "$crop_geom" ]; then
+        # Process with crop (Mobile 4:5)
+        convert "$src_file" -gravity center -crop "$crop_geom" +repage -resize "$resize_geom" -strip -quality 65 "${base_output}.avif" < /dev/null
+        convert "$src_file" -gravity center -crop "$crop_geom" +repage -resize "$resize_geom" -strip -quality 75 "${base_output}.webp" < /dev/null
+        convert "$src_file" -gravity center -crop "$crop_geom" +repage -resize "$resize_geom" -strip -quality 80 "${base_output}.jpg" < /dev/null
+    else
+        # Process without crop (Desktop / Tablet / Card)
+        convert "$src_file" -resize "$resize_geom" -strip -quality 65 "${base_output}.avif" < /dev/null
+        convert "$src_file" -resize "$resize_geom" -strip -quality 75 "${base_output}.webp" < /dev/null
+        convert "$src_file" -resize "$resize_geom" -strip -quality 80 "${base_output}.jpg" < /dev/null
+    fi
+}
+
+# Enable nullglob to safely handle empty matches
+shopt -s nullglob
+shopt -s globstar
+
+# Collect all matching files into an array
+files=("$INPUT_DIR"/*.jpg "$INPUT_DIR"/*.jpeg "$INPUT_DIR"/*.png "$INPUT_DIR"/*.JPG "$INPUT_DIR"/*.PNG)
+
+if [ ${#files[@]} -eq 0 ]; then
+    echo "⚠️ No image files found in $INPUT_DIR"
+    exit 0
+fi
+
+for img in "${files[@]}"; do
+    [ -f "$img" ] || continue
+    
+    filename=$(basename "$img")
+    base_name="${filename%.*}"
+
+    echo "Processing: $filename"
+
+    # Detect Anamorphic Letterboxing (Sample Y=20 line)
+    # Redirect < /dev/null to ensure convert doesn't drain stdin
+    IS_LETTERBOX=$(convert "$img" -crop 9999x1+0+20 -format "%[fx:(mean<0.15 && standard_deviation<0.05)?1:0]" info: < /dev/null)
+
+    MASTER_TMP="/tmp/master_${base_name}.jpg"
 
     if [ "$IS_LETTERBOX" -eq 1 ]; then
-        echo "   -> 🎞️ Anamorphic detected. Zooming and cropping center to full 16:9..."
-        
-        # Surgical Center Crop: Extracts a 1422x800 sweet-spot from the center.
-        # This completely drops the 140px black bars on top/bottom and pulls the sides in to match 16:9.
+        echo "   -> 🎞️ Anamorphic letterbox detected. Applying surgical center crop..."
         convert "$img" \
                 -gravity center \
-                -crop 1422x800+0+0 +repage \
-                -resize 1920x1080 \
-                "$FULLSCREEN_DIR/$filename"
+                -crop 1138x640+142+80 +repage \
+                -resize 1920x1080! \
+                -strip -quality 92 \
+                "$MASTER_TMP" < /dev/null
     else
-        echo "   -> 📺 Standard 16:9 detected. Normalizing asset..."
-        # If it's already full-frame, just resize natively to fit our target master layout
+        echo "   -> 📺 Standard 16:9 asset detected. Normalizing..."
         convert "$img" \
-                -resize 1920x1080 \
-                "$FULLSCREEN_DIR/$filename"
+                -resize 1920x1080! \
+                -strip -quality 92 \
+                "$MASTER_TMP" < /dev/null
     fi
 
-    # Step 2: Generate the lightweight Card asset (Max 340px horizontal) from our clean master
-    convert "$FULLSCREEN_DIR/$filename" -resize 340x "$CARD_DIR/$filename"
-    
-    echo "   -> Base assets successfully updated."
+    # VARIANT 1: Desktop Master (16:9 - 1920x1080)
+    export_variants "$MASTER_TMP" "$OUTPUT_DIR/${base_name}_desktop" "1920x1080!" ""
+    echo "   -> 🖥️ Exported ${base_name}_desktop (.avif, .webp, .jpg)"
+
+    # VARIANT 2: Tablet (16:9 - 1280x720)
+    export_variants "$MASTER_TMP" "$OUTPUT_DIR/${base_name}_tablet" "1280x720" ""
+    echo "   -> 💻 Exported ${base_name}_tablet (.avif, .webp, .jpg)"
+
+    # VARIANT 3: YouTube Sidebar Card (16:9 - 336x188 @ 2x Retina)
+    export_variants "$MASTER_TMP" "$OUTPUT_DIR/${base_name}_card" "336x188!" ""
+    echo "   -> 🃏 Exported ${base_name}_card (.avif, .webp, .jpg)"
+
+    # VARIANT 4: Mobile Portrait (4:5 - 800x1000)
+    export_variants "$MASTER_TMP" "$OUTPUT_DIR/${base_name}_mobile" "800x1000" "864x1080+0+0"
+    echo "   -> 📱 Exported ${base_name}_mobile (.avif, .webp, .jpg)"
+
+    rm -f "$MASTER_TMP"
+    echo "   ✓ Successfully processed $filename"
 done
 
 echo "--------------------------------------------------------"
-echo "✨ Pipeline complete! Clean files populated in $OUTPUT_DIR"
-
-
-mkdir -p compressed && for f in *.png; do [ -f "$f" ] && convert "$f" -strip -quality 65 "compressed/${f%.*}.jpg" && convert "$f" -resize 350x -quality 75 "compressed/${f%.*}_card.jpg"; done
-
-for f in *.png; do [ -f "$f" ] && convert "$f" -strip -quality 65 "compressed/${f%.*}.jpg" ; done
+echo "✨ Pipeline complete! All files processed in $OUTPUT_DIR"

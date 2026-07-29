@@ -1,8 +1,8 @@
 // public/js/publicApp.js
-
+import { registerCarousel } from "./carousel.js";
 document.addEventListener("alpine:init", () => {
   const Alpine = window.Alpine;
-
+  registerCarousel(Alpine);
   Alpine.data("studioWorkspace", () => ({
     init() {
       this.$nextTick(() => {
@@ -75,7 +75,7 @@ document.addEventListener("alpine:init", () => {
           .replace(/\//g, "_")
           .replace(/=+$/, "");
 
-        const shareUrl = `${window.location.origin}/playlist/index.html?share=${base64UrlSafe}`;
+        const shareUrl = `${window.location.origin}/playlist?share=${base64UrlSafe}`;
         navigator.clipboard.writeText(shareUrl).then(() => {
           alert("copied to clipboard");
         });

@@ -5,18 +5,17 @@ import { loadComponent } from "../../../utils/component.js";
 import type { CardProps, HeroProps, LayoutProps } from "../../types.js";
 import { getArtistFromSegment } from "../utils/getArtistFromSegment.js";
 
-const Menu = loadComponent("Menu.html");
-const Layout = loadComponent<LayoutProps>("BaseLayout.html");
-const Hero = loadComponent<HeroProps>("Hero.html");
+const Menu = loadComponent("/components/Menu.html");
+const Layout = loadComponent<LayoutProps>("/components/BaseLayout.html");
+const Hero = loadComponent<HeroProps>("/components/Hero.html");
 const PrivatePerformanceCard = loadComponent<CardProps>(
   "/private/templates/PrivatePerformanceCard.html",
 );
 
 export const compilePrivateDashboard = (
-  segments: any,
+  artist: any,
   performances: any,
 ): void => {
-  const artist = getArtistFromSegment(segments);
   const outputDir = join(process.cwd(), "public/artists", artist.id, "private");
   mkdirSync(outputDir, { recursive: true });
   const gridHtml = performances.map(PrivatePerformanceCard).join("");
@@ -29,7 +28,7 @@ export const compilePrivateDashboard = (
   const htmlContent = Layout({
     pageTitle: artist.name,
     bodyContent: `
-    ${menuHtml}
+    <div style="position:fixed;z-index:20;padding:4rem">${menuHtml}</div>
     ${heroHtml}
     <main class="performance-grid">
     ${gridHtml}

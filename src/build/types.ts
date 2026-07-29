@@ -65,6 +65,7 @@ interface LayoutProps {
 interface PlayerProps {
   studioTitle: string;
   controls: string;
+  menu: string;
 }
 
 interface StudioProps {

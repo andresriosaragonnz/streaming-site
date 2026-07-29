@@ -14,4 +14,6 @@
 @import "./components/_cards.css";
 @import "./components/_carousel-sidebar.css";
 @import "./components/_controls.css";
-@import "./components/_buttons-status.css";
+@import "./components/_PrivatePlayerControls.css";
+@import "./components/_modal.css";
+@import "./components/_player.css";

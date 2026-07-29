@@ -63,14 +63,23 @@
   scroll-snap-align: center;
   background: var(--bg-card);
 }
+.sidebar-item-card-private {
+  background: var(--bg-card-private);
+}
 
+.sidebar-item-card-private:hover {
+  background: var(--bg-card-private-private);
+}
+
+.item-active-highlight {
+  background: var(--bg-selected);
+}
 .sidebar-item-card .item-thumbnail {
-  width: 100%;
-  aspect-ratio: 16/9;
-  background-size: cover;
-  background-position: center;
-  border-radius: 4px;
-  flex-shrink: 0;
+  display: block;
+  width: 100%; /* Or fixed thumbnail width if inside a sidebar list */
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--bg-card); /* Fallback dark loading placeholder */
 }
 
 .sidebar-item-card .item-meta {

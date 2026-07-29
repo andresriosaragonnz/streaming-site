@@ -236,74 +236,49 @@
     :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
     style="position: relative; overflow: hidden; border-radius: 12px"
   >
-    <!-- VIDEO PLAYER MODE (Visible when mode is true) -->
     <div
       x-show="$store.review.mode && active.source"
       style="width: 100%; height: 100%; background: #000"
     >
-      <video
-        id="r2-stream-player"
-        controls
-        playsinline
-        preload="metadata"
-        style="width: 100%; height: 100%; object-fit: contain; display: block"
-      ></video>
+      <div x-show="active.source" style="width: 100%; height: 100%; background: #000">
+  <video
+    id="r2-stream-player"
+    controls
+    playsinline
+    preload="metadata"
+    :poster="`${active.heroImage}_desktop.jpg`"
+    style="width: 100%; height: 100%; object-fit: contain; display: block"
+  ></video>
+</div>
+
     </div>
 
-    <!-- MP3 AUDIO PLAYER MODE (Visible when mode is false) -->
     <div
       x-show="!$store.review.mode && active.source"
-      style="
-        width: 100%;
-        height: 100%;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        background-color: #1a1a1a;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-      "
-      :style="active.playerImage ? `background-image: url(${active.playerImage})` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+      class="audio-player"
+      :style="active.heroImage ? `background-image: url(${active.heroImage}_desktop.jpg)` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
     >
       <!-- Audio Player Controls Pinned to the Bottom -->
-      <div
-        style="
-          width: 100%;
-          padding: 16px;
-          background: rgba(0, 0, 0, 0.6);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          box-sizing: border-box;
-        "
-      >
-        <audio
-          id="r2-audio-player"
-          controls
-          preload="metadata"
-          style="width: 100%; max-width: 500px"
-        ></audio>
-      </div>
-    </div>
+      <div class="audio-player">
+  <!-- Cassette Artwork Layer -->
+  <img
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/cassete_icon.jpg"
+    alt="Audio Player Cover"
+    class="audio-player-hero"
+  />
 
-    <!-- Empty Fallback Workspace State -->
-    <template x-if="!active.source">
-      <div
-        style="
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #111;
-        "
-      >
-        <div class="preview-badge">No Stream Active</div>
-      </div>
-    </template>
+  <!-- Audio Controls Overlay -->
+  <div class="audio-player-controls">
+    <audio
+      id="r2-audio-player"
+      :src="active.sourceMp3"
+      controls
+      style="width: 100%"
+    ></audio>
+  </div>
+</div>
+
+    </div>
   </div>
 
   <div
@@ -347,39 +322,8 @@
 </div>
 
 </section>
- <!-- src/templates/panels/ReviewSidebar.html -->
-<aside class="playlist-sidebar">
-  <div
-    class="carousel-wrapper"
-    x-data="{ 
-      canScrollLeft: false, 
-      canScrollRight: false,
-      checkScroll() {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        this.canScrollLeft = el.scrollLeft > 5;
-        this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 5;
-      },
-      scroll(direction) {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        const scrollAmount = 252;
-        el.scrollBy({ 
-          left: direction === 'left' ? -scrollAmount : scrollAmount, 
-          behavior: 'smooth' 
-        });
-      }
-    }"
-    x-init="
-      $nextTick(() => { checkScroll(); });
-      window.addEventListener('resize', () => checkScroll());
-      
-      if (window.ResizeObserver) {
-        const observer = new ResizeObserver(() => checkScroll());
-        observer.observe($refs.scrollList);
-      }
-    "
-  >
+ <aside class="playlist-sidebar">
+  <div class="carousel-wrapper" x-data="carousel">
     <button
       type="button"
       class="carousel-nav-btn nav-left"
@@ -401,10 +345,22 @@
         :key="seg.id || idx"
       >
         <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
-  <div
-    class="item-thumbnail"
-    :style="`background-image: url('/screenshots/card/${seg.id}.jpg')`"
-  ></div>
+  <!-- Responsive Picture replacing background-image -->
+  <picture class="item-thumbnail">
+    <!-- AVIF format (first priority) -->
+    <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
+
+    <!-- WebP format (second priority) -->
+    <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
+
+    <!-- Legacy JPEG Fallback -->
+    <img
+      :src="`${seg.cardImage}.jpg`"
+      :alt="seg.title"
+      loading="lazy"
+      style="width: 100%; height: 100%; object-fit: cover; display: block"
+    />
+  </picture>
 
   <div class="item-meta">
     <div class="title-text">
@@ -412,7 +368,35 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.duration"></span>
+      <span x-text="seg.formatedDuration"></span>
+    </div>
+  </div>
+</div>
+<div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
+  <!-- Responsive Picture replacing background-image -->
+  <picture class="item-thumbnail">
+    <!-- AVIF format (first priority) -->
+    <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
+
+    <!-- WebP format (second priority) -->
+    <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
+
+    <!-- Legacy JPEG Fallback -->
+    <img
+      :src="`${seg.cardImage}.jpg`"
+      :alt="seg.title"
+      loading="lazy"
+      style="width: 100%; height: 100%; object-fit: cover; display: block"
+    />
+  </picture>
+
+  <div class="item-meta">
+    <div class="title-text">
+      <!-- FIXED: Linked to the dynamic, reactive title string -->
+      <span x-text="seg.title"></span>
+    </div>
+    <div class="title-text">
+      <span x-text="seg.formatedDuration"></span>
     </div>
   </div>
 </div>
@@ -435,7 +419,7 @@
 
 </div>
 <script type="application/json" id="studio-segments-data">
-  [{"id":"yIwsfqcdM","artistId":"decibel_force","title":"segment_0","index":"0","artistName":"decibel_force","eventDate":"20241012","venueName":"ding_dong_lounge","startTime":0,"duration":360,"hash":"sha256-8f43c08b2bc96173d1222f2812d4d97f268b8a0a1a0f8821017b203c90aefd6f","performance":"decibel_force-ding_dong_lounge-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/yIwsfqcdM.jpg","formattedTitle":"segment 0","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8"},{"id":"ayxQFAxzZ","artistId":"decibel_force","title":"segment_1","artistName":"decibel_force","eventDate":"20241012","venueName":"ding_dong_lounge","index":"1","startTime":360,"duration":360,"hash":"sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1","performance":"decibel_force-ding_dong_lounge-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/ayxQFAxzZ.jpg","formattedTitle":"segment 1","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/ayxQFAxzZ/output.m3u8"},{"id":"T2Sl2e6zz","artistId":"decibel_force","title":"segment_0","index":"0","artistName":"decibel_force","eventDate":"20241012","venueName":"big_fan","startTime":720,"duration":360,"hash":"sha256-fd304e8d2bb56fa2b88fce71cf7d853b0dfae63b8d4f45a75cfdd17fa4bb529e","performance":"decibel_force-big_fan-20241012","status":"public","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/card/T2Sl2e6zz.jpg","formattedTitle":"segment 0","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8"}]
+  [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"big fan","id":"T2Sl2e6zz","performance":"decibel_force-big_fan-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/T2Sl2e6zz.mp3","title":"segment_0","venueName":"big_fan","status":"public"},{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 1","formattedVenue":"big fan","id":"YJkE29oDn","performance":"decibel_force-big_fan-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/YJkE29oDn/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/YJkE29oDn.mp3","title":"segment_1","venueName":"big_fan","status":"public"}]
 </script>
 
   </body>

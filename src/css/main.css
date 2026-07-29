@@ -12,4 +12,5 @@
 /* 4. Independent Public Interface Components */
 @import "./components/_hero.css";
 @import "./components/_cards.css";
-@import "./components/_buttons-status.css";
+@import "./components/_PrivatePlayerControls.css";
+@import "./components/_player.css";

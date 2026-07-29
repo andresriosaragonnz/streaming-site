@@ -1,34 +1,90 @@
 /* src/css/components/_hero.css */
+
+#menu-container {
+  position: fixed;
+  padding: 1.5rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-muted, #9ca3af);
+}
+
 .artist-hero {
   position: relative;
   width: 100%;
-  height: 55vh;
-  background-size: cover;
-  background-position: center;
+  /* Mobile portrait viewport height default */
+  height: 50vh;
+  height: 50dvh;
+  min-height: 380px;
+  overflow: hidden;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end; /* Pins .hero-overlay to the bottom */
 }
 
-.hero-overlay {
+/* Base Image Positioning */
+.hero-picture,
+.hero-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 4rem;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  z-index: 1;
+}
+
+/* Gradient Overlay sitting over the image but under text */
+.hero-gradient-overlay {
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     to top,
-    var(--bg-deep) 0%,
-    rgba(4, 7, 20, 0.5) 70%,
+    var(--bg-deep, #040714) 0%,
+    rgba(4, 7, 20, 0.4) 60%,
     transparent 100%
   );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Text & Content Overlay Layer */
+.hero-overlay {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  padding: 1.5rem;
 }
 
 .hero-overlay h1 {
-  font-size: 3.5rem;
+  font-size: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.5px;
   margin-bottom: 0.5rem;
 }
 
 .performance-count {
-  color: var(--text-muted);
-  font-size: 1.1rem;
+  color: var(--text-muted, #9ca3af);
+  font-size: 1rem;
   font-weight: 500;
+}
+
+/* Tablet & Desktop Adjustments */
+@media (min-width: 640px) {
+  .artist-hero {
+    height: 55vh;
+    height: 55dvh;
+  }
+
+  .hero-overlay {
+    padding: 3rem 4rem;
+  }
+
+  .hero-overlay h1 {
+    font-size: 3.5rem;
+  }
+
+  .performance-count {
+    font-size: 1.1rem;
+  }
 }

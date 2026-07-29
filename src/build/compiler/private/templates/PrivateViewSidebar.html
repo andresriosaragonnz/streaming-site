@@ -1,36 +1,5 @@
-<!-- src/templates/panels/ReviewSidebar.html -->
 <aside class="playlist-sidebar">
-  <div
-    class="carousel-wrapper"
-    x-data="{ 
-      canScrollLeft: false, 
-      canScrollRight: false,
-      checkScroll() {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        this.canScrollLeft = el.scrollLeft > 5;
-        this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 5;
-      },
-      scroll(direction) {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        const scrollAmount = 252;
-        el.scrollBy({ 
-          left: direction === 'left' ? -scrollAmount : scrollAmount, 
-          behavior: 'smooth' 
-        });
-      }
-    }"
-    x-init="
-      $nextTick(() => { checkScroll(); });
-      window.addEventListener('resize', () => checkScroll());
-      
-      if (window.ResizeObserver) {
-        const observer = new ResizeObserver(() => checkScroll());
-        observer.observe($refs.scrollList);
-      }
-    "
-  >
+  <div class="carousel-wrapper" x-data="carousel">
     <button
       type="button"
       class="carousel-nav-btn nav-left"

@@ -3,9 +3,10 @@
   class="card"
   style="text-decoration: none; color: inherit"
 >
-  <div class="card-thumbnail" style="background-image: url('{{image}}')"></div>
+  {{> components/common/CardImage.html}}
+
   <div class="card-metadata">
-    <h3 class="capitalize-words">{{venueName}}</h3>
-    <p class="date">{{date}}</p>
+    <h3 class="capitalize-words">{{formattedVenueName}}</h3>
+    <p class="date">{{formattedDate}}</p>
   </div>
 </a>
