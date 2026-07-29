@@ -1,56 +1,69 @@
-import { Segment, PlaylistsMap } from "../types.js";
-import { getActiveSegment, parseSegmentsData } from "../utils/segmentUtils.js";
-import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils.js";
+import { Segment, PlaylistsMap } from "../types";
+import { getActiveSegment, parseSegmentsData } from "../utils/segmentUtils";
+import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils";
 
 export function initAlpineStores(Alpine: any): void {
-  // CONSOLIDATED REVIEW STORE (Data + Workspace Lifecycle)
+  // 1. REGISTER publicWorkspace DATA COMPONENT (Watcher & Hydration Hub)
+  Alpine.data("publicWorkspace", () => ({
+    init(this: any) {
+      this.$nextTick(() => {
+        const dataEl = document.getElementById("studio-segments-data");
+        if (dataEl && dataEl.textContent) {
+          this.$store.review.segments = parseSegmentsData(dataEl.textContent);
+          this.$store.review.currentIndex = 0;
+          console.log("✅ Public player workspace hydrated successfully.");
+
+          if (typeof window.setupMediaPlayback === "function") {
+            window.setupMediaPlayback(this.active, this.$store.review.mode);
+          }
+        }
+      });
+
+      // Watch currentIndex changes and trigger media playback
+      this.$watch("$store.review.currentIndex", () => {
+        this.$nextTick(() => {
+          if (typeof window.setupMediaPlayback === "function") {
+            window.setupMediaPlayback(this.active, this.$store.review.mode);
+          }
+        });
+      });
+
+      // Watch mode changes and trigger media playback switch
+      this.$watch("$store.review.mode", () => {
+        this.$nextTick(() => {
+          if (typeof window.setupMediaPlayback === "function") {
+            window.setupMediaPlayback(this.active, this.$store.review.mode);
+          }
+        });
+      });
+    },
+
+    get active(): Segment {
+      const store = Alpine.store("review");
+      if (!store || !store.segments || !store.segments[store.currentIndex]) {
+        return {
+          id: "",
+          title: "",
+          cardImage: "/screenshots/card/card-fallback.jpg",
+          status: "public",
+        };
+      }
+      return store.segments[store.currentIndex];
+    },
+  }));
+
+  // 2. REGISTER REVIEW STORE
   Alpine.store("review", {
     segments: [] as Segment[],
     mode: true,
     currentIndex: 0,
 
-    // Hydrate store directly from the DOM element
-    init() {
-      Alpine.effect(() => {
-        // Run after Alpine mounts DOM nodes
-        setTimeout(() => {
-          const dataEl = document.getElementById("studio-segments-data");
-          if (dataEl && dataEl.textContent && this.segments.length === 0) {
-            this.segments = parseSegmentsData(dataEl.textContent);
-            this.currentIndex = 0;
-            console.log("✅ Review store hydrated successfully.");
-            this.triggerPlaybackUpdate();
-          }
-        }, 0);
-      });
-    },
-
-    // Reactive active segment getter
-    get active(): Segment {
-      return getActiveSegment(this.segments, this.currentIndex);
-    },
-
-    // Actions
     togleMode() {
       this.mode = !this.mode;
-      this.triggerPlaybackUpdate();
-    },
-
-    setCurrentIndex(index: number) {
-      if (index >= 0 && index < this.segments.length) {
-        this.currentIndex = index;
-        this.triggerPlaybackUpdate();
-      }
-    },
-
-    triggerPlaybackUpdate() {
-      if (typeof window.setupMediaPlayback === "function") {
-        window.setupMediaPlayback(this.active, this.mode);
-      }
     },
   });
 
-  // PLAYLISTS STORE
+  // 3. REGISTER PLAYLISTS STORE
   Alpine.store("playlists", {
     playlists: { favorites: [], shared: [] } as PlaylistsMap,
 
@@ -73,8 +86,9 @@ export function initAlpineStores(Alpine: any): void {
 
     addActiveToPlaylist(playlistName: string): void {
       const reviewStore = Alpine.store("review");
-      if (reviewStore.active && reviewStore.active.id) {
-        this.addToPlaylist(reviewStore.active.id, playlistName);
+      const activeSegment = reviewStore.segments[reviewStore.currentIndex];
+      if (activeSegment && activeSegment.id) {
+        this.addToPlaylist(activeSegment.id, playlistName);
       }
     },
 

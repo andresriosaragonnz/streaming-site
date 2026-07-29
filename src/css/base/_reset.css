@@ -17,7 +17,7 @@ body {
 
 /* Prevent Alpine flashing templates before initialization */
 [x-cloak] {
-  display: none !important;
+  display: none;
 }
 
 /* Typography Utility Shards */
