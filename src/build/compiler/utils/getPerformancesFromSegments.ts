@@ -1,38 +1,41 @@
-import { dateFromString } from "./formatDates.js";
-import { getCardImage } from "../utils/getCardImage.js";
 import { getRandomIndex } from "../utils/getRandomIndex.js";
 
-const getPerformancesFromSegments = (segments: any) => {
+const getPerformancesFromSegmentsStatus = (segments: any) => {
   const performancesIndex = {} as any;
   for (const segment of segments) {
     const {
       artistName,
-      venueName,
+      cardImage,
       eventDate,
+      formattedDate,
+      heroImage,
       id,
       performance,
-      heroImage,
-      cardImage,
-      formattedDate,
+      venueName,
+      status,
+      formattedArtist,
     } = segment;
+    const initial = {
+      artistName: encodeURIComponent(artistName),
+      formattedArtist,
+      link: `${performance}`,
+      venueName: venueName,
+      formattedVenueName: venueName.replaceAll("_", " "),
+      eventDate,
+      formattedDate,
+      segments: [segment],
+      heroImages: [heroImage],
+      cardImages: [cardImage],
+      status,
+      performance,
+    };
     const currentPerformance = performancesIndex[performance];
     if (currentPerformance) {
       currentPerformance.cardImages.push(cardImage);
       currentPerformance.heroImages.push(heroImage);
       currentPerformance.segments.push(segment);
     } else {
-      performancesIndex[performance] = {
-        artistName: encodeURIComponent(artistName),
-        link: `${venueName}-${eventDate}`,
-        venueName: venueName,
-        formattedVenueName: venueName.replaceAll("_", " "),
-        eventDate,
-        formattedDate,
-        images: [id],
-        segments: [segment],
-        heroImages: [heroImage],
-        cardImages: [cardImage],
-      };
+      performancesIndex[performance] = initial;
     }
   }
   const performances = Object.values(performancesIndex).map(
@@ -45,7 +48,14 @@ const getPerformancesFromSegments = (segments: any) => {
     },
   );
 
-  return Object.values(performances);
+  return performances;
+};
+
+const getPerformancesFromSegments = (segments: any) => {
+  const publicSegments = segments.filter((seg: any) => seg.status === "public");
+  const publicSeg = getPerformancesFromSegmentsStatus(publicSegments);
+  const privateSeg = getPerformancesFromSegmentsStatus(segments);
+  return { public: publicSeg, private: privateSeg };
 };
 
 export { getPerformancesFromSegments };

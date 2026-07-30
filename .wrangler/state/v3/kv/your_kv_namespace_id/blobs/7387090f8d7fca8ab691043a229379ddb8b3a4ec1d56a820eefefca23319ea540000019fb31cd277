@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>decibel_force | Live Archive</title>
+    <title> | Live Archive</title>
     <link rel="stylesheet" href="/css/main.css" />
   </head>
   <body>
@@ -228,33 +228,33 @@
     <source
       type="image/avif"
       media="(max-width: 639px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_mobile.avif"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_mobile.avif"
     />
     <source
       type="image/webp"
       media="(max-width: 639px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_mobile.webp"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_mobile.webp"
     />
 
     <source
       type="image/avif"
       media="(max-width: 1023px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_tablet.avif"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_tablet.avif"
     />
     <source
       type="image/webp"
       media="(max-width: 1023px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_tablet.webp"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_tablet.webp"
     />
 
     <!-- Desktop Master (16:9) (>= 1024px) -->
-    <source type="image/avif" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.avif" />
-    <source type="image/webp" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.webp" />
+    <source type="image/avif" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_desktop.avif" />
+    <source type="image/webp" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_desktop.webp" />
 
     <!-- Legacy Fallback JPG -->
     <img
-      src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.jpg"
-      alt="decibel force"
+      src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_desktop.jpg"
+      alt="emergency awesome"
       class="hero-img"
       loading="eager"
     />
@@ -267,23 +267,23 @@
 
   <div class="hero-overlay">
     <a href="/" class="btn-back">← Back to Archive</a>
-    <h1 class="capitalize-words">decibel force</h1>
-    <p class="performance-count">2 Documented</p>
+    <h1 class="capitalize-words">emergency awesome</h1>
+    <p class="performance-count">1 Documented</p>
   </div>
 </div>
 
     <main class="performance-grid">
     <a
-  href="/artists/decibel_force/ding_dong_lounge-20241012"
+  href="/private/emergency_awesome-whanmmy-20250623"
   class="card"
   style="text-decoration: none; color: inherit"
 >
   <picture class="card-thumbnail">
-  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card.avif" type="image/avif" />
-  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card.webp" type="image/webp" />
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_card.avif" type="image/avif" />
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_card.webp" type="image/webp" />
   <img
-    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card.jpg"
-    alt="ding dong lounge - 12 Oct 24"
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_card.jpg"
+    alt="whanmmy - 23 Jun 25"
     loading="lazy"
     style="width: 100%; height: 100%; object-fit: cover; display: block"
   />
@@ -291,30 +291,8 @@
 
 
   <div class="card-metadata">
-    <h3 class="capitalize-words h3">ding dong lounge</h3>
-    <p class="date">12 Oct 24</p>
-  </div>
-</a>
-<a
-  href="/artists/decibel_force/big_fan-20241012"
-  class="card"
-  style="text-decoration: none; color: inherit"
->
-  <picture class="card-thumbnail">
-  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_card.avif" type="image/avif" />
-  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_card.webp" type="image/webp" />
-  <img
-    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_card.jpg"
-    alt="big fan - 12 Oct 24"
-    loading="lazy"
-    style="width: 100%; height: 100%; object-fit: cover; display: block"
-  />
-</picture>
-
-
-  <div class="card-metadata">
-    <h3 class="capitalize-words h3">big fan</h3>
-    <p class="date">12 Oct 24</p>
+    <h3 class="capitalize-words">whanmmy</h3>
+    <p class="date">23 Jun 25</p>
   </div>
 </a>
 

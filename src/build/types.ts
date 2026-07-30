@@ -1,5 +1,5 @@
 interface HeroProps {
-  image: string;
+  heroImage: string;
   title: string;
   count: number;
 }

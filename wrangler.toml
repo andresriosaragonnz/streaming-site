@@ -1,0 +1,18 @@
+name = "poc-backend"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Serve static files from the ./public directory at the Cloudflare Edge
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "poc-db"
+database_id = "your-cloudflare-d1-database-id" # Created via: npx wrangler d1 create studio-db
+
+[[kv_namespaces]]
+binding = "PAGE_CACHE"
+id = "your_kv_namespace_id" # Put a placeholder or real KV ID here

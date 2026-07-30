@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>decibel_force | Live Archive</title>
+    <title> | Live Archive</title>
     <link rel="stylesheet" href="/css/main.css" />
   </head>
   <body>
@@ -228,32 +228,32 @@
     <source
       type="image/avif"
       media="(max-width: 639px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_mobile.avif"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_mobile.avif"
     />
     <source
       type="image/webp"
       media="(max-width: 639px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_mobile.webp"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_mobile.webp"
     />
 
     <source
       type="image/avif"
       media="(max-width: 1023px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_tablet.avif"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_tablet.avif"
     />
     <source
       type="image/webp"
       media="(max-width: 1023px)"
-      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_tablet.webp"
+      srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_tablet.webp"
     />
 
     <!-- Desktop Master (16:9) (>= 1024px) -->
-    <source type="image/avif" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.avif" />
-    <source type="image/webp" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.webp" />
+    <source type="image/avif" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_desktop.avif" />
+    <source type="image/webp" srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_desktop.webp" />
 
     <!-- Legacy Fallback JPG -->
     <img
-      src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_desktop.jpg"
+      src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_desktop.jpg"
       alt="decibel force"
       class="hero-img"
       loading="eager"
@@ -273,16 +273,12 @@
 </div>
 
     <main class="performance-grid">
-    <a
-  href="/artists/decibel_force/private/ding_dong_lounge-20241012"
-  class="card"
-  style="text-decoration: none; color: inherit"
->
+    <a href="/decibel_force-ding_dong_lounge-20241012" class="card" style="text-decoration: none; color: inherit">
   <picture class="card-thumbnail">
-  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card.avif" type="image/avif" />
-  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card.webp" type="image/webp" />
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card.avif" type="image/avif" />
+  <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card.webp" type="image/webp" />
   <img
-    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card.jpg"
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card.jpg"
     alt="ding dong lounge - 12 Oct 24"
     loading="lazy"
     style="width: 100%; height: 100%; object-fit: cover; display: block"
@@ -291,15 +287,11 @@
 
 
   <div class="card-metadata">
-    <h3 class="capitalize-words">ding dong lounge</h3>
+    <h3 class="capitalize-words h3">ding dong lounge</h3>
     <p class="date">12 Oct 24</p>
   </div>
 </a>
-<a
-  href="/artists/decibel_force/private/big_fan-20241012"
-  class="card"
-  style="text-decoration: none; color: inherit"
->
+<a href="/decibel_force-big_fan-20241012" class="card" style="text-decoration: none; color: inherit">
   <picture class="card-thumbnail">
   <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card.avif" type="image/avif" />
   <source srcset="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card.webp" type="image/webp" />
@@ -313,7 +305,7 @@
 
 
   <div class="card-metadata">
-    <h3 class="capitalize-words">big fan</h3>
+    <h3 class="capitalize-words h3">big fan</h3>
     <p class="date">12 Oct 24</p>
   </div>
 </a>

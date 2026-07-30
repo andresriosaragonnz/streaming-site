@@ -22,7 +22,7 @@ http
     let urlPath = parsedUrl.pathname;
 
     // --- DYNAMIC SSR PAGE ROUTE (PHP Style) ---
-    if (urlPath === "/playlist" || urlPath === "/private") {
+    if (urlPath === "/playlist") {
       const sharedData = parsedUrl.searchParams.get("share"); // e.g., "x7K9pW2mQ,Kj8mR3wPy"
       let base64 = sharedData.replace(/-/g, "+").replace(/_/g, "/");
       while (base64.length % 4) base64 += "=";

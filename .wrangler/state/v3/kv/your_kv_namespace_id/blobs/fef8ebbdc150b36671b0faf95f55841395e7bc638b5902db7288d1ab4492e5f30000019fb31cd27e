@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>big fan - 12 Oct 24 | Live Archive</title>
+    <title>decibel force - ding dong lounge - 12 Oct 24 | Live Archive</title>
     <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
@@ -224,7 +224,7 @@
 </div>
 </div>
     <div class="meta-title-card-right">
-      <h2>big fan - 12 Oct 24</h2>
+      <h2>decibel force - ding dong lounge - 12 Oct 24</h2>
     </div>
   </div>
 
@@ -342,55 +342,54 @@
       </div>
 
       <!-- Expandable Terms Container -->
+
       <div x-show="expanded" x-collapse class="contract-body">
-        <h4>DIRECT SYNCHRONISATION AND ONLINE STREAMING LICENCE AGREEMENT</h4>
+  <h4>DIRECT SYNCHRONISATION AND ONLINE STREAMING LICENCE AGREEMENT</h4>
 
-        <p>
-          <strong>1. PARTIES</strong><br />
-          This Agreement is between the Platform and the undersigned
-          artist/copyright owner ("Licensor").
-        </p>
+  <p>
+    <strong>1. PARTIES</strong><br />
+    This Agreement is between the Platform and the undersigned artist/copyright
+    owner ("Licensor").
+  </p>
 
-        <p>
-          <strong>2. GRANT OF LICENCE</strong><br />
-          The Licensor grants the Platform a worldwide, non-exclusive,
-          royalty-free, direct licence to:<br />
-          a) Synchronize the musical composition and sound recording entitled
-          <strong x-text="active?.title || 'the selected works'"></strong> with
-          video footage uploaded by the videographer.<br />
-          b) Stream, transmit, and display the resulting audiovisual work on the
-          Platform's website and related non-commercial channels.
-        </p>
+  <p>
+    <strong>2. GRANT OF LICENCE</strong><br />
+    The Licensor grants the Platform a worldwide, non-exclusive, royalty-free,
+    direct licence to:<br />
+    a) Synchronize the musical composition and sound recording entitled
+    <strong x-text="active?.title || 'the selected works'"></strong> with video
+    footage uploaded by the videographer.<br />
+    b) Stream, transmit, and display the resulting audiovisual work on the
+    Platform's website and related non-commercial channels.
+  </p>
 
-        <p>
-          <strong>3. DIRECT LICENSING DECLARATION (APRA AMCOS BYPASS)</strong
-          ><br />
-          The Licensor acknowledges that they retain full ownership of the Work.
-          Pursuant to APRA AMCOS direct licensing rules, the Licensor explicitly
-          authorizes the Platform to stream and synchronize the Work without
-          requiring third-party licensing or fee collection from APRA AMCOS or
-          PPCA.
-        </p>
+  <p>
+    <strong>3. DIRECT LICENSING DECLARATION (APRA AMCOS BYPASS)</strong><br />
+    The Licensor acknowledges that they retain full ownership of the Work.
+    Pursuant to APRA AMCOS direct licensing rules, the Licensor explicitly
+    authorizes the Platform to stream and synchronize the Work without requiring
+    third-party licensing or fee collection from APRA AMCOS or PPCA.
+  </p>
 
-        <p>
-          <strong>4. WARRANTIES & INDEMNITY</strong><br />
-          The Licensor warrants that:<br />
-          a) They are the sole creator and copyright owner of the Work, or hold
-          all necessary authority to grant this licence.<br />
-          b) The Work is 100% original and contains no unlicensed third-party
-          samples, cover compositions, or unauthorized media.<br />
-          c) The Licensor agrees to indemnify and hold harmless the Platform
-          against any third-party copyright claims or licensing demands arising
-          from the streaming of this Work.
-        </p>
+  <p>
+    <strong>4. WARRANTIES & INDEMNITY</strong><br />
+    The Licensor warrants that:<br />
+    a) They are the sole creator and copyright owner of the Work, or hold all
+    necessary authority to grant this licence.<br />
+    b) The Work is 100% original and contains no unlicensed third-party samples,
+    cover compositions, or unauthorized media.<br />
+    c) The Licensor agrees to indemnify and hold harmless the Platform against
+    any third-party copyright claims or licensing demands arising from the
+    streaming of this Work.
+  </p>
 
-        <p>
-          <strong>5. TERM & TERMINATION</strong><br />
-          This licence remains in effect indefinitely until revoked in writing
-          by the Licensor. Upon receiving a written revocation, the Platform
-          shall remove the media within 5 business days.
-        </p>
-      </div>
+  <p>
+    <strong>5. TERM & TERMINATION</strong><br />
+    This licence remains in effect indefinitely until revoked in writing by the
+    Licensor. Upon receiving a written revocation, the Platform shall remove the
+    media within 5 business days.
+  </p>
+</div>
 
       <!-- Modal Actions Gated by Checkbox -->
       <div class="modal-actions">
@@ -523,7 +522,7 @@
 </div>
 
 <script type="application/json" id="studio-segments-data">
-  [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"big fan","id":"T2Sl2e6zz","performance":"decibel_force-big_fan-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/T2Sl2e6zz.mp3","title":"segment_0","venueName":"big_fan","status":"public"},{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 1","formattedVenue":"big fan","id":"YJkE29oDn","performance":"decibel_force-big_fan-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/YJkE29oDn/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/YJkE29oDn.mp3","title":"segment_1","venueName":"big_fan","status":"public"}]
+  [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"ding dong lounge","id":"yIwsfqcdM","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/yIwsfqcdM.mp3","title":"segment_0","venueName":"ding_dong_lounge","status":"public"},{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/ayxQFAxzZ","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 1","formattedVenue":"ding dong lounge","id":"ayxQFAxzZ","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/ayxQFAxzZ/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/ayxQFAxzZ.mp3","title":"segment_1","venueName":"ding_dong_lounge","status":"private"}]
 </script>
 
   </body>

@@ -1,7 +1,4 @@
-import { writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
 import { loadComponent } from "../../../utils/component.js";
-import { dateFromString } from "../utils/formatDates.js";
 import {
   LayoutProps,
   PlayerProps,
@@ -28,10 +25,12 @@ const ControlSection = loadComponent(
   "/public/templates/PublicPlayerControls.html",
 );
 
-export const compilePublicPerformance = (
-  segments: any,
-  displayTitle: string,
-): string => {
+export const compilePublicPerformance = (performance: any): string => {
+  const { formattedArtist, venueName, eventDate, segments, formattedDate } =
+    performance;
+  const cleanVenue = venueName.replaceAll("_", " ");
+
+  const displayTitle = `${formattedArtist} - ${cleanVenue} - ${formattedDate}`;
   const formattedJson = JSON.stringify(segments);
   const ControlSectionHtml = ControlSection({});
   const menuHtml = Menu({});
@@ -52,25 +51,4 @@ export const compilePublicPerformance = (
     bodyContent: `${dynamicStudioHtml}`,
   });
   return htmlContent;
-};
-
-export const compilePublicPerformances = (performances: any): void => {
-  for (const performance of performances) {
-    const { artistName, venueName, eventDate, segments } = performance;
-    const outputDir = join(
-      process.cwd(),
-      "public/artists",
-      artistName,
-      `${venueName}-${eventDate}`,
-    );
-    mkdirSync(outputDir, { recursive: true });
-    const cleanVenue = venueName.replaceAll("_", " ");
-    const cleanDate = dateFromString(eventDate);
-    const displayTitle = `${cleanVenue} - ${cleanDate.formated}`;
-    const htmlContent = compilePublicPerformance(segments, displayTitle);
-    const outputPath = join(outputDir, `index.html`);
-    writeFileSync(outputPath, htmlContent, "utf8");
-  }
-
-  return;
 };

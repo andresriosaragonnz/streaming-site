@@ -31,14 +31,23 @@ export function hasStatusChanged(
 /**
  * Returns all segments whose statuses have changed compared to the snapshot.
  */
-export function getChangedSegments(
-  segments: Segment[],
-  initialStatuses: StatusSnapshot,
-): Segment[] {
-  return segments.filter((seg, idx) => {
-    const key = seg.id ?? idx.toString();
-    return seg.status !== initialStatuses[key];
-  });
+export function getChangedSegments(segments: Segment[]): {
+  privateIds: string[];
+  publicIds: string[];
+  artist: string[];
+} {
+  console.log(segments[0]);
+  const privateSeg = segments
+    .filter((seg) => seg.status === "private")
+    .map((seg) => seg.id);
+  const publicSeg = segments
+    .filter((seg) => seg.status === "public")
+    .map((seg) => seg.id);
+  return {
+    privateIds: privateSeg,
+    publicIds: publicSeg,
+    artist: segments[0].artistId,
+  };
 }
 
 /**

@@ -82,17 +82,31 @@ export function initPrivateAlpineStores(Alpine: any): void {
       this.isCommitModalOpen = false;
     },
 
-    submitCommit() {
-      const changed = getChangedSegments(this.segments, this.initialStatuses);
-      console.log("🚀 Committing changes:", changed);
+    async submitCommit() {
+      const changed = getChangedSegments(this.segments);
 
-      // Update initialStatuses snapshot to match new committed values
-      changed.forEach((seg, idx) => {
-        const key = seg.id ?? idx.toString();
-        this.initialStatuses[key] = seg.status;
-      });
+      try {
+        // 2. Send POST request to Hono /api/commit-status
+        const response = await fetch("/api/commit-status", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(changed),
+        });
 
-      this.closeCommitModal();
+        if (!response.ok) {
+          throw new Error(
+            `Commit status failed with status ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+      } catch (error) {
+        console.error("❌ Failed to submit commit status:", error);
+      } finally {
+        this.closeCommitModal();
+      }
     },
 
     togleMode() {

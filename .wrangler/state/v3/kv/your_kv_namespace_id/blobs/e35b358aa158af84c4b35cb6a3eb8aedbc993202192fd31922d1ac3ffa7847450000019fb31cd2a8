@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>big fan - 23 Jun 25 | Live Archive</title>
+    <title>decibel force - ding dong lounge - 12 Oct 24 | Live Archive</title>
     <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
-    <div class="studio-container" x-data="studioWorkspace">
-  <section class="player-column">
+    <div class="studio-container"><section
+  class="player-column"
+  x-data="publicWorkspace"
+  id="'publicPlayerColumn"
+>
   <div class="meta-title-card">
     <div><div class="menu">
   <style>
@@ -224,101 +227,108 @@
 </div>
 </div>
     <div class="meta-title-card-right">
-      <h2>big fan - 23 Jun 25</h2>
+      <h2>decibel force - ding dong lounge - 12 Oct 24</h2>
+      <div class="toggle" @click="$store.review.togleMode()">
+        <input type="checkbox" :checked="!$store.review.mode" />
+        <label></label>
+      </div>
     </div>
   </div>
 
-  <div class="video-player-mock">
-    <!-- Clean HTML5 Native Architecture targeting your R2 Bucket objects directly -->
+  <div
+    :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
+    style="position: relative; overflow: hidden; border-radius: 12px"
+  >
+    <!-- Video Player View -->
     <div
-      x-show="active.source"
+      x-show="$store.review.mode && active.source"
       style="width: 100%; height: 100%; background: #000"
     >
-      <video
-        id="r2-stream-player"
-        controls
-        playsinline
-        preload="metadata"
-        :poster="active.heroImage"
-        style="width: 100%; height: 100%; object-fit: contain; display: block"
-      ></video>
+      <div x-show="active.source" style="width: 100%; height: 100%; background: #000">
+  <video
+    id="r2-stream-player"
+    controls
+    playsinline
+    preload="metadata"
+    :poster="`${active.heroImage}_desktop.jpg`"
+    style="width: 100%; height: 100%; object-fit: contain; display: block"
+  ></video>
+</div>
+
     </div>
 
-    <!-- Empty Fallback Workspace State -->
-    <template x-if="!active.source">
-      <div
-        style="
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-size: cover;
-          background-position: center;
-        "
-        :style="active.heroImage ? `background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.6)), url(${active.heroImage})` : ''"
-      >
-        <div class="preview-badge">No Stream Active</div>
-      </div>
-    </template>
+    <!-- Audio Player View -->
+    <div
+      x-show="!$store.review.mode && active.source"
+      class="audio-player"
+      :style="active.heroImage ? `background-image: url('${active.heroImage}.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+    >
+      <!-- Audio Player Controls Pinned to the Bottom -->
+      <div class="audio-player">
+  <!-- Cassette Artwork Layer -->
+  <img
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/cassete_icon.jpg"
+    alt="Audio Player Cover"
+    class="audio-player-hero"
+  />
+
+  <!-- Audio Controls Overlay -->
+  <div class="audio-player-controls">
+    <audio
+      id="r2-audio-player"
+      :src="active.sourceMp3"
+      controls
+      style="width: 100%"
+    ></audio>
+  </div>
+</div>
+
+    </div>
   </div>
 
-  <div class="meta-workspace-card">
+  <div
+  class="meta-workspace-card"
+  x-data="{ 
+    selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
+  }"
+>
   <div class="header-row">
     <div class="studio-controls-group">
       <div class="input-field-group">
-        <input
-          type="text"
-          x-model="active.title"
-          @input="$store.review.syncStore($store.review.currentIndex, active.title)"
-        />
+        <!-- 1. Bind to local component state variable instead of active.title -->
+        <select x-model="selectedPlaylist">
+          <!-- 2. Loop through your state dynamically, or keep them hardcoded -->
+          <template
+            x-for="(list, name) in $store.playlists.playlists"
+            :key="name"
+          >
+            <option :value="name" x-text="name"></option>
+          </template>
+        </select>
       </div>
 
+      <!-- 3. Pass the selected playlist target parameter straight to the method -->
       <button
-        @click="$store.review.toggleStatus($store.review.currentIndex)"
+        @click="$store.playlists.addActiveToPlaylist(selectedPlaylist)"
         type="button"
-        :class="active.status === 'public' ? 'btn-public' : 'btn-private'"
+        class="btn-public"
       >
-        <span x-text="active.status === 'public' ? 'Public' : 'Private'"></span>
+        <span>Add to playlist</span>
+      </button>
+      <button
+        @click="$store.playlists.generateShareLink(selectedPlaylist)"
+        type="button"
+        class="btn-public"
+      >
+        <span>Share playlist</span>
       </button>
     </div>
   </div>
 </div>
 
 </section>
- <!-- src/templates/panels/ReviewSidebar.html -->
-<aside class="playlist-sidebar">
-  <div
-    class="carousel-wrapper"
-    x-data="{ 
-      canScrollLeft: false, 
-      canScrollRight: false,
-      checkScroll() {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        this.canScrollLeft = el.scrollLeft > 5;
-        this.canScrollRight = el.scrollLeft + el.clientWidth < el.scrollWidth - 5;
-      },
-      scroll(direction) {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        const scrollAmount = 252;
-        el.scrollBy({ 
-          left: direction === 'left' ? -scrollAmount : scrollAmount, 
-          behavior: 'smooth' 
-        });
-      }
-    }"
-    x-init="
-      $nextTick(() => { checkScroll(); });
-      window.addEventListener('resize', () => checkScroll());
-      
-      if (window.ResizeObserver) {
-        const observer = new ResizeObserver(() => checkScroll());
-        observer.observe($refs.scrollList);
-      }
-    "
-  >
+ <aside class="playlist-sidebar">
+  <div class="carousel-wrapper" x-data="carousel">
     <button
       type="button"
       class="carousel-nav-btn nav-left"
@@ -339,30 +349,18 @@
         x-for="(seg, idx) in $store.review.segments"
         :key="seg.id || idx"
       >
-        <div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
-  <!-- Responsive Picture replacing background-image -->
+        <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <picture class="item-thumbnail">
-    <!-- AVIF format (first priority) -->
-    <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
+  <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
+  <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
+  <img
+    :src="`${seg.cardImage}.jpg`"
+    :alt="seg.title"
+    loading="lazy"
+    style="width: 100%; height: 100%; object-fit: cover; display: block"
+  />
+</picture>
 
-    <!-- WebP format (second priority) -->
-    <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
-
-    <!-- Legacy JPEG Fallback -->
-    <img
-      :src="`${seg.cardImage}.jpg`"
-      :alt="seg.title"
-      loading="lazy"
-      style="width: 100%; height: 100%; object-fit: cover; display: block"
-    />
-  </picture>
 
   <div class="item-meta">
     <div class="title-text">
@@ -370,46 +368,7 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
-    </div>
-  </div>
-</div>
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card' : 'sidebar-item-card=private'
-  ]"
->
-  <!-- Responsive Picture replacing background-image -->
-  <picture class="item-thumbnail">
-    <!-- AVIF format (first priority) -->
-    <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
-
-    <!-- WebP format (second priority) -->
-    <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
-
-    <!-- Legacy JPEG Fallback -->
-    <img
-      :src="`${seg.cardImage}.jpg`"
-      :alt="seg.title"
-      loading="lazy"
-      style="width: 100%; height: 100%; object-fit: cover; display: block"
-    />
-  </picture>
-
-  <div class="item-meta">
-    <div class="title-text">
-      <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
-    </div>
-    <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
+      <span x-text="seg.formatedDuration"></span>
     </div>
   </div>
 </div>
@@ -429,13 +388,11 @@
     </button>
   </div>
 </aside>
-
 </div>
-
 <script type="application/json" id="studio-segments-data">
-  [{"artistName":"emergency_awesome","artistId":"emergency_awesome","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW","duration":360,"eventDate":"20250623","formatedDuration":"06:00","formattedArtist":"emergency awesome","formattedDate":"23 Jun 25","formattedTitle":"segment 0","formattedVenue":"big fan","id":"gth1zPWBW","performance":"emergency_awesome-big_fan-20250623","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/gth1zPWBW/output.m3u","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/gth1zPWBW.mp3","title":"segment_0","venueName":"big_fan"},{"artistName":"emergency_awesome","artistId":"emergency_awesome","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/OqrWnBGJR_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/OqrWnBGJR","duration":360,"eventDate":"20250623","formatedDuration":"06:00","formattedArtist":"emergency awesome","formattedDate":"23 Jun 25","formattedTitle":"segment 1","formattedVenue":"big fan","id":"OqrWnBGJR","performance":"emergency_awesome-big_fan-20250623","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/OqrWnBGJR/output.m3u","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/OqrWnBGJR.mp3","title":"segment_1","venueName":"big_fan"}]
+  [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"ding dong lounge","id":"yIwsfqcdM","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/yIwsfqcdM.mp3","title":"segment_0","venueName":"ding_dong_lounge","status":"public"}]
 </script>
 
   </body>
-  <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/publicApp.js"></script>
 </html>

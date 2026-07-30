@@ -25,7 +25,7 @@ export const data = [
     duration: 360,
     hash: "sha256-2db5c98a5fc8b56f26487e83ac5bde92c10b2bcfc4d4f647bc5d290fa8cb3fe1",
     performance: "decibel_force-ding_dong_lounge-20241012",
-    status: "public",
+    status: "private",
   },
   {
     id: "T2Sl2e6zz",

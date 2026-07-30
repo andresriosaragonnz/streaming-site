@@ -2,19 +2,33 @@
   "name": "archive-engine",
   "version": "1.0.0",
   "scripts": {
-    "build": "bun run src/build.ts"
+    "build": "bun run src/build.ts",
+    "hono-local": "bunx wrangler dev --local",
+    "sync:local": "bun run scripts/bulkCompileAndSync.ts",
+    "sync:prod": "NODE_ENV=production bun run scripts/bulkCompileAndSync.ts",
+    "dev": "wrangler dev",
+    "deploy": "bun run sync:prod && wrangler deploy",
+    "init-db": "bunx wrangler d1 execute DB --local --file=./schema.sql",
+    "seed-db": "npx wrangler d1 execute DB --local --file=seed.sql",
+    "db:reset": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --local --file=./schema.sql && bunx wrangler d1 execute DB --local --file=./seed.sql",
+    "compile-js": "bun build src/ts/privateApp.ts --outdir ./public/js --minify --target browser"
   },
   "type": "module",
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260729.1",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "^1.3.14",
-    "@types/node": "^26.1.1",
-    "lightningcss": "^1.32.0"
+    "@types/node": "^26.1.2",
+    "lightningcss": "^1.32.0",
+    "wrangler": "^4.115.0"
   },
   "private": true,
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
-    "date-fns-tz": "^3.2.0"
+    "better-sqlite3": "^13.0.2",
+    "date-fns-tz": "^3.2.0",
+    "hono": "^4.12.32"
   }
 }
