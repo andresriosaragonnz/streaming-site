@@ -1,14 +1,23 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>emergency awesome - whanmmy - 23 Jun 25 | Live Archive</title>
+    <title>{{pageTitle}} | Live Archive</title>
     <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
     <div class="studio-container" x-data="privateWorkspace">
-  <section class="player-column">
+      <section
+  class="player-column"
+  x-data="publicWorkspace"
+  id="'publicPlayerColumn"
+>
   <div class="meta-title-card">
     <div><div class="menu">
   <style>
@@ -224,13 +233,21 @@
 </div>
 </div>
     <div class="meta-title-card-right">
-      <h2>emergency awesome - whanmmy - 23 Jun 25</h2>
+      <h2>decibel force-big fan-12 Oct 24</h2>
+      <div class="toggle" @click="$store.review.togleMode()">
+        <input type="checkbox" :checked="!$store.review.mode" />
+        <label></label>
+      </div>
     </div>
   </div>
 
-  <div class="video-player-mock">
+  <div
+    :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
+    style="position: relative; overflow: hidden; border-radius: 12px"
+  >
+    <!-- Video Player View -->
     <div
-      x-show="active.source"
+      x-show="$store.review.mode && active.source"
       style="width: 100%; height: 100%; background: #000"
     >
       <div x-show="active.source" style="width: 100%; height: 100%; background: #000">
@@ -239,180 +256,79 @@
     controls
     playsinline
     preload="metadata"
-    :poster="`${active.heroImage}_desktop.jpg`"
     style="width: 100%; height: 100%; object-fit: contain; display: block"
   ></video>
 </div>
 
     </div>
+
+    <!-- Audio Player View -->
+    <div
+      x-show="!$store.review.mode && active.source"
+      class="audio-player"
+      :style="active.heroImage ? `background-image: url('${active.heroImage}_desktop.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+    >
+      <!-- Audio Player Controls Pinned to the Bottom -->
+      <div class="audio-player">
+  <!-- Cassette Artwork Layer -->
+  <img
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/cassete_icon.jpg"
+    alt="Audio Player Cover"
+    class="audio-player-hero"
+  />
+
+  <!-- Audio Controls Overlay -->
+  <div class="audio-player-controls">
+    <audio
+      id="r2-audio-player"
+      :src="active.sourceMp3"
+      controls
+      style="width: 100%"
+    ></audio>
+  </div>
+</div>
+
+    </div>
   </div>
 
-  <div class="meta-workspace-card">
-  <div class="studio-controls-group">
-    <div class="input-field-group">
-      <input
-        type="text"
-        x-model="active.title"
-        @input="$store.review.syncStore($store.review.currentIndex, active.title)"
-      />
-    </div>
+  <div
+  class="meta-workspace-card"
+  x-data="{ 
+    selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
+  }"
+>
+  <div class="header-row">
+    <div class="studio-controls-group">
+      <div class="input-field-group">
+        <!-- 1. Bind to local component state variable instead of active.title -->
+        <select x-model="selectedPlaylist">
+          <!-- 2. Loop through your state dynamically, or keep them hardcoded -->
+          <template
+            x-for="(list, name) in $store.playlists.playlists"
+            :key="name"
+          >
+            <option :value="name" x-text="name"></option>
+          </template>
+        </select>
+      </div>
 
-    <button
-      @click="$store.review.toggleStatus($store.review.currentIndex)"
-      type="button"
-      class="btn-status"
-      :class="active.status === 'public' ? 'btn-public' : 'btn-private'"
-    >
-      <span x-text="active.status === 'public' ? 'Public' : 'Private'"></span>
-    </button>
-    <div class="studio-controls-status-count-container">
-      <span
-        x-text="$store.review.getCount()"
-        class="studio-controls-status-count"
-      ></span>
-      <span
-        x-text="$store.review.getCountPrivate()"
-        class="studio-controls-status-count"
-      ></span>
-    </div>
-    <div class="status-action-wrapper">
-      <!-- Commit Action -->
+      <!-- 3. Pass the selected playlist target parameter straight to the method -->
       <button
-        x-show="$store.review.hasStatusChanged()"
-        @click="$store.review.openCommitModal()"
+        @click="$store.playlists.addActiveToPlaylist(selectedPlaylist)"
         type="button"
-        class="btn-status btn-public"
+        class="btn-public"
       >
-        <span>Commit</span>
+        <span>Add to playlist</span>
+      </button>
+      <button
+        @click="$store.playlists.generateShareLink(selectedPlaylist)"
+        type="button"
+        class="btn-public"
+      >
+        <span>Share playlist</span>
       </button>
     </div>
   </div>
-  <!-- COMMIT MODAL TEMPLATE -->
-<div
-  x-show="$store.review.isCommitModalOpen"
-  x-cloak
-  @keydown.escape.window="$store.review.closeCommitModal()"
-  class="modal-backdrop"
->
-  <div @click.away="$store.review.closeCommitModal()" class="modal-card">
-    <div class="modal-header">
-      <h2>Review Public Segments</h2>
-      <p class="modal-subtitle">The following segments will be made public:</p>
-    </div>
-
-    <!-- List of changed segments -->
-    <ul class="commit-segment-list">
-      <template
-        x-for="(seg, idx) in $store.review.getPublicSegments()"
-        :key="seg.id ?? idx"
-      >
-        <li class="commit-segment-item">
-          <span x-text="seg.title" class="segment-title"></span>
-          <span
-            x-text="seg.status"
-            :class="seg.status === 'public' ? 'status-tag-public' : 'status-tag-private'"
-            class="status-tag"
-          ></span>
-        </li>
-      </template>
-    </ul>
-
-    <!-- APRA AMCOS DIRECT LICENSING AGREEMENT -->
-    <div
-      x-data="{ agreed: false, expanded: false }"
-      class="license-agreement-container"
-    >
-      <div class="agreement-header">
-        <label class="checkbox-label">
-          <input type="checkbox" x-model="agreed" id="apra-agreement-check" />
-          <span
-            >I agree to the Direct Synchronisation & Online Streaming
-            Licence</span
-          >
-        </label>
-
-        <button
-          type="button"
-          class="btn-toggle-terms"
-          @click="expanded = !expanded"
-          x-text="expanded ? 'Hide Terms ▲' : 'View Terms ▼'"
-        >
-          View Terms ▼
-        </button>
-      </div>
-
-      <!-- Expandable Terms Container -->
-
-      <div x-show="expanded" x-collapse class="contract-body">
-  <h4>DIRECT SYNCHRONISATION AND ONLINE STREAMING LICENCE AGREEMENT</h4>
-
-  <p>
-    <strong>1. PARTIES</strong><br />
-    This Agreement is between the Platform and the undersigned artist/copyright
-    owner ("Licensor").
-  </p>
-
-  <p>
-    <strong>2. GRANT OF LICENCE</strong><br />
-    The Licensor grants the Platform a worldwide, non-exclusive, royalty-free,
-    direct licence to:<br />
-    a) Synchronize the musical composition and sound recording entitled
-    <strong x-text="active?.title || 'the selected works'"></strong> with video
-    footage uploaded by the videographer.<br />
-    b) Stream, transmit, and display the resulting audiovisual work on the
-    Platform's website and related non-commercial channels.
-  </p>
-
-  <p>
-    <strong>3. DIRECT LICENSING DECLARATION (APRA AMCOS BYPASS)</strong><br />
-    The Licensor acknowledges that they retain full ownership of the Work.
-    Pursuant to APRA AMCOS direct licensing rules, the Licensor explicitly
-    authorizes the Platform to stream and synchronize the Work without requiring
-    third-party licensing or fee collection from APRA AMCOS or PPCA.
-  </p>
-
-  <p>
-    <strong>4. WARRANTIES & INDEMNITY</strong><br />
-    The Licensor warrants that:<br />
-    a) They are the sole creator and copyright owner of the Work, or hold all
-    necessary authority to grant this licence.<br />
-    b) The Work is 100% original and contains no unlicensed third-party samples,
-    cover compositions, or unauthorized media.<br />
-    c) The Licensor agrees to indemnify and hold harmless the Platform against
-    any third-party copyright claims or licensing demands arising from the
-    streaming of this Work.
-  </p>
-
-  <p>
-    <strong>5. TERM & TERMINATION</strong><br />
-    This licence remains in effect indefinitely until revoked in writing by the
-    Licensor. Upon receiving a written revocation, the Platform shall remove the
-    media within 5 business days.
-  </p>
-</div>
-
-      <!-- Modal Actions Gated by Checkbox -->
-      <div class="modal-actions">
-        <button
-          @click="$store.review.closeCommitModal()"
-          type="button"
-          class="btn-modal btn-modal-cancel"
-        >
-          Cancel
-        </button>
-        <button
-          @click="$store.review.submitCommit()"
-          type="button"
-          :disabled="!agreed"
-          class="btn-modal btn-modal-confirm"
-        >
-          Confirm Changes
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
 </div>
 
 </section>
@@ -438,14 +354,7 @@
         x-for="(seg, idx) in $store.review.segments"
         :key="seg.id || idx"
       >
-        <div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card-private' : 'sidebar-item-card'
-  ]"
->
+        <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <picture class="item-thumbnail">
   <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
   <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
@@ -464,20 +373,11 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
+      <span x-text="seg.formatedDuration"></span>
     </div>
   </div>
 </div>
-<div
-  @click="$store.review.currentIndex = idx"
-  class="sidebar-item-card"
-  :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card-private' : 'sidebar-item-card'
-  ]"
->
+<div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
   <picture class="item-thumbnail">
   <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
   <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
@@ -496,9 +396,7 @@
       <span x-text="seg.title"></span>
     </div>
     <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
+      <span x-text="seg.formatedDuration"></span>
     </div>
   </div>
 </div>
@@ -519,12 +417,11 @@
   </div>
 </aside>
 
-</div>
+    </div>
 
-<script type="application/json" id="studio-segments-data">
-  [{"artistName":"emergency_awesome","artistId":"emergency_awesome","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/gth1zPWBW","duration":360,"eventDate":"20250623","formatedDuration":"06:00","formattedArtist":"emergency awesome","formattedDate":"23 Jun 25","formattedTitle":"segment 0","formattedVenue":"whanmmy","id":"gth1zPWBW","performance":"emergency_awesome-whanmmy-20250623","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/gth1zPWBW/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/gth1zPWBW.mp3","title":"segment_0","venueName":"whanmmy","status":"private"},{"artistName":"emergency_awesome","artistId":"emergency_awesome","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/OqrWnBGJR_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/OqrWnBGJR","duration":360,"eventDate":"20250623","formatedDuration":"06:00","formattedArtist":"emergency awesome","formattedDate":"23 Jun 25","formattedTitle":"segment 1","formattedVenue":"whanmmy","id":"OqrWnBGJR","performance":"emergency_awesome-whanmmy-20250623","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/OqrWnBGJR/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/OqrWnBGJR.mp3","title":"segment_1","venueName":"whanmmy","status":"private"}]
-</script>
-
+    <script type="application/json" id="studio-segments-data">
+      [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/T2Sl2e6zz","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"big fan","id":"T2Sl2e6zz","performance":"decibel_force-big_fan-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/T2Sl2e6zz/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/T2Sl2e6zz.mp3","title":"segment_0","venueName":"big_fan","status":"public"},{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/YJkE29oDn","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 1","formattedVenue":"big fan","id":"YJkE29oDn","performance":"decibel_force-big_fan-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/YJkE29oDn/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/YJkE29oDn.mp3","title":"segment_1","venueName":"big_fan","status":"public"}]
+    </script>
   </body>
   <script type="module" src="/js/privateApp.js"></script>
 </html>

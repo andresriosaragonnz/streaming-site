@@ -1,5 +1,8 @@
 import { Hono } from "hono";
-import { compileArtistPages } from "./build/compiler/index";
+import { renderPrivatePerformance } from "./build/compiler/private/renderPrivatePerformance/renderPrivatePerformance";
+import { renderPrivateDashboard } from "./build/compiler/private/renderPrivateDashboard/renderPrivateDashboard";
+import { renderPublicPerformance } from "./build/compiler/public/renderPublicPerformance/renderPublicPerformance";
+import { renderPublicEcosystem } from "./build/compiler/public/renderPublicEcosystem/renderPublicEcosystem";
 
 // Define the Cloudflare KV binding type
 type Bindings = {
@@ -8,16 +11,37 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
+app.get("/private/performance/:slug", async (c) => {
+  const slug = c.req.param("slug");
+  const cacheKey = `private-${slug}`;
+  const sql = `SELECT * FROM segments WHERE performance = ?`;
+  const { results } = await c.env.DB.prepare(sql).bind(slug).all();
+  console.log({ results });
+  const html = renderPrivatePerformance(results);
+  return c.html(html);
+});
+
 app.get("/private/:slug", async (c) => {
   const slug = c.req.param("slug");
   const cacheKey = `private-${slug}`;
-  let html = (await c.env.PAGE_CACHE.get(cacheKey)) || "error";
+  const sql = `SELECT * FROM segments WHERE artistId = ?`;
+  const { results } = await c.env.DB.prepare(sql).bind(slug).all();
+  const html = renderPrivateDashboard(results);
+  // let html = (await c.env.PAGE_CACHE.get(cacheKey)) || "error";
+  return c.html(html);
+});
+
+app.get("/performance/:slug", async (c) => {
+  const slug = c.req.param("slug");
+  const sql = `SELECT * FROM segments WHERE performance = ?`;
+  const { results } = await c.env.DB.prepare(sql).bind(slug).all();
+  const html = renderPublicPerformance(results);
   return c.html(html);
 });
 
 app.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
-  let html = (await c.env.PAGE_CACHE.get(slug)) || "error";
+  const html = (await c.env.PAGE_CACHE.get(slug)) || "error";
   return c.html(html);
 });
 
@@ -49,16 +73,15 @@ app.post("/api/commit-status", async (c) => {
     await c.env.DB.batch(statements);
 
     const totalUpdated = privateIds.length + publicIds.length;
-    console.log(`✅ Successfully updated ${totalUpdated} segment(s) in D1.`);
     c.executionCtx.waitUntil(
       (async () => {
         const sql = `SELECT * FROM segments WHERE artistId = ?`;
         const { results } = await c.env.DB.prepare(sql).bind(artist).all();
-        console.log({ results });
-        const bulkPayload = compileArtistPages(results);
-
+        const kvPairs = renderPublicEcosystem(results);
+        await Promise.all(
+          kvPairs.map(({ key, value }) => c.env.PAGE_CACHE.put(key, value)),
+        );
         console.log(`Found ${results.length} segments. Compiling pages...`);
-        console.log(bulkPayload);
       })(),
     );
 

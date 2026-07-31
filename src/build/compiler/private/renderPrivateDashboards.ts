@@ -1,5 +1,5 @@
 import { groupPerformancesByArtists } from "../utils/groupPerformancesByArtists";
-import { compilePrivateDashboard } from "./compilePrivateDashboard";
+import { compilePrivateDashboard } from "./compileCache";
 
 const compilePrivateDashboards = (performances: any) => {
   const groupedArtists = groupPerformancesByArtists(performances.private);

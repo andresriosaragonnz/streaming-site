@@ -1,13 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>decibel force - ding dong lounge - 12 Oct 24 | Live Archive</title>
+    <title>{{pageTitle}} | Live Archive</title>
     <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
-    <div class="studio-container"><section
+    <div class="studio-container" x-data="privateWorkspace">
+      <section
   class="player-column"
   x-data="publicWorkspace"
   id="'publicPlayerColumn"
@@ -227,7 +233,7 @@
 </div>
 </div>
     <div class="meta-title-card-right">
-      <h2>decibel force - ding dong lounge - 12 Oct 24</h2>
+      <h2>decibel force-ding dong lounge-12 Oct 24</h2>
       <div class="toggle" @click="$store.review.togleMode()">
         <input type="checkbox" :checked="!$store.review.mode" />
         <label></label>
@@ -250,7 +256,6 @@
     controls
     playsinline
     preload="metadata"
-    :poster="`${active.heroImage}_desktop.jpg`"
     style="width: 100%; height: 100%; object-fit: contain; display: block"
   ></video>
 </div>
@@ -261,7 +266,7 @@
     <div
       x-show="!$store.review.mode && active.source"
       class="audio-player"
-      :style="active.heroImage ? `background-image: url('${active.heroImage}.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+      :style="active.heroImage ? `background-image: url('${active.heroImage}_desktop.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
     >
       <!-- Audio Player Controls Pinned to the Bottom -->
       <div class="audio-player">
@@ -388,11 +393,12 @@
     </button>
   </div>
 </aside>
-</div>
-<script type="application/json" id="studio-segments-data">
-  [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"ding dong lounge","id":"yIwsfqcdM","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/yIwsfqcdM.mp3","title":"segment_0","venueName":"ding_dong_lounge","status":"public"}]
-</script>
 
+    </div>
+
+    <script type="application/json" id="studio-segments-data">
+      [{"artistName":"decibel_force","artistId":"decibel_force","cardImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM_card","heroImage":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/yIwsfqcdM","duration":360,"eventDate":"20241012","formatedDuration":"06:00","formattedArtist":"decibel force","formattedDate":"12 Oct 24","formattedTitle":"segment 0","formattedVenue":"ding dong lounge","id":"yIwsfqcdM","performance":"decibel_force-ding_dong_lounge-20241012","source":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/yIwsfqcdM/output.m3u8","sourceMp3":"https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/mp3/yIwsfqcdM.mp3","title":"segment_0","venueName":"ding_dong_lounge","status":"public"}]
+    </script>
   </body>
-  <script type="module" src="/js/publicApp.js"></script>
+  <script type="module" src="/js/privateApp.js"></script>
 </html>

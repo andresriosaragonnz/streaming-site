@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{pageTitle}} | Live Archive</title>
+    <link rel="stylesheet" href="/css/review-studio.css" />
+  </head>
+  <body>
+    <div class="studio-container" x-data="privateWorkspace">
+      {{> private/renderPrivatePerformance/PrivateViewPlayer.html}} {{>
+      private/renderPrivatePerformance/PrivateViewSidebar.html}}
+    </div>
+
+    <script type="application/json" id="studio-segments-data">
+      {{jsonSegments}}
+    </script>
+  </body>
+  <script type="module" src="/js/privateApp.js"></script>
+</html>

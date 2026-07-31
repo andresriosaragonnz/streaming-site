@@ -4,7 +4,7 @@
   id="'publicPlayerColumn"
 >
   <div class="meta-title-card">
-    <div>{{menu}}</div>
+    <div>{{> components/Menu.html}}</div>
     <div class="meta-title-card-right">
       <h2>{{studioTitle}}</h2>
       <div class="toggle" @click="$store.review.togleMode()">
@@ -30,12 +30,12 @@
     <div
       x-show="!$store.review.mode && active.source"
       class="audio-player"
-      :style="active.heroImage ? `background-image: url('${active.heroImage}.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
+      :style="active.heroImage ? `background-image: url('${active.heroImage}_desktop.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
     >
       <!-- Audio Player Controls Pinned to the Bottom -->
       {{> components/common/AudioPlayer.html}}
     </div>
   </div>
 
-  {{controls}}
+  {{> public/renderPublicPerformance/PublicPlayerControls.html}}
 </section>
