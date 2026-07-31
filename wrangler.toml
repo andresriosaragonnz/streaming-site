@@ -10,9 +10,10 @@ binding = "ASSETS"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "poc-db"
-database_id = "your-cloudflare-d1-database-id" # Created via: npx wrangler d1 create studio-db
+database_name = "db"
+database_id = "f3d47265-97b0-4399-b0d0-3761b522e680" # Created via: npx wrangler d1 create studio-db
 
 [[kv_namespaces]]
 binding = "PAGE_CACHE"
-id = "your_kv_namespace_id" # Put a placeholder or real KV ID here
+id = "62705a56a0f745e985b2d712e8653903" # Put a placeholder or real KV ID here
+

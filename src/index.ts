@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import { renderPrivatePerformance } from "./build/compiler/private/renderPrivatePerformance/renderPrivatePerformance";
-import { renderPrivateDashboard } from "./build/compiler/private/renderPrivateDashboard/renderPrivateDashboard";
-import { renderPublicPerformance } from "./build/compiler/public/renderPublicPerformance/renderPublicPerformance";
-import { renderPublicEcosystem } from "./build/compiler/public/renderPublicEcosystem/renderPublicEcosystem";
+import { renderPrivatePerformance } from "./compiler/private/renderPrivatePerformance/renderPrivatePerformance";
+import { renderPrivateDashboard } from "./compiler/private/renderPrivateDashboard/renderPrivateDashboard";
+import { renderPublicPerformance } from "./compiler/public/renderPublicPerformance/renderPublicPerformance";
+import { renderPublicEcosystem } from "./compiler/public/renderPublicEcosystem/renderPublicEcosystem";
 
 // Define the Cloudflare KV binding type
 type Bindings = {
@@ -41,7 +41,7 @@ app.get("/performance/:slug", async (c) => {
 
 app.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const html = (await c.env.PAGE_CACHE.get(slug)) || "error";
+  const html = (await c.env.PAGE_CACHE.get(slug)) || "Key missing";
   return c.html(html);
 });
 

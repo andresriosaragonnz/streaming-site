@@ -7,7 +7,7 @@
     "sync:local": "bun run scripts/bulkCompileAndSync.ts",
     "sync:prod": "NODE_ENV=production bun run scripts/bulkCompileAndSync.ts",
     "dev": "wrangler dev",
-    "deploy": "bun run sync:prod && wrangler deploy",
+    "deploy": "wrangler deploy",
     "init-db": "bunx wrangler d1 execute DB --local --file=./schema.sql",
     "seed-db": "npx wrangler d1 execute DB --local --file=seed.sql",
     "kv:reset": "rm -rf .wrangler/state/v3/kv",
