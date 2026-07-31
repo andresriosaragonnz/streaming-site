@@ -1,7 +1,9 @@
 import { readAndExpandTemplate } from "./readAndExpandTemplate.js";
+import { compileStylesheets } from "./css.js";
 import fs from "fs";
 
 const compileCache = () => {
+  compileStylesheets();
   const cache = {
     PrivateDashboard: readAndExpandTemplate(
       "/private/renderPrivateDashboard/PrivateDashboard.html",

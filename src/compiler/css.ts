@@ -34,10 +34,9 @@ export function compileStylesheets(): void {
     );
 
     // Explicitly ground paths relative to where this exact compiler module script lives
-    const projectRoot = resolve(join(__dirname, "../../.."));
+    const projectRoot = resolve(join(__dirname, "../.."));
     const outputDir = join(projectRoot, "public/css");
-    const srcCssDir = join(projectRoot, "src/css");
-
+    const srcCssDir = join(projectRoot, "src/compiler/css");
     mkdirSync(outputDir, { recursive: true });
 
     // 1. Compile the main public portfolio styles
