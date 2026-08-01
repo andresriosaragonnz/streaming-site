@@ -8,11 +8,12 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{pageTitle}} | Live Archive</title>
+    <title>Performance</title>
     <link rel="stylesheet" href="/css/review-studio.css" />
   </head>
   <body>
-    <div class="studio-container" x-data="privateWorkspace">
+    {{> components/common/Toast.html}}
+    <div class="studio-container" x-data="publicWorkspace">
       {{> public/renderPublicPerformance/PublicViewPlayer.html}} {{>
       public/renderPublicPerformance/PublicViewSidebar.html}}
     </div>
@@ -21,5 +22,5 @@
       {{jsonSegments}}
     </script>
   </body>
-  <script type="module" src="/js/privateApp.js"></script>
+  <script type="module" src="/js/publicApp.js"></script>
 </html>

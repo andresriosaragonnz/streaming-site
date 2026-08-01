@@ -3,6 +3,7 @@ import compiledTemplates from "../../../../templateCache.json" with { type: "jso
 
 export const renderPublicPerformance = (performance: any): string => {
   const { segments } = performance;
+
   const { formattedArtist, venueName, formattedDate } = segments[0];
   const cards = segments
     .map((segment: any) =>

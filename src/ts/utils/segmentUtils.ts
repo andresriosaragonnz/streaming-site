@@ -3,7 +3,7 @@ import { Segment } from "../types.js";
 export const FALLBACK_SEGMENT: Segment = {
   id: "",
   title: "",
-  cardImage: "/screenshots/card/card-fallback.jpg",
+  cardImage: "",
   status: "public",
 };
 

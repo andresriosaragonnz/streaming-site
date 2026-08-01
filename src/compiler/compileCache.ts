@@ -29,6 +29,7 @@ const compileCache = () => {
     PublicSegmentCard: readAndExpandTemplate(
       "/public/renderPublicPerformance/PublicSegmentCard.html",
     ),
+    Missing: readAndExpandTemplate("/public/Missing.html"),
   };
   fs.writeFileSync("./templateCache.json", JSON.stringify(cache));
 };

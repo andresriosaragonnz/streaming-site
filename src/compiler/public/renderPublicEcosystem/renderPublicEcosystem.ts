@@ -2,6 +2,8 @@ import { formatSegments } from "../../formatSegments/index.js";
 import { getPerformancesFromSegments } from "../../utils/getPerformancesFromSegments.js";
 import { renderPublicPortfolio } from "../renderPublicPortfolio/renderPublicPortfolio.js";
 import { renderPublicPerformance } from "../renderPublicPerformance/renderPublicPerformance.js";
+import { renderComponent } from "../../renderPage.js";
+import compiledTemplates from "../../../../templateCache.json" with { type: "json" };
 
 export const renderPublicEcosystem = (segments: any): any => {
   const formatedSegments = formatSegments(segments);
@@ -15,7 +17,7 @@ export const renderPublicEcosystem = (segments: any): any => {
 
   for (const performance of performances.private) {
     performanceIndex[performance.performance] = {
-      value: `<div> ONly private</div>`,
+      value: renderComponent(compiledTemplates.Missing, {}),
       key: performance.performance,
     };
   }

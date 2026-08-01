@@ -40,6 +40,15 @@ export function initAlpineStores(Alpine: any): void {
 
     get active(): Segment {
       const store = Alpine.store("review");
+      if (!store || !store.segments || !store.segments[store.currentIndex]) {
+        return {
+          id: "",
+          title: "",
+          source: "", // Ensures active.source exists safely as an empty string
+          status: "public",
+          cardImage: "",
+        };
+      }
       return store.segments[store.currentIndex];
     },
   }));
@@ -58,11 +67,14 @@ export function initAlpineStores(Alpine: any): void {
   // 3. REGISTER PLAYLISTS STORE
   Alpine.store("playlists", {
     playlists: { favorites: [], shared: [] } as PlaylistsMap,
-
     async generateShareLink(playlistName: string): Promise<void> {
       const ids = this.playlists[playlistName];
+      console.log({ playlistName, ids });
+
+      // Use the explicit Alpine reference passed into initAlpineStores
+      Alpine.store("toast").trigger("Cannot share an empty playlist.", "info");
+
       if (!ids || ids.length === 0) {
-        alert("⚠️ Cannot share an empty playlist.");
         return;
       }
 
@@ -70,12 +82,18 @@ export function initAlpineStores(Alpine: any): void {
 
       try {
         await navigator.clipboard.writeText(shareUrl);
-        alert("copied to clipboard");
+        Alpine.store("toast").trigger(
+          "📋 Playlist link copied to clipboard!",
+          "success",
+        );
       } catch (err) {
         console.error("Failed to copy to clipboard:", err);
+        Alpine.store("toast").trigger(
+          "❌ Failed to copy link to clipboard.",
+          "error",
+        );
       }
     },
-
     addActiveToPlaylist(playlistName: string): void {
       const reviewStore = Alpine.store("review");
       const activeSegment = reviewStore.segments[reviewStore.currentIndex];

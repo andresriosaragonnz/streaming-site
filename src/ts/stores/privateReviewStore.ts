@@ -56,7 +56,7 @@ export function initPrivateAlpineStores(Alpine: any): void {
         return {
           id: "",
           title: "",
-          cardImage: "/screenshots/card/card-fallback.jpg",
+          cardImage: "",
           status: "private",
         };
       }
@@ -121,9 +121,8 @@ export function initPrivateAlpineStores(Alpine: any): void {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.segments),
+          body: JSON.stringify({ segments: this.segments }),
         });
-        console.log(response);
         if (!response.ok) {
           throw new Error(
             `Commit status failed with status ${response.status}`,

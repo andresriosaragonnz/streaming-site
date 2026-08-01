@@ -1,25 +1,36 @@
 import { registerCarousel } from "./utils/carousel.js";
 import { initAlpineStores } from "./stores/publicStore.js";
 
-document.addEventListener("alpine:init", () => {
-  const Alpine = window.Alpine;
+function bootAlpine() {
+  const Alpine = (window as any).Alpine;
+  if (!Alpine) return;
+
+  // Prevent double registration if already booted
+  if ((window as any).__alpineBooted) return;
+  (window as any).__alpineBooted = true;
 
   registerCarousel(Alpine);
   initAlpineStores(Alpine);
-});
+  console.log("🚀 Alpine stores successfully registered.");
+}
 
-// Boot script loader for media engine & Alpine
+// Listen for standard init event
+document.addEventListener("alpine:init", bootAlpine);
+
+// Dynamically load media engine -> then Alpine
 const mediaEngineScript = document.createElement("script");
 mediaEngineScript.src = "/js/mediaInit.js";
 
 mediaEngineScript.onload = () => {
-  console.log(
-    "⚡ Option B Media Engine loaded. Booting Alpine wrapper next...",
-  );
-  const script = document.createElement("script");
-  script.src = "/js/alpine.js";
-  script.defer = true;
-  document.head.appendChild(script);
+  const alpineScript = document.createElement("script");
+  alpineScript.src = "/js/alpine.js";
+
+  // Boot stores explicitly as soon as alpine.js loads
+  alpineScript.onload = () => {
+    bootAlpine();
+  };
+
+  document.head.appendChild(alpineScript);
 };
 
 document.head.appendChild(mediaEngineScript);

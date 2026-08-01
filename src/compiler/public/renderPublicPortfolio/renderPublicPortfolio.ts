@@ -8,7 +8,7 @@ export const renderPublicPortfolio = (
 ): string => {
   const { formattedArtist } = formatedSegments[0];
   if (performances.public.length === 0) {
-    return `<div>empty</div>`;
+    return renderComponent(compiledTemplates.Missing, {});
   }
   const gridHtml = performances.public
     .map((performance: any) =>

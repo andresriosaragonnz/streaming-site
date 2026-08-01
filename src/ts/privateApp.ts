@@ -3,7 +3,6 @@ import { initPrivateAlpineStores } from "./stores/privateReviewStore.js";
 
 document.addEventListener("alpine:init", () => {
   const Alpine = window.Alpine;
-
   registerCarousel(Alpine);
   initPrivateAlpineStores(Alpine);
 });
@@ -13,9 +12,6 @@ const mediaEngineScript = document.createElement("script");
 mediaEngineScript.src = "/js/mediaInit.js";
 
 mediaEngineScript.onload = () => {
-  console.log(
-    "⚡ Option B Media Engine loaded. Booting Alpine wrapper next...",
-  );
   const script = document.createElement("script");
   script.src = "/js/alpine.js";
   script.defer = true;

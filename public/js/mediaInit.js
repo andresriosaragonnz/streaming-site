@@ -1,5 +1,3 @@
-// public/js/mediaInit.js
-
 window.setupMediaPlayback = function (activeItem, currentMode) {
   const video = document.getElementById("r2-stream-player");
   const audio = document.getElementById("r2-audio-player");

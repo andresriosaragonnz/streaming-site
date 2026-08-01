@@ -1,13 +1,12 @@
 <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
-  {{> components/common/SegmentCardImage.html}}
-
   <div class="item-meta">
+    {{> components/common/SegmentCardImage.html}}
     <div class="title-text">
       <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
-    </div>
-    <div class="title-text">
       <span x-text="seg.formatedDuration"></span>
     </div>
+  </div>
+  <div class="title-text">
+    <span x-text="seg.title"></span>
   </div>
 </div>
