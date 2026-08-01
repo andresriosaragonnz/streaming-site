@@ -1,5 +1,5 @@
 import { Segment } from "../types.js";
-import { getActiveSegment, parseSegmentsData } from "../utils/segmentUtils.js";
+import { parseSegmentsData } from "../utils/segmentUtils.js";
 import {
   StatusSnapshot,
   createStatusSnapshot,
@@ -64,16 +64,47 @@ export function initPrivateAlpineStores(Alpine: any): void {
     },
   }));
 
+  Alpine.store("toast", {
+    show: false,
+    message: "",
+    type: "success" as "success" | "error" | "info",
+    timeoutId: null as any,
+
+    trigger(
+      message: string,
+      type: "success" | "error" | "info" = "success",
+      duration = 3000,
+    ) {
+      // Clear any existing timeout if a new toast arrives quickly
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+      }
+
+      this.message = message;
+      this.type = type;
+      this.show = true;
+
+      this.timeoutId = setTimeout(() => {
+        this.show = false;
+      }, duration);
+    },
+
+    dismiss() {
+      this.show = false;
+    },
+  });
+
   // 2. REGISTER DEDICATED PRIVATE REVIEW STORE
   Alpine.store("review", {
     segments: [] as Segment[],
     initialStatuses: {} as StatusSnapshot,
     mode: true,
+    changed: false,
     currentIndex: 0,
     isCommitModalOpen: false,
 
     openCommitModal() {
-      if (this.hasStatusChanged()) {
+      if (this.changed) {
         this.isCommitModalOpen = true;
       }
     },
@@ -83,8 +114,6 @@ export function initPrivateAlpineStores(Alpine: any): void {
     },
 
     async submitCommit() {
-      const changed = getChangedSegments(this.segments);
-
       try {
         // 2. Send POST request to Hono /api/commit-status
         const response = await fetch("/api/commit-status", {
@@ -92,16 +121,27 @@ export function initPrivateAlpineStores(Alpine: any): void {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(changed),
+          body: JSON.stringify(this.segments),
         });
-
+        console.log(response);
         if (!response.ok) {
           throw new Error(
             `Commit status failed with status ${response.status}`,
           );
         }
-
         const data = await response.json();
+        Alpine.store("toast").trigger(
+          "Changes committed successfully!",
+          "success",
+        );
+        console.log("✅ Commit successful:", data);
+
+        // 2. RESET STATE AFTER COMMIT
+        // Re-capture the initial status snapshot so hasStatusChanged evaluates to false
+        this.initialStatuses = createStatusSnapshot(this.segments);
+
+        // Reset change flag
+        this.changed = false;
       } catch (error) {
         console.error("❌ Failed to submit commit status:", error);
       } finally {
@@ -119,17 +159,17 @@ export function initPrivateAlpineStores(Alpine: any): void {
         this.segments[targetIdx].status =
           currentStatus === "public" ? "private" : "public";
         this.broadcastChange(this.segments[targetIdx]);
+        this.changed = hasStatusChanged(this.segments, this.initialStatuses);
       }
-    },
-
-    hasStatusChanged(): boolean {
-      return hasStatusChanged(this.segments, this.initialStatuses);
     },
 
     getPublicSegments(): Segment[] {
       return filterSegmentsByStatus(this.segments, "public");
     },
 
+    gePrivateSegments(): Segment[] {
+      return filterSegmentsByStatus(this.segments, "private");
+    },
     getCount(): string {
       return `public:${filterSegmentsByStatus(this.segments, "public").length}`;
     },

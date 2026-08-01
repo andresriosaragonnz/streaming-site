@@ -2,21 +2,19 @@
   @click="$store.review.currentIndex = idx"
   class="sidebar-item-card"
   :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : '',
-    seg.status === 'private' ? 'sidebar-item-card-private' : 'sidebar-item-card'
+    $store.review.currentIndex === idx ? 'item-active-highlight' : ''
   ]"
 >
-  {{> components/common/SegmentCardImage.html}}
-
   <div class="item-meta">
-    <div class="title-text">
-      <!-- FIXED: Linked to the dynamic, reactive title string -->
-      <span x-text="seg.title"></span>
+    {{> components/common/SegmentCardImage.html}}
+    <div class="status-text">
+      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"></span>
+      <span x-text="seg.formatedDuration"></span>
     </div>
-    <div class="title-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"
-        >Private</span
-      >
-    </div>
+  </div>
+
+  <div class="title-text">
+    <!-- FIXED: Linked to the dynamic, reactive title string -->
+    <span x-text="seg.title"></span>
   </div>
 </div>

@@ -27,6 +27,22 @@
         </li>
       </template>
     </ul>
+    <!-- List of changed segments -->
+    <ul class="commit-segment-list">
+      <template
+        x-for="(seg, idx) in $store.review.gePrivateSegments()"
+        :key="seg.id ?? idx"
+      >
+        <li class="commit-segment-item">
+          <span x-text="seg.title" class="segment-title"></span>
+          <span
+            x-text="seg.status"
+            :class="seg.status === 'public' ? 'status-tag-public' : 'status-tag-private'"
+            class="status-tag"
+          ></span>
+        </li>
+      </template>
+    </ul>
 
     <!-- APRA AMCOS DIRECT LICENSING AGREEMENT -->
     <div

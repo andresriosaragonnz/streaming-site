@@ -17,3 +17,5 @@
 @import "./components/_PrivatePlayerControls.css";
 @import "./components/_modal.css";
 @import "./components/_player.css";
+@import "./components/_menu.css";
+@import "./components/_toast.css";

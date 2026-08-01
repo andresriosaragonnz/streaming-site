@@ -1,0 +1,135 @@
+/* Baseline Wrapper (Invisible so it doesn't break main page layouts) */
+.menu {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* 
+     * PURE CSS DRAWER MECHANICS 
+     */
+
+/* 1. Hide the structural checkbox completely */
+#drawer-toggle {
+  display: none;
+}
+
+/* 2. Style the trigger button (Hamburger Menu) - NOW FIXED/STICKY */
+.drawer-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #1f2937;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: 1px solid #374151;
+  transition: background-color 0.2s ease;
+  user-select: none;
+
+  /* Sticky/Fixed Positioning */
+
+  z-index: 30; /* Keeps it above content, but below the dark overlay (40) */
+}
+.drawer-trigger:hover {
+  background-color: #374151;
+}
+
+/* 3. The dark background overlay */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none; /* Ignore clicks when hidden */
+  transition: opacity 0.3s ease;
+  z-index: 40;
+}
+
+/* 4. The Drawer Panel itself */
+.drawer-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background-color: #111827;
+  border-right: 1px solid #1f2937;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  transform: translateX(-100%); /* Push completely off-screen */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 5. Trigger the open states when the hidden checkbox is checked */
+#drawer-toggle:checked ~ .drawer-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+#drawer-toggle:checked ~ .drawer-panel {
+  transform: translateX(0);
+}
+
+/* 
+     * DRAWER INTERIOR STYLING 
+     */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 20px;
+  border-bottom: 1px solid #1f2937;
+}
+.drawer-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Close button inside the drawer */
+.drawer-close {
+  color: #9ca3af;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.drawer-close:hover {
+  color: #ffffff;
+}
+
+/* Link list styling */
+.drawer-links {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.drawer-link {
+  display: block;
+  padding: 12px 16px;
+  color: #d1d5db;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.drawer-link:hover {
+  background-color: #1f2937;
+  color: #ffffff;
+}

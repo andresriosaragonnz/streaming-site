@@ -29,7 +29,7 @@
     <div class="status-action-wrapper">
       <!-- Commit Action -->
       <button
-        x-show="$store.review.hasStatusChanged()"
+        x-show="$store.review.changed"
         @click="$store.review.openCommitModal()"
         type="button"
         class="btn-status btn-public"

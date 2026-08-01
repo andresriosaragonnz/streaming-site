@@ -36,7 +36,6 @@ export function getChangedSegments(segments: Segment[]): {
   publicIds: string[];
   artist: string[];
 } {
-  console.log(segments[0]);
   const privateSeg = segments
     .filter((seg) => seg.status === "private")
     .map((seg) => seg.id);
