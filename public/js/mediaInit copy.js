@@ -2,20 +2,8 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
   const video = document.getElementById("r2-stream-player");
   const audio = document.getElementById("r2-audio-player");
 
-  // Helper to advance Alpine store
-  const triggerNext = () => {
-    console.log("🏁 Playback ended. Auto-advancing to next segment...");
-    if (window.Alpine && window.Alpine.store("review")) {
-      window.Alpine.store("review").nextSegment();
-    }
-  };
-
-  // Reset ongoing streams and clean up previous ended listeners
+  // Reset ongoing streams to prevent memory leaks and buffer collisions
   if (video) {
-    if (video._onEndedHandler) {
-      video.removeEventListener("ended", video._onEndedHandler);
-      video._onEndedHandler = null;
-    }
     video.pause();
     if (video.src.startsWith("blob:")) {
       URL.revokeObjectURL(video.src);
@@ -24,12 +12,7 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
     video.removeAttribute("src");
     video.load();
   }
-
   if (audio) {
-    if (audio._onEndedHandler) {
-      audio.removeEventListener("ended", audio._onEndedHandler);
-      audio._onEndedHandler = null;
-    }
     audio.pause();
     audio.src = "";
   }
@@ -49,13 +32,8 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
   if (currentMode) {
     if (!video) return;
 
-    // Attach ended listener for auto-advance
-    video._onEndedHandler = triggerNext;
-    video.addEventListener("ended", video._onEndedHandler);
-
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = streamUrl;
-      video.play().catch((err) => console.log("Autoplay blocked:", err));
       return;
     }
 
@@ -128,7 +106,6 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
           };
 
           await queueAndFetchNext();
-          video.play().catch((err) => console.log("Autoplay blocked:", err));
         } catch (err) {
           console.error("❌ MSE processing error:", err);
         }
@@ -139,13 +116,7 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
   else {
     if (!audio || !streamUrlMp3) return;
     console.log("🎵 Streaming audio file from R2:", streamUrlMp3);
-
-    // Attach ended listener for auto-advance
-    audio._onEndedHandler = triggerNext;
-    audio.addEventListener("ended", audio._onEndedHandler);
-
     audio.src = streamUrlMp3;
     audio.load();
-    audio.play().catch((err) => console.log("Autoplay blocked:", err));
   }
 };

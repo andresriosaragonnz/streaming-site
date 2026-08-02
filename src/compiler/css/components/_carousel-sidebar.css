@@ -138,10 +138,24 @@
   right: 0.5rem;
   padding-left: 3px;
 }
+.sidebar-artist-button {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  font-size: 1.2rem;
+  width: auto;
+  padding: 0.8rem;
+  text-decoration: none;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.sidebar-artist-button:hover {
+  background: color-mix(in srgb, var(--bg-card) 80%, #fff);
+}
 
 @media (min-width: 1536px) {
   .playlist-sidebar {
-    flex: 0 0 30%;
+    flex: 0 0 20%;
     max-height: 85vh;
   }
 
@@ -189,5 +203,10 @@
     display: flex;
     flex-direction: row;
     gap: 1.6rem;
+  }
+  .sidebar-item-card {
+    display: flex;
+    padding: 0.8rem;
+    flex: 0 0 180px;
   }
 }

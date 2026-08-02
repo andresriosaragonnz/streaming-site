@@ -29,6 +29,10 @@ const compileCache = () => {
     PublicSegmentCard: readAndExpandTemplate(
       "/public/renderPublicPerformance/PublicSegmentCard.html",
     ),
+    PlaylistSegmentCard: readAndExpandTemplate(
+      "/playlist/renderPlaylist/PlaylistSegmentCard.html",
+    ),
+    Playlist: readAndExpandTemplate("/playlist/renderPlaylist/Playlist.html"),
     Missing: readAndExpandTemplate("/public/Missing.html"),
   };
   fs.writeFileSync("./templateCache.json", JSON.stringify(cache));

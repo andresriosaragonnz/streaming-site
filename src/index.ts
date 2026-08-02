@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { renderPrivatePerformance } from "./compiler/private/renderPrivatePerformance/renderPrivatePerformance";
 import { renderPrivateDashboard } from "./compiler/private/renderPrivateDashboard/renderPrivateDashboard";
-import { renderPublicPerformance } from "./compiler/public/renderPublicPerformance/renderPublicPerformance";
+import { renderPlaylist } from "./compiler/playlist/renderPlaylist/renderPlaylist";
 import { renderPublicEcosystem } from "./compiler/public/renderPublicEcosystem/renderPublicEcosystem";
 import { formatSegments } from "./compiler/formatSegments/index.js";
 
@@ -14,7 +14,6 @@ const app = new Hono<{ Bindings: Bindings }>();
 
 app.get("/private/performance/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const cacheKey = `private-${slug}`;
   const sql = `SELECT * FROM segments WHERE performance = ?`;
   const { results } = await c.env.DB.prepare(sql).bind(slug).all();
   const html = renderPrivatePerformance(results);
@@ -51,8 +50,7 @@ app.get("/playlist", async (c) => {
       .all();
 
     // 6. Render and return HTML page
-    console.log(results);
-    const html = renderPublicPerformance({ segments: formatSegments(results) });
+    const html = renderPlaylist({ segments: formatSegments(results) });
     return c.html(html);
   } catch (err) {
     console.error("Failed to parse playlist share parameter:", err);
@@ -62,26 +60,35 @@ app.get("/playlist", async (c) => {
 
 app.get("/private/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const cacheKey = `private-${slug}`;
   const sql = `SELECT * FROM segments WHERE artistId = ?`;
   const { results } = await c.env.DB.prepare(sql).bind(slug).all();
   const html = renderPrivateDashboard(results);
-  // let html = (await c.env.PAGE_CACHE.get(cacheKey)) || "error";
   return c.html(html);
 });
 
-app.get("/performance/:slug", async (c) => {
-  const slug = c.req.param("slug");
-  const sql = `SELECT * FROM segments WHERE performance = ?`;
-  const { results } = await c.env.DB.prepare(sql).bind(slug).all();
-  const html = renderPublicPerformance(results);
-  return c.html(html);
+app.get("/reset", async (c) => {
+  const sql = `SELECT * FROM segments`;
+  const { results } = await c.env.DB.prepare(sql).all();
+  const groupedByArtist = {} as any;
+  for (const segment of results) {
+    if (groupedByArtist[segment.artistName]) {
+      groupedByArtist[segment.artistName].push(segment);
+    } else {
+      groupedByArtist[segment.artistName] = [segment];
+    }
+  }
+  const pages = Object.values(groupedByArtist)
+    .map(renderPublicEcosystem)
+    .flat();
+  await Promise.all(
+    pages.map(({ key, value }) => c.env.PAGE_CACHE.put(key, value)),
+  );
+  return c.text("done");
 });
 
 app.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
   const found = await c.env.PAGE_CACHE.get(slug);
-  console.log({ found });
   const html = found || "";
   return c.html(html);
 });

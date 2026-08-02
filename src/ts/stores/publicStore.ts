@@ -62,6 +62,18 @@ export function initAlpineStores(Alpine: any): void {
     togleMode() {
       this.mode = !this.mode;
     },
+    nextSegment() {
+      console.log("in next segment");
+      if (this.segments.length === 0) return;
+
+      if (this.currentIndex < this.segments.length - 1) {
+        this.currentIndex++;
+      }
+      // Option B (Loop playlist): Uncomment line below to wrap back to first track
+      else {
+        this.currentIndex = 0;
+      }
+    },
   });
 
   // 3. REGISTER PLAYLISTS STORE
