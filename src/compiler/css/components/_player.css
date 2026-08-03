@@ -10,6 +10,11 @@
   overflow: hidden;
 }
 
+.performance-title {
+  text-transform: capitalize;
+  font-size: larger;
+}
+
 /* Cassette Image (Cover + Film Negative Effect) */
 .audio-player-hero {
   position: absolute;

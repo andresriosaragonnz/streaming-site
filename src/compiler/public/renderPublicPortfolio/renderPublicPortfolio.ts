@@ -6,7 +6,7 @@ export const renderPublicPortfolio = (
   performances: any,
   formatedSegments: any,
 ): string => {
-  const { formattedArtist } = formatedSegments[0];
+  const { formattedArtist, artistId } = formatedSegments[0];
   if (performances.public.length === 0) {
     return renderComponent(compiledTemplates.Missing, {});
   }
@@ -17,8 +17,10 @@ export const renderPublicPortfolio = (
     .join("");
   const htmlContent = renderComponent(compiledTemplates.PublicPortfolio, {
     title: `${formattedArtist}`,
+    link: artistId,
     count: performances.private.length,
     gridHtml,
+    pageTitle: `${formattedArtist}`,
     heroImage: formatedSegments[getRandomIndex(formatedSegments)].heroImage,
   });
   return htmlContent;

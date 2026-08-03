@@ -7,7 +7,11 @@
   font-weight: 700;
   color: var(--text-muted, #9ca3af);
 }
-
+.btn-back {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-muted, #9ca3af);
+}
 .artist-hero {
   position: relative;
   width: 100%;

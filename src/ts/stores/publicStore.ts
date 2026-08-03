@@ -1,6 +1,8 @@
 import { Segment, PlaylistsMap } from "../types.js";
 import { parseSegmentsData } from "../utils/segmentUtils.js";
 import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils.js";
+import { getCardImage } from "../../compiler/formatSegments/getCardImage.js";
+import { getHeroImage } from "../../compiler/formatSegments/getHeroImage.js";
 
 export function initAlpineStores(Alpine: any): void {
   // 1. REGISTER publicWorkspace DATA COMPONENT (Watcher & Hydration Hub)
@@ -14,7 +16,11 @@ export function initAlpineStores(Alpine: any): void {
           console.log("✅ Public player workspace hydrated successfully.");
 
           if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(this.active, this.$store.review.mode);
+            window.setupMediaPlayback(
+              this.active,
+              this.$store.review.mode,
+              true,
+            );
           }
         }
       });
@@ -23,7 +29,11 @@ export function initAlpineStores(Alpine: any): void {
       this.$watch("$store.review.currentIndex", () => {
         this.$nextTick(() => {
           if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(this.active, this.$store.review.mode);
+            window.setupMediaPlayback(
+              this.active,
+              this.$store.review.mode,
+              false,
+            );
           }
         });
       });
@@ -32,7 +42,11 @@ export function initAlpineStores(Alpine: any): void {
       this.$watch("$store.review.mode", () => {
         this.$nextTick(() => {
           if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(this.active, this.$store.review.mode);
+            window.setupMediaPlayback(
+              this.active,
+              this.$store.review.mode,
+              true,
+            );
           }
         });
       });
@@ -75,22 +89,61 @@ export function initAlpineStores(Alpine: any): void {
       }
     },
   });
-
   // 3. REGISTER PLAYLISTS STORE
+  const LOCAL_STORAGE_KEY = "user_playlists";
+
   Alpine.store("playlists", {
-    playlists: { favorites: [], shared: [] } as PlaylistsMap,
+    // 1. Initial State (tries loading from LocalStorage first, defaults to empty arrays)
+    playlists: (() => {
+      try {
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return saved ? JSON.parse(saved) : { favorites: [], shared: [] };
+      } catch {
+        return { favorites: [], shared: [] };
+      }
+    })() as PlaylistsMap,
+
+    getPlaylistsPortfolio() {
+      const values = Object.keys(this.playlists).reduce((acc, current) => {
+        const playlist = this.playlists[current];
+        if (playlist.length === 0) {
+          return acc;
+        }
+        return {
+          ...acc,
+          [current]: {
+            amount: playlist.length,
+            image: `https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/${playlist[0]}_card`,
+          },
+        };
+      }, {});
+      return values;
+    },
+    // Helper method to sync current state to LocalStorage
+    saveToLocalStorage(): void {
+      try {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(this.playlists));
+      } catch (err) {
+        console.error("Failed to save playlists to localStorage:", err);
+      }
+    },
+
     async generateShareLink(playlistName: string): Promise<void> {
       const ids = this.playlists[playlistName];
-      console.log({ playlistName, ids });
-
-      // Use the explicit Alpine reference passed into initAlpineStores
-      Alpine.store("toast").trigger("Cannot share an empty playlist.", "info");
 
       if (!ids || ids.length === 0) {
+        Alpine.store("toast").trigger(
+          "Cannot share an empty playlist.",
+          "info",
+        );
         return;
       }
 
-      const shareUrl = createShareUrl(window.location.origin, ids);
+      const shareUrl = createShareUrl(
+        window.location.origin,
+        ids,
+        playlistName,
+      );
 
       try {
         await navigator.clipboard.writeText(shareUrl);
@@ -106,6 +159,17 @@ export function initAlpineStores(Alpine: any): void {
         );
       }
     },
+
+    getShareLink(playlistName: string): string {
+      const ids = this.playlists[playlistName];
+      const shareUrl = createShareUrl(
+        window.location.origin,
+        ids,
+        playlistName,
+      );
+      return shareUrl;
+    },
+
     addActiveToPlaylist(playlistName: string): void {
       const reviewStore = Alpine.store("review");
       const activeSegment = reviewStore.segments[reviewStore.currentIndex];
@@ -120,7 +184,16 @@ export function initAlpineStores(Alpine: any): void {
         playlistName,
         segmentId,
       );
-      console.log(`📡 Playlist ${playlistName} updated locally.`);
+
+      // 2. Persist updated playlists to LocalStorage
+      this.saveToLocalStorage();
+
+      console.log(
+        `📡 Playlist ${playlistName} updated locally and saved to localStorage.`,
+      );
+
+      // Optional feedback trigger
+      Alpine.store("toast").trigger(`Added to ${playlistName}!`, "success");
     },
   });
 

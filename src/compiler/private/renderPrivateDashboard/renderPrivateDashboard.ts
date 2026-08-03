@@ -2,10 +2,11 @@ import { renderComponent } from "../../renderPage.js";
 import { formatSegments } from "../../formatSegments/index.js";
 import { getPerformancesFromSegments } from "../../utils/getPerformancesFromSegments.js";
 import compiledTemplates from "../../../../templateCache.json" with { type: "json" };
+import { getRandomIndex } from "../../utils/getRandomIndex.js";
 
 export const renderPrivateDashboard = (segments: any): string => {
   const formatedSegments = formatSegments(segments);
-  const { formattedArtist } = formatedSegments[0];
+  const { formattedArtist, artistId } = formatedSegments[0];
   const performances = getPerformancesFromSegments(formatedSegments);
   const gridHtml = performances.private
     .map((performance) =>
@@ -16,6 +17,9 @@ export const renderPrivateDashboard = (segments: any): string => {
     title: `${formattedArtist}`,
     count: performances.private.length,
     gridHtml,
+    heroImage: formatedSegments[getRandomIndex(formatedSegments)].heroImage,
+    heroBackTitle: "See public Profile",
+    heroBackLink: artistId,
   });
   return htmlContent;
 };

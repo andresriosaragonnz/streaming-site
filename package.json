@@ -8,6 +8,7 @@
     "sync:prod": "NODE_ENV=production bun run scripts/bulkCompileAndSync.ts",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "seed-remote": "npx wrangler d1 execute db --remote --file=./seed.sql",
     "init-db": "bunx wrangler d1 execute DB --local --file=./schema.sql",
     "seed-db": "npx wrangler d1 execute DB --local --file=seed.sql",
     "kv:reset": "rm -rf .wrangler/state/v3/kv",

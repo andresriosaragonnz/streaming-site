@@ -26,7 +26,7 @@ const formatSegments = (rawSegments: any[]) => {
       formattedVenue: segment.venueName.replaceAll("_", " "),
       id: segment.id,
       performance: segment.performance,
-      source: getVideoSource(segment.id),
+      source: getVideoSource(segment.index),
       sourceMp3: getAudioSource(segment.id),
       title: segment.title,
       venueName: segment.venueName,

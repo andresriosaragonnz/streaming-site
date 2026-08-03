@@ -4,35 +4,61 @@
     selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
   }"
 >
-  <div class="header-row">
+  <div
+    class="header-row"
+    x-data="{ selectedPlaylist: 'favorites', customPlaylistName: '' }"
+  >
     <div class="studio-controls-group">
+      <!-- Playlist Selector -->
       <div class="input-field-group">
-        <!-- 1. Bind to local component state variable instead of active.title -->
         <select x-model="selectedPlaylist">
-          <!-- 2. Loop through your state dynamically, or keep them hardcoded -->
+          <!-- Dynamic playlists from store -->
           <template
             x-for="(list, name) in $store.playlists.playlists"
             :key="name"
           >
             <option :value="name" x-text="name"></option>
           </template>
+
+          <!-- Action Option for New Playlist -->
+          <option value="__new__">+ Create New Playlist...</option>
         </select>
       </div>
 
-      <!-- 3. Pass the selected playlist target parameter straight to the method -->
+      <!-- Free Text Input (Appears only when "+ Create New Playlist..." is selected) -->
+      <div
+        class="input-field-group"
+        x-show="selectedPlaylist === '__new__'"
+        x-cloak
+      >
+        <input
+          type="text"
+          x-model="customPlaylistName"
+          placeholder="Enter playlist name..."
+          class="input-public"
+        />
+      </div>
+
+      <!-- Add Button: Resolves whether to use selected item or custom text -->
       <button
-        @click="$store.playlists.addActiveToPlaylist(selectedPlaylist)"
+        x-cloak
+        x-show="active.source"
+        @click="
+        const target = selectedPlaylist === '__new__' ? customPlaylistName.trim() : selectedPlaylist;
+        if (target) {
+          $store.playlists.addActiveToPlaylist(target);
+          if (selectedPlaylist === '__new__') {
+            selectedPlaylist = target; // Automatically switch select to the newly created playlist
+            customPlaylistName = '';   // Clear input
+          }
+        } else {
+          $store.toast.trigger('Please enter a valid playlist name.', 'error');
+        }
+      "
         type="button"
         class="btn-public"
       >
         <span>Add to playlist</span>
-      </button>
-      <button
-        @click="$store.playlists.generateShareLink(selectedPlaylist)"
-        type="button"
-        class="btn-public"
-      >
-        <span>Share playlist</span>
       </button>
     </div>
   </div>

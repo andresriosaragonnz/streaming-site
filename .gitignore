@@ -2,6 +2,8 @@
 node_modules
 devAssets
 .wrangler
+public/images
+
 # output
 out
 dist

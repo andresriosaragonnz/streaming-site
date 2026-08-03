@@ -6,13 +6,13 @@
   <div class="meta-title-card">
     <div>{{> components/Menu.html}}</div>
     <div class="meta-title-card-right">
-      <h2>{{studioTitle}}</h2>
       <div class="toggle" @click="$store.review.togleMode()">
         <input type="checkbox" :checked="!$store.review.mode" />
         <label></label>
       </div>
     </div>
   </div>
+  <div class="performance-title">{{studioTitle}}</div>
 
   <div
     :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
@@ -37,5 +37,5 @@
     </div>
   </div>
 
-  {{> public/renderPublicPerformance/PublicPlayerControls.html}}
+  {{> playlist/renderPlaylist/PlaylistPlayerControls.html}}
 </section>

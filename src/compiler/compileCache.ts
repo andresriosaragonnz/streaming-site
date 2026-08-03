@@ -33,9 +33,14 @@ const compileCache = () => {
       "/playlist/renderPlaylist/PlaylistSegmentCard.html",
     ),
     Playlist: readAndExpandTemplate("/playlist/renderPlaylist/Playlist.html"),
+
     Missing: readAndExpandTemplate("/public/Missing.html"),
   };
   fs.writeFileSync("./templateCache.json", JSON.stringify(cache));
+  fs.writeFileSync(
+    "./public/myplaylists.html",
+    readAndExpandTemplate("/playlist/playlistList/PlaylistPortfolio.html"),
+  );
 };
 
 compileCache();

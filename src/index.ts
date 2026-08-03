@@ -5,12 +5,33 @@ import { renderPlaylist } from "./compiler/playlist/renderPlaylist/renderPlaylis
 import { renderPublicEcosystem } from "./compiler/public/renderPublicEcosystem/renderPublicEcosystem";
 import { formatSegments } from "./compiler/formatSegments/index.js";
 
-// Define the Cloudflare KV binding type
+// Define D1 Database binding type (No KV needed)
 type Bindings = {
-  PAGE_CACHE: KVNamespace;
+  DB: D1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+/**
+ * Helper utility to batch write key-value pairs to the `pages` D1 SQLite table.
+ * Uses atomic batching to execute upserts in a single network round-trip.
+ */
+async function savePagesToD1(
+  db: D1Database,
+  pages: { key: string; value: string }[],
+) {
+  if (pages.length === 0) return;
+
+  const statements = pages.map(({ key, value }) =>
+    db
+      .prepare(
+        `INSERT INTO pages (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+      )
+      .bind(key, value),
+  );
+
+  await db.batch(statements);
+}
 
 app.get("/private/performance/:slug", async (c) => {
   const slug = c.req.param("slug");
@@ -22,6 +43,7 @@ app.get("/private/performance/:slug", async (c) => {
 
 app.get("/playlist", async (c) => {
   let shareParam = c.req.query("share");
+  const nameParam = c.req.query("name") || "playlist";
   if (!shareParam) {
     return c.text("Missing share parameter", 400);
   }
@@ -50,7 +72,12 @@ app.get("/playlist", async (c) => {
       .all();
 
     // 6. Render and return HTML page
-    const html = renderPlaylist({ segments: formatSegments(results) });
+    const html = renderPlaylist(
+      {
+        segments: formatSegments(results),
+      },
+      nameParam,
+    );
     return c.html(html);
   } catch (err) {
     console.error("Failed to parse playlist share parameter:", err);
@@ -80,16 +107,22 @@ app.get("/reset", async (c) => {
   const pages = Object.values(groupedByArtist)
     .map(renderPublicEcosystem)
     .flat();
-  await Promise.all(
-    pages.map(({ key, value }) => c.env.PAGE_CACHE.put(key, value)),
-  );
+
+  // Write all generated pages to D1 `pages` table
+  await savePagesToD1(c.env.DB, pages);
+
   return c.text("done");
 });
 
 app.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const found = await c.env.PAGE_CACHE.get(slug);
-  const html = found || "";
+
+  // Read HTML directly from the D1 `pages` SQLite table
+  const row = await c.env.DB.prepare(`SELECT value FROM pages WHERE key = ?`)
+    .bind(slug)
+    .first<{ value: string }>();
+
+  const html = row?.value || "";
   return c.html(html);
 });
 
@@ -116,16 +149,18 @@ app.post("/api/commit-status", async (c) => {
         const sql = `SELECT * FROM segments WHERE artistId = ?`;
         const { results } = await c.env.DB.prepare(sql).bind(artist).all();
         const kvPairs = renderPublicEcosystem(results);
-        await Promise.all(
-          kvPairs.map(({ key, value }) => c.env.PAGE_CACHE.put(key, value)),
+
+        // Write re-compiled pages directly to D1 table asynchronously
+        await savePagesToD1(c.env.DB, kvPairs);
+        console.log(
+          `Found ${results.length} segments. Compiling pages to D1...`,
         );
-        console.log(`Found ${results.length} segments. Compiling pages...`);
       })(),
     );
 
     return c.json({
       status: "ok",
-      message: `Updated  segment(s)`,
+      message: `Updated segment(s)`,
     });
   } catch (error) {
     console.error("❌ Failed to update D1 database:", error);

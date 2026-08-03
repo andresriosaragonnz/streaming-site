@@ -1,6 +1,10 @@
 import { PlaylistsMap } from "../types";
 
-export function createShareUrl(origin: string, segmentIds: string[]): string {
+export function createShareUrl(
+  origin: string,
+  segmentIds: string[],
+  name: string,
+): string {
   if (!segmentIds || segmentIds.length === 0) {
     return "";
   }
@@ -10,21 +14,23 @@ export function createShareUrl(origin: string, segmentIds: string[]): string {
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 
-  return `${origin}/playlist?share=${base64UrlSafe}`;
+  return `${origin}/playlist?share=${base64UrlSafe}&name=${name}`;
 }
 
 export function appendToPlaylist(
-  currentPlaylists: PlaylistsMap,
+  playlistsMap: PlaylistsMap,
   playlistName: string,
   segmentId: string,
 ): PlaylistsMap {
-  const existingList = currentPlaylists[playlistName] || [];
-  if (existingList.includes(segmentId)) {
-    return currentPlaylists;
+  const currentList = playlistsMap[playlistName] || [];
+
+  // Prevent duplicate track IDs in the same playlist
+  if (currentList.includes(segmentId)) {
+    return playlistsMap;
   }
 
   return {
-    ...currentPlaylists,
-    [playlistName]: [...existingList, segmentId],
+    ...playlistsMap,
+    [playlistName]: [...currentList, segmentId],
   };
 }

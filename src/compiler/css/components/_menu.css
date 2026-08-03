@@ -6,6 +6,17 @@
     sans-serif;
 }
 
+.menu-container {
+  position: fixed;
+  z-index: 20;
+  padding: 2rem;
+}
+
+@media (min-width: 1536px) {
+  .menu-container {
+    padding: 4rem;
+  }
+}
 /* 
      * PURE CSS DRAWER MECHANICS 
      */

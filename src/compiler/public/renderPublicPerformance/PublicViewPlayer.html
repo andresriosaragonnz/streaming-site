@@ -6,13 +6,13 @@
   <div class="meta-title-card">
     <div>{{> components/Menu.html}}</div>
     <div class="meta-title-card-right">
-      <h2>{{studioTitle}}</h2>
       <div class="toggle" @click="$store.review.togleMode()">
         <input type="checkbox" :checked="!$store.review.mode" />
         <label></label>
       </div>
     </div>
   </div>
+  <div class="performance-title">{{studioTitle}}</div>
 
   <div
     :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
@@ -20,6 +20,7 @@
   >
     <!-- Video Player View -->
     <div
+      x-cloak
       x-show="$store.review.mode && active.source"
       style="width: 100%; height: 100%; background: #000"
     >
@@ -28,6 +29,7 @@
 
     <!-- Audio Player View -->
     <div
+      x-cloak
       x-show="!$store.review.mode && active.source"
       class="audio-player"
       :style="active.heroImage ? `background-image: url('${active.heroImage}_desktop.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
