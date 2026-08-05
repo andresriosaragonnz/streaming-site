@@ -169,6 +169,7 @@
 
   .carousel-wrapper {
     display: block;
+    overflow-y: scroll;
   }
 
   .carousel-nav-btn {

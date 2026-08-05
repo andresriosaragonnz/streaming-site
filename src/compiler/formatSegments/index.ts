@@ -27,7 +27,7 @@ const formatSegments = (rawSegments: any[]) => {
       id: segment.id,
       performance: segment.performance,
       source: getVideoSource(segment.index),
-      sourceMp3: getAudioSource(segment.id),
+      sourceMp3: getAudioSource(segment.index),
       title: segment.title,
       venueName: segment.venueName,
       status: segment.status,

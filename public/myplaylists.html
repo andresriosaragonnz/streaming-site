@@ -13,11 +13,11 @@
   </head>
   <body>
     <div class="menu-container"><div class="menu">
-  <!-- 1. The Hidden State Controller -->
+  <!-- Hidden State Controller -->
   <input type="checkbox" id="drawer-toggle" />
 
-  <!-- 2. The Open Button -->
-  <label for="drawer-toggle" class="drawer-trigger">
+  <!-- Open Trigger Button -->
+  <label for="drawer-toggle" class="drawer-trigger" aria-label="Open menu">
     <svg
       width="18"
       height="18"
@@ -35,10 +35,10 @@
     Menu
   </label>
 
-  <!-- 3. The Dark Overlay Backdrop (Clicking it closes the drawer) -->
-  <label for="drawer-toggle" class="drawer-overlay"></label>
+  <!-- Overlay Backdrop -->
+  <label for="drawer-toggle" class="drawer-overlay" aria-hidden="true"></label>
 
-  <!-- 4. The Drawer Layout Block -->
+  <!-- Drawer Panel -->
   <aside class="drawer-panel">
     <div class="drawer-header">
       <h2>Studio Navigation</h2>
@@ -47,45 +47,29 @@
       >
     </div>
 
-    <!-- JSON Compilation Target -->
-    <ul id="drawer-target" class="drawer-links"></ul>
+    <ul id="drawer-target" class="drawer-links">
+      <li>
+        <a href="/myplaylists" class="drawer-link">My playlists</a>
+      </li>
+      <li>
+        <a href="/roadmap" class="drawer-link">Roadmap</a>
+      </li>
+      <li>
+        <a href="/budget" class="drawer-link">Budget</a>
+      </li>
+
+      <!-- Private Bands Container (Populated via menu.js) -->
+      <li
+        id="private-bands-section"
+        class="drawer-section"
+        style="display: none"
+      >
+        <span class="drawer-section-title">private:</span>
+        <ul id="private-bands-list" class="drawer-sublinks"></ul>
+      </li>
+    </ul>
   </aside>
-
-  <!-- 5. The Compilation Script -->
-  <script>
-    // JSON Routing Data
-    const menuRoutes = [
-      { title: "My playlists", href: "/myplaylists" },
-      { title: "Private", href: "/private/decibel_force" },
-      { title: "Roadmap", href: "/roadmap" },
-      { title: "Budget", href: "/budget" },
-    ];
-
-    /**
-     * Maps the JSON routing objects into pure HTML list items.
-     */
-    function compileMenu(items) {
-      const targetContainer = document.getElementById("drawer-target");
-      if (!targetContainer || !items.length) return;
-
-      const compiledHtml = items
-        .map(
-          (item) => `
-        <li>
-          <a href="${item.href}" class="drawer-link">${item.title}</a>
-        </li>
-      `,
-        )
-        .join("\n");
-
-      targetContainer.innerHTML = compiledHtml;
-    }
-
-    // Trigger target compilation immediately when document mounts
-    document.addEventListener("DOMContentLoaded", () => {
-      compileMenu(menuRoutes);
-    });
-  </script>
+  <script type="module" src="/js/menu.js"></script>
 </div>
 </div>
     <div

@@ -17,6 +17,7 @@ const compileCache = () => {
     PrivateSegmentCard: readAndExpandTemplate(
       "/private/renderPrivatePerformance/PrivateSegmentCard.html",
     ),
+    Claim: readAndExpandTemplate("/private/renderClaim/Claim.html"),
     PublicPortfolio: readAndExpandTemplate(
       "/public/renderPublicPortfolio/PublicPortfolio.html",
     ),

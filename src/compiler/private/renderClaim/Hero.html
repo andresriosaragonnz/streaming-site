@@ -1,37 +1,44 @@
-<div class="artist-hero">
+<div
+  class="artist-hero"
+  x-data="{ 
+    // Generates a random number between 1 and n (e.g., 5 total hero images)
+    heroImage: `/images/playlist_${Math.floor(Math.random() * 5) + 1}` 
+  }"
+>
   <!-- 1. Responsive Picture Stack -->
   <picture class="hero-picture">
     <!-- Mobile Portrait (4:5) (< 640px) -->
     <source
       type="image/avif"
       media="(max-width: 639px)"
-      srcset="{{heroImage}}_mobile.avif"
+      :srcset="`${heroImage}_mobile.avif`"
     />
     <source
       type="image/webp"
       media="(max-width: 639px)"
-      srcset="{{heroImage}}_mobile.webp"
+      :srcset="`${heroImage}_mobile.webp`"
     />
 
+    <!-- Tablet (max-width: 1023px) -->
     <source
       type="image/avif"
       media="(max-width: 1023px)"
-      srcset="{{heroImage}}_tablet.avif"
+      :srcset="`${heroImage}_tablet.avif`"
     />
     <source
       type="image/webp"
       media="(max-width: 1023px)"
-      srcset="{{heroImage}}_tablet.webp"
+      :srcset="`${heroImage}_tablet.webp`"
     />
 
     <!-- Desktop Master (16:9) (>= 1024px) -->
-    <source type="image/avif" srcset="{{heroImage}}_desktop.avif" />
-    <source type="image/webp" srcset="{{heroImage}}_desktop.webp" />
+    <source type="image/avif" :srcset="`${heroImage}_desktop.avif`" />
+    <source type="image/webp" :srcset="`${heroImage}_desktop.webp`" />
 
     <!-- Legacy Fallback JPG -->
     <img
-      src="{{heroImage}}_desktop.jpg"
-      alt="{{title}}"
+      :src="`${heroImage}_desktop.jpg`"
+      alt="My playlists"
       class="hero-img"
       loading="eager"
     />
@@ -41,11 +48,7 @@
   <div class="hero-gradient-overlay"></div>
 
   <!-- 3. Foreground Content Overlay (Aligned to Bottom) -->
-
   <div class="hero-overlay">
-    <h1 class="capitalize-words">{{title}}</h1>
-    <a href="/webcopy?artist={{link}}" class="btn-back">See network</a>
-    <p class="performance-count">{{count}} Documented</p>
-    <div id="performance-link" data-artist="{{link}}"></div>
+    <h1 class="capitalize-words">My Authorized artists</h1>
   </div>
 </div>

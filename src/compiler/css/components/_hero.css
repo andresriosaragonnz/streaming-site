@@ -73,6 +73,11 @@
   font-weight: 500;
 }
 
+#performance-link a {
+  color: var(--text-muted, #9ca3af);
+  font-size: 1rem;
+  font-weight: 500;
+}
 /* Tablet & Desktop Adjustments */
 @media (min-width: 640px) {
   .artist-hero {

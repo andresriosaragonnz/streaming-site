@@ -17,3 +17,8 @@ database_id = "f3d47265-97b0-4399-b0d0-3761b522e680" # Created via: npx wrangler
 binding = "PAGE_CACHE"
 id = "62705a56a0f745e985b2d712e8653903" # Put a placeholder or real KV ID here
 
+
+[[r2_buckets]]
+binding = "STATIC_BUCKET"
+bucket_name = "pages"
+
