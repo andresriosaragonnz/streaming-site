@@ -8,3 +8,4 @@ export { serveGenerateToken } from "./generateToken";
 export { usePrivate } from "./usePrivate";
 export { serveClaim } from "./serveClaim";
 export { serveReset } from "./serveReset";
+export { serveOptions } from "./serveOptions";

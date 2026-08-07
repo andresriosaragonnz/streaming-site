@@ -9,6 +9,7 @@ import {
   serveGenerateToken,
   serveClaim,
   serveReset,
+  serveOptions,
 } from "./server";
 
 // Define D1 Database binding type (No KV needed)
@@ -19,6 +20,7 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.get("/reset", serveReset);
+app.get("/api/search-options", serveOptions);
 
 app.get("/admin/generate-token", serveGenerateToken);
 

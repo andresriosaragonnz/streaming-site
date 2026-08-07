@@ -13,29 +13,66 @@
   </head>
   <body>
     <div class="menu-container"><div class="menu">
-  <!-- Hidden State Controller -->
+  <!-- Hidden State Controllers -->
   <input type="checkbox" id="drawer-toggle" />
+  <input type="checkbox" id="search-toggle" />
 
-  <!-- Open Trigger Button -->
-  <label for="drawer-toggle" class="drawer-trigger" aria-label="Open menu">
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <line x1="3" y1="12" x2="21" y2="12"></line>
-      <line x1="3" y1="6" x2="21" y2="6"></line>
-      <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-    Menu
-  </label>
+  <!-- Action Bar (Menu + Search Triggers) -->
+  <div class="menu-action-bar">
+    <label for="drawer-toggle" class="drawer-trigger" aria-label="Open menu">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+      Menu
+    </label>
 
-  <!-- Overlay Backdrop -->
+    <label for="search-toggle" class="search-trigger" aria-label="Open search">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </label>
+  </div>
+
+  <!-- Search Overlay & Autocomplete Container -->
+  <label for="search-toggle" class="search-overlay" aria-hidden="true"></label>
+
+  <div class="search-container">
+    <div class="search-header">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search studio..."
+        autocomplete="off"
+      />
+      <label for="search-toggle" class="search-close" aria-label="Close search"
+        >&times;</label
+      >
+    </div>
+    <ul id="autocomplete-results" class="autocomplete-list"></ul>
+  </div>
+
+  <!-- Drawer Overlay Backdrop -->
   <label for="drawer-toggle" class="drawer-overlay" aria-hidden="true"></label>
 
   <!-- Drawer Panel -->
@@ -69,6 +106,7 @@
       </li>
     </ul>
   </aside>
+
   <script type="module" src="/js/menu.js"></script>
 </div>
 </div>
