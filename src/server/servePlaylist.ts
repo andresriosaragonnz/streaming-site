@@ -16,7 +16,6 @@ export const servePlaylist = async (c: any) => {
     // 3. Decode base64 to plain text ID string (e.g., "id1,id2,id3")
     const decodedString = atob(shareParam);
     const ids = decodedString.split(",").filter(Boolean);
-
     if (ids.length === 0) {
       return c.text("Invalid playlist IDs", 400);
     }
@@ -29,11 +28,13 @@ export const servePlaylist = async (c: any) => {
     const { results } = await c.env.DB.prepare(sql)
       .bind(...ids)
       .all();
-
+    const found = ids.map((id) =>
+      results.find((result: any) => result.id === id),
+    );
     // 6. Render and return HTML page
     const html = renderPlaylist(
       {
-        segments: formatSegments(results),
+        segments: formatSegments(found),
       },
       nameParam,
     );

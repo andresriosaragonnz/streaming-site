@@ -1,8 +1,6 @@
 import { Segment, PlaylistsMap } from "../types.js";
 import { parseSegmentsData } from "../utils/segmentUtils.js";
 import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils.js";
-import { getCardImage } from "../../compiler/formatSegments/getCardImage.js";
-import { getHeroImage } from "../../compiler/formatSegments/getHeroImage.js";
 
 export function initAlpineStores(Alpine: any): void {
   // 1. REGISTER publicWorkspace DATA COMPONENT (Watcher & Hydration Hub)
@@ -97,11 +95,18 @@ export function initAlpineStores(Alpine: any): void {
     playlists: (() => {
       try {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-        return saved ? JSON.parse(saved) : { favorites: [], shared: [] };
+        const finalList = saved ? JSON.parse(saved) : { favorites: [] };
+        return finalList;
       } catch {
         return { favorites: [], shared: [] };
       }
     })() as PlaylistsMap,
+
+    getPlaylistOptions() {
+      const current = this.playlists;
+      console.log({ current });
+      return [...Object.keys(current), "+ New Playlist..."];
+    },
 
     getPlaylistsPortfolio() {
       const values = Object.keys(this.playlists).reduce((acc, current) => {
@@ -162,6 +167,7 @@ export function initAlpineStores(Alpine: any): void {
 
     getShareLink(playlistName: string): string {
       const ids = this.playlists[playlistName];
+      console.log(this.playlists[playlistName]);
       const shareUrl = createShareUrl(
         window.location.origin,
         ids,

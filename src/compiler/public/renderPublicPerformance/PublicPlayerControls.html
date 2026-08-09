@@ -14,21 +14,18 @@
         <select x-model="selectedPlaylist">
           <!-- Dynamic playlists from store -->
           <template
-            x-for="(list, name) in $store.playlists.playlists"
+            x-for="(name, idx) in $store.playlists.getPlaylistOptions()"
             :key="name"
           >
             <option :value="name" x-text="name"></option>
           </template>
-
-          <!-- Action Option for New Playlist -->
-          <option value="__new__">+ Create New Playlist...</option>
         </select>
       </div>
 
       <!-- Free Text Input (Appears only when "+ Create New Playlist..." is selected) -->
       <div
         class="input-field-group"
-        x-show="selectedPlaylist === '__new__'"
+        x-show="selectedPlaylist === '+ New Playlist...'"
         x-cloak
       >
         <input
@@ -44,10 +41,10 @@
         x-cloak
         x-show="active.source"
         @click="
-        const target = selectedPlaylist === '__new__' ? customPlaylistName.trim() : selectedPlaylist;
+        const target = selectedPlaylist === '+ New Playlist...' ? customPlaylistName.trim() : selectedPlaylist;
         if (target) {
           $store.playlists.addActiveToPlaylist(target);
-          if (selectedPlaylist === '__new__') {
+          if (selectedPlaylist === '+ New Playlist...') {
             selectedPlaylist = target; // Automatically switch select to the newly created playlist
             customPlaylistName = '';   // Clear input
           }

@@ -211,6 +211,7 @@
     flex: 0 0 180px;
   }
 }
+
 /* Disable snap behavior during drag operations so dragging is smooth */
 .sidebar-scroll-list.is-dragging {
   scroll-snap-type: none !important;

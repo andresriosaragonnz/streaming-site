@@ -8,7 +8,7 @@ export function createShareUrl(
   if (!segmentIds || segmentIds.length === 0) {
     return "";
   }
-
+  console.log(segmentIds.join(","));
   const base64UrlSafe = btoa(segmentIds.join(","))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")

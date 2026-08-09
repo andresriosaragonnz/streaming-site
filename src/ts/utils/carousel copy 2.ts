@@ -109,29 +109,6 @@ export function registerCarousel(Alpine: any): void {
         segments.splice(targetIdx, 0, movedItem);
 
         this.$store.review.segments = segments;
-        // Save reordered playlist to Local Storage
-        const urlParams = new URLSearchParams(window.location.search);
-        const playlistName = urlParams.get("name");
-
-        if (playlistName) {
-          try {
-            const storageKey = `${playlistName}`;
-            console.log({ segments, storageKey });
-            const newSegments = segments.map((segment) => segment.id);
-            const currentPlaylistjson =
-              localStorage.getItem("user_playlists") || "";
-            const currentPlaylists = JSON.parse(currentPlaylistjson);
-            localStorage.setItem(
-              "user_playlists",
-              JSON.stringify({
-                ...currentPlaylists,
-                [storageKey]: newSegments,
-              }),
-            );
-          } catch (e) {
-            console.log(e);
-          }
-        }
 
         this.$nextTick(() => {
           this.checkScroll();
