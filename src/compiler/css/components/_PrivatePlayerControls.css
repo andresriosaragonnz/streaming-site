@@ -1,0 +1,20 @@
+.btn-status {
+  font-weight: bolder;
+  font-size: larger;
+  padding: 10px;
+  border-radius: 12px;
+  color: var(--text-main);
+}
+.btn-public {
+  background-color: var(--bg-public);
+}
+.btn-public:hover {
+  background-color: var(--bg-public-hover);
+}
+
+.btn-private {
+  background-color: var(--bg-private);
+}
+.btn-private:hover {
+  background-color: var(--bg-private-hover);
+}

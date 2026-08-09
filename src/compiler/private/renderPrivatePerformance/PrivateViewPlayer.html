@@ -1,0 +1,18 @@
+<section class="player-column">
+  <div class="meta-title-card">
+    <div>{{> components/Menu.html}}</div>
+    <div class="meta-title-card-right"></div>
+  </div>
+  <div class="performance-title">{{studioTitle}}</div>
+
+  <div class="video-player-mock">
+    <div
+      x-show="active.source"
+      style="width: 100%; height: 100%; background: #000"
+    >
+      {{> components/common/VideoPlayer.html}}
+    </div>
+  </div>
+
+  {{> private/renderPrivatePerformance/PrivatePlayerControls.html}}
+</section>

@@ -1,0 +1,18 @@
+<div class="audio-player">
+  <!-- Cassette Artwork Layer -->
+  <img
+    src="https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/cassete_icon.jpg"
+    alt="Audio Player Cover"
+    class="audio-player-hero"
+  />
+
+  <!-- Audio Controls Overlay -->
+  <div class="audio-player-controls">
+    <audio
+      id="r2-audio-player"
+      :src="active.sourceMp3"
+      controls
+      style="width: 100%"
+    ></audio>
+  </div>
+</div>

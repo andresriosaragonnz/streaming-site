@@ -1,25 +1,47 @@
-// public/js/mediaInit.js
-
-window.setupMediaPlayback = function (activeItem, currentMode) {
+window.setupMediaPlayback = function (
+  activeItem,
+  currentMode,
+  isInitialLoad = false,
+) {
   const video = document.getElementById("r2-stream-player");
   const audio = document.getElementById("r2-audio-player");
 
-  // Reset ongoing streams to prevent memory leaks and buffer collisions
-  if (video) {
-    video.pause();
-    if (video.src.startsWith("blob:")) {
-      URL.revokeObjectURL(video.src);
+  const safePlay = async (mediaEl) => {
+    try {
+      await mediaEl.play();
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.warn("Autoplay prevented:", err);
+      }
     }
+  };
+
+  // Auto-advance callback (ALWAYS auto-plays next tracks)
+  const triggerNext = () => {
+    console.log("🏁 Playback ended. Auto-advancing...");
+    if (window.Alpine && window.Alpine.store("review")) {
+      window.Alpine.store("review").nextSegment();
+    }
+  };
+
+  // Reset ongoing streams
+  if (video) {
+    if (video._onEndedHandler)
+      video.removeEventListener("ended", video._onEndedHandler);
+    video.pause();
+    if (video.src.startsWith("blob:")) URL.revokeObjectURL(video.src);
     video.src = "";
     video.removeAttribute("src");
     video.load();
   }
+
   if (audio) {
+    if (audio._onEndedHandler)
+      audio.removeEventListener("ended", audio._onEndedHandler);
     audio.pause();
     audio.src = "";
   }
 
-  // Clear running custom controller tracking instances
   if (window.activeCustomMseController) {
     window.activeCustomMseController.abort();
     window.activeCustomMseController = null;
@@ -30,12 +52,21 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
   const streamUrl = activeItem.source;
   const streamUrlMp3 = activeItem.sourceMp3;
 
-  // 1. VIDEO MODE ACTIVE: Handle custom light fMP4 playlist streaming
+  // 1. VIDEO MODE ACTIVE
   if (currentMode) {
     if (!video) return;
 
+    video._onEndedHandler = triggerNext;
+    video.addEventListener("ended", video._onEndedHandler);
+
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = streamUrl;
+      // Only play automatically if this is NOT the initial page load
+      if (!isInitialLoad) {
+        video.addEventListener("canplay", () => safePlay(video), {
+          once: true,
+        });
+      }
       return;
     }
 
@@ -108,17 +139,32 @@ window.setupMediaPlayback = function (activeItem, currentMode) {
           };
 
           await queueAndFetchNext();
+
+          // Only play automatically if NOT initial load
+          if (!isInitialLoad) {
+            video.addEventListener("canplay", () => safePlay(video), {
+              once: true,
+            });
+          }
         } catch (err) {
           console.error("❌ MSE processing error:", err);
         }
       });
     }
   }
-  // 2. AUDIO MODE ACTIVE: Stream absolute full-length MP3
+  // 2. AUDIO MODE ACTIVE
   else {
     if (!audio || !streamUrlMp3) return;
-    console.log("🎵 Streaming audio file from R2:", streamUrlMp3);
+
+    audio._onEndedHandler = triggerNext;
+    audio.addEventListener("ended", audio._onEndedHandler);
+
     audio.src = streamUrlMp3;
     audio.load();
+
+    // Only play automatically if NOT initial load
+    if (!isInitialLoad) {
+      audio.addEventListener("canplay", () => safePlay(audio), { once: true });
+    }
   }
 };

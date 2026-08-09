@@ -1,0 +1,62 @@
+<div
+  class="meta-workspace-card"
+  x-data="{ 
+    selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
+  }"
+>
+  <div
+    class="header-row"
+    x-data="{ selectedPlaylist: 'favorites', customPlaylistName: '' }"
+  >
+    <div class="studio-controls-group">
+      <!-- Playlist Selector -->
+      <div class="input-field-group">
+        <select x-model="selectedPlaylist">
+          <!-- Dynamic playlists from store -->
+          <template
+            x-for="(name, idx) in $store.playlists.getPlaylistOptions()"
+            :key="name"
+          >
+            <option :value="name" x-text="name"></option>
+          </template>
+        </select>
+      </div>
+
+      <!-- Free Text Input (Appears only when "+ Create New Playlist..." is selected) -->
+      <div
+        class="input-field-group"
+        x-show="selectedPlaylist === '+ New Playlist...'"
+        x-cloak
+      >
+        <input
+          type="text"
+          x-model="customPlaylistName"
+          placeholder="Enter playlist name..."
+          class="input-public"
+        />
+      </div>
+
+      <!-- Add Button: Resolves whether to use selected item or custom text -->
+      <button
+        x-cloak
+        x-show="active.source"
+        @click="
+        const target = selectedPlaylist === '+ New Playlist...' ? customPlaylistName.trim() : selectedPlaylist;
+        if (target) {
+          $store.playlists.addActiveToPlaylist(target);
+          if (selectedPlaylist === '+ New Playlist...') {
+            selectedPlaylist = target; // Automatically switch select to the newly created playlist
+            customPlaylistName = '';   // Clear input
+          }
+        } else {
+          $store.toast.trigger('Please enter a valid playlist name.', 'error');
+        }
+      "
+        type="button"
+        class="btn-public"
+      >
+        <span>Add to playlist</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,53 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #040714;
+  overflow: hidden;
+  color: white;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+#graph {
+  width: 100vw;
+  height: 100vh;
+}
+
+.label {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-weight: bold;
+  opacity: 0.8;
+  letter-spacing: 1px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#reset-btn-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: auto;
+  z-index: 20;
+  display: flex;
+  gap: 2rem;
+}
+
+.reset-btn {
+  background: #0072d2;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.reset-btn:hover {
+  background: #0088ff;
+}

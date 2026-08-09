@@ -1,0 +1,19 @@
+<div
+  class="sidebar-item-card"
+  :class="{ 'is-being-dragged': draggedIndex === idx }"
+  draggable="true"
+  @dragstart="handleDragStart(idx, $event)"
+  @dragover="handleDragOver($event)"
+  @drop="handleDrop(idx, $event)"
+  @dragend="handleDragEnd()"
+>
+  <div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
+    <div class="item-meta">{{> components/common/SegmentCardImage.html}}</div>
+    <div class="title-text">
+      <span x-text="seg.title"></span>
+    </div>
+    <div class="title-text">
+      <span x-text="seg.formattedArtist"></span>
+    </div>
+  </div>
+</div>

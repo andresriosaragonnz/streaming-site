@@ -1,0 +1,38 @@
+<aside class="playlist-sidebar">
+  <div class="carousel-wrapper" x-data="carousel">
+    <button
+      type="button"
+      class="carousel-nav-btn nav-left"
+      x-show="canScrollLeft"
+      @click="scroll('left')"
+      x-transition
+      x-cloak
+    >
+      ‹
+    </button>
+
+    <div
+      class="sidebar-scroll-list"
+      x-ref="scrollList"
+      @scroll.debounce.50ms="checkScroll()"
+    >
+      <template
+        x-for="(seg, idx) in $store.review.segments"
+        :key="seg.id || idx"
+      >
+        {{cards}}
+      </template>
+    </div>
+
+    <button
+      type="button"
+      class="carousel-nav-btn nav-right"
+      x-show="canScrollRight"
+      @click="scroll('right')"
+      x-transition
+      x-cloak
+    >
+      ›
+    </button>
+  </div>
+</aside>

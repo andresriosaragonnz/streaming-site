@@ -1,0 +1,49 @@
+<div class="artist-hero">
+  <!-- 1. Responsive Picture Stack -->
+  <picture class="hero-picture">
+    <!-- Mobile Portrait (4:5) (< 640px) -->
+    <source
+      type="image/avif"
+      media="(max-width: 639px)"
+      srcset="{{heroImage}}_mobile.avif"
+    />
+    <source
+      type="image/webp"
+      media="(max-width: 639px)"
+      srcset="{{heroImage}}_mobile.webp"
+    />
+
+    <source
+      type="image/avif"
+      media="(max-width: 1023px)"
+      srcset="{{heroImage}}_tablet.avif"
+    />
+    <source
+      type="image/webp"
+      media="(max-width: 1023px)"
+      srcset="{{heroImage}}_tablet.webp"
+    />
+
+    <!-- Desktop Master (16:9) (>= 1024px) -->
+    <source type="image/avif" srcset="{{heroImage}}_desktop.avif" />
+    <source type="image/webp" srcset="{{heroImage}}_desktop.webp" />
+
+    <!-- Legacy Fallback JPG -->
+    <img
+      src="{{heroImage}}_desktop.jpg"
+      alt="{{title}}"
+      class="hero-img"
+      loading="eager"
+    />
+  </picture>
+
+  <!-- 2. Independent Gradient Overlay for Readability -->
+  <div class="hero-gradient-overlay"></div>
+
+  <!-- 3. Foreground Content Overlay (Aligned to Bottom) -->
+
+  <div class="hero-overlay">
+    <h1 class="capitalize-words">{{title}}</h1>
+    <a href="/{{heroBackLink}}" class="btn-back">{{heroBackTitle}}</a>
+  </div>
+</div>

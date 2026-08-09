@@ -1,5 +1,5 @@
 interface HeroProps {
-  image: string;
+  heroImage: string;
   title: string;
   count: number;
 }
@@ -65,6 +65,7 @@ interface LayoutProps {
 interface PlayerProps {
   studioTitle: string;
   controls: string;
+  menu: string;
 }
 
 interface StudioProps {

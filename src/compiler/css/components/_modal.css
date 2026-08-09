@@ -1,0 +1,280 @@
+/* src/css/components/_modal.css */
+
+/* Hide un-rendered Alpine templates before initialization */
+[x-cloak] {
+  display: none !important;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: var(--bg-deep, #040714);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.5),
+    0 8px 10px -6px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 520px;
+  width: 100%;
+  color: #ffffff;
+  transition:
+    max-width 0.2s ease,
+    transform 0.2s ease;
+}
+
+.modal-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.modal-subtitle {
+  margin: 0;
+  color: var(--text-muted, #9ca3af);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* List Formatting */
+.commit-segment-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.commit-segment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.commit-segment-item:last-child {
+  border-bottom: none;
+}
+
+.segment-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #f3f4f6;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 1rem;
+}
+
+/* Status Tags */
+.status-tag {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.status-tag-public {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-tag-private {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* APRA License Agreement Styles */
+.license-agreement-container {
+  background-color: var(--bg-card, #1a1d29);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+  color: var(--text-main, #f9f9f9);
+}
+
+.agreement-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+@media (min-width: 1536px) {
+  .agreement-header {
+    flex-direction: row;
+  }
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1.05rem; /* Increased size */
+  color: var(--text-main, #f9f9f9);
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 22px; /* Increased checkbox touch target */
+  height: 22px;
+  accent-color: var(--accent-blue, #0063e5);
+  cursor: pointer;
+}
+
+.btn-toggle-terms {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: var(--text-main, #ffffff);
+  cursor: pointer;
+  font-size: 0.9rem; /* Increased size */
+  font-weight: 600;
+  padding: 6px 12px; /* Elevated to a button pill style */
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+@media (min-width: 1536px) {
+  .btn-toggle-terms {
+    width: auto;
+  }
+}
+
+.btn-toggle-terms:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.contract-body {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: var(--bg-deep, #040714);
+  border-radius: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted, #cacaca);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.contract-body h4 {
+  color: #ffffff;
+  margin: 0 0 0.6rem 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.contract-body p {
+  margin-bottom: 0.75rem;
+}
+
+.contract-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* Action Buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.btn-modal {
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-modal-cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #d1d5db;
+}
+
+.btn-modal-cancel:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.btn-modal-confirm {
+  background: var(--accent-blue, #0063e5);
+  border: 1px solid var(--accent-blue-hover, #0072ff);
+  color: #ffffff;
+}
+
+.btn-modal-confirm:hover:not(:disabled) {
+  background: var(--accent-blue-hover, #0072ff);
+}
+
+.btn-modal-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: transparent;
+}
+
+/* 150% Larger Modal on Desktop Layout */
+@media (min-width: 1024px) {
+  .modal-card {
+    transform: scale(1.5);
+    transform-origin: center center; /* Keeps it centered relative to backdrop */
+    max-width: 780px; /* 520px * 1.5 = 780px */
+    padding: 2.5rem;
+  }
+
+  .modal-header h2 {
+    font-size: 1.85rem;
+  }
+
+  .modal-subtitle {
+    font-size: 1rem;
+  }
+
+  .checkbox-label {
+    font-size: 1.15rem; /* Scaled up for desktop */
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
+
+  .btn-toggle-terms {
+    font-size: 0.95rem;
+    padding: 8px 16px;
+  }
+
+  .contract-body {
+    max-height: 260px;
+    font-size: 0.92rem;
+  }
+}

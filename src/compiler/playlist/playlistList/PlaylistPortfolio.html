@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Playlists</title>
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <div class="menu-container">{{> components/Menu.html}}</div>
+    {{> playlist/playlistList/PlaylistHero.html}}
+    <main class="performance-grid" x-data>
+      <template
+        x-for="(list, name) in $store.playlists.getPlaylistsPortfolio()"
+        :key="name"
+      >
+        <a
+          :href="$store.playlists.getShareLink(name)"
+          class="card"
+          style="text-decoration: none; color: inherit"
+        >
+          <div class="card">
+            <picture class="item-thumbnail">
+              <source :srcset="`${list.image}.avif`" type="image/avif" />
+              <source :srcset="`${list.image}.webp`" type="image/webp" />
+              <img
+                :src="`${list.image}.jpg`"
+                loading="lazy"
+                style="
+                  width: 100%;
+                  height: 100%;
+                  object-fit: cover;
+                  display: block;
+                "
+              />
+            </picture>
+
+            <div class="card-metadata">
+              <h3 class="capitalize-words h3" x-text="name"></h3>
+              <p class="amount" x-text="`${list.amount} Items`"></p>
+            </div>
+          </div>
+        </a>
+      </template>
+    </main>
+  </body>
+  <script type="module" src="/js/publicApp.js"></script>
+</html>

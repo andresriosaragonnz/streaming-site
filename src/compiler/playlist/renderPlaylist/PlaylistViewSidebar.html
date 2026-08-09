@@ -1,0 +1,66 @@
+<aside class="playlist-sidebar">
+  <a
+    class="sidebar-artist-button"
+    :href="'/' + $store.review.segments[$store.review.currentIndex].artistName"
+    x-text="$store.review.segments[$store.review.currentIndex].formattedArtist"
+  ></a>
+  <div class="carousel-wrapper" x-data="carousel">
+    <button
+      type="button"
+      class="carousel-nav-btn nav-left"
+      x-show="canScrollLeft"
+      @click="scroll('left')"
+      x-transition
+      x-cloak
+    >
+      ‹
+    </button>
+
+    <div
+      class="sidebar-scroll-list"
+      x-ref="scrollList"
+      @scroll.debounce.50ms="checkScroll()"
+    >
+      <template
+        x-for="(seg, idx) in $store.review.segments"
+        :key="seg.id || idx"
+      >
+        <div
+          class="sidebar-item-card"
+          :class="{ 'is-being-dragged': draggedIndex === idx }"
+          draggable="true"
+          @dragstart="handleDragStart(idx, $event)"
+          @dragover="handleDragOver($event)"
+          @drop="handleDrop(idx, $event)"
+          @dragend="handleDragEnd()"
+        >
+          <div
+            @click="$store.review.currentIndex = idx"
+            class="sidebar-item-card"
+          >
+            <div class="item-meta">
+              {{> components/common/SegmentCardImage.html}}
+            </div>
+            <div class="title-text">
+              <span x-text="seg.title"></span>
+            </div>
+            <div class="title-text">
+              <span x-text="seg.formattedArtist"></span>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <button
+      type="button"
+      class="carousel-nav-btn nav-right"
+      x-show="canScrollRight"
+      @click="scroll('right')"
+      x-transition
+      x-cloak
+    >
+      ›
+    </button>
+  </div>
+</aside>
