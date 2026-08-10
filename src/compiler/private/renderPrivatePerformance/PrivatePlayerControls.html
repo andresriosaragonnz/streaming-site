@@ -4,12 +4,12 @@
       <input
         type="text"
         x-model="active.title"
-        @input="$store.review.syncStore($store.review.currentIndex, active.title)"
+        @input="$store.review.syncStore($store.player.currentIndex, active.title)"
       />
     </div>
 
     <button
-      @click="$store.review.toggleStatus($store.review.currentIndex)"
+      @click="$store.review.toggleStatus($store.player.currentIndex)"
       type="button"
       class="btn-status"
       :class="active.status === 'public' ? 'btn-public' : 'btn-private'"

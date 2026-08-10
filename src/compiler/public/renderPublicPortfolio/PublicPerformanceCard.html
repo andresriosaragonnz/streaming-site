@@ -1,4 +1,10 @@
-<a href="/{{link}}" class="card" style="text-decoration: none; color: inherit">
+<a
+  href="/{{link}}"
+  class="card"
+  style="text-decoration: none; color: inherit"
+  @pointerenter.once="if (!window.HTMLScriptElement.supports?.('speculationrules')) { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = '/{{link}}'; document.head.appendChild(l); }"
+  @touchstart.passive.once="if (!window.HTMLScriptElement.supports?.('speculationrules')) { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = '/{{link}}'; document.head.appendChild(l); }"
+>
   {{> components/common/CardImage.html}}
 
   <div class="card-metadata">

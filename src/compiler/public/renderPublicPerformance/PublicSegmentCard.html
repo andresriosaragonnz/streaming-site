@@ -1,4 +1,4 @@
-<div @click="$store.review.currentIndex = idx" class="sidebar-item-card">
+<div @click="$store.player.selectSegment(idx)" class="sidebar-item-card">
   <div class="item-meta">{{> components/common/SegmentCardImage.html}}</div>
   <div class="title-text">
     <span x-text="seg.title"></span>

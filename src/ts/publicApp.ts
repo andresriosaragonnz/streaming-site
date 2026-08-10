@@ -1,5 +1,9 @@
 import { registerCarousel } from "./utils/carousel.js";
 import { initAlpineStores } from "./stores/publicStore.js";
+import { initPlaylistStore } from "./stores/playlistStore.js";
+import { initFollowStore } from "./stores/followStore.js";
+import { initToastStore } from "./stores/toastStore.js";
+import { initPlayerStore } from "./stores/playerStore.js";
 
 function bootAlpine() {
   const Alpine = (window as any).Alpine;
@@ -10,7 +14,11 @@ function bootAlpine() {
   (window as any).__alpineBooted = true;
 
   registerCarousel(Alpine);
+  initPlayerStore(Alpine);
   initAlpineStores(Alpine);
+  initPlaylistStore(Alpine);
+  initFollowStore(Alpine);
+  initToastStore(Alpine);
   console.log("🚀 Alpine stores successfully registered.");
 }
 

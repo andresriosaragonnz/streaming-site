@@ -1,8 +1,8 @@
 <aside class="playlist-sidebar">
   <a
     class="sidebar-artist-button"
-    :href="'/' + $store.review.segments[$store.review.currentIndex].artistName"
-    x-text="$store.review.segments[$store.review.currentIndex].formattedArtist"
+    :href="'/' + $store.player.segments[$store.player.currentIndex].artistName"
+    x-text="$store.player.segments[$store.player.currentIndex].formattedArtist"
   ></a>
   <div class="carousel-wrapper" x-data="carousel">
     <button
@@ -22,7 +22,7 @@
       @scroll.debounce.50ms="checkScroll()"
     >
       <template
-        x-for="(seg, idx) in $store.review.segments"
+        x-for="(seg, idx) in $store.player.segments"
         :key="seg.id || idx"
       >
         <div
@@ -35,7 +35,7 @@
           @dragend="handleDragEnd()"
         >
           <div
-            @click="$store.review.currentIndex = idx"
+            @click="$store.player.currentIndex = idx"
             class="sidebar-item-card"
           >
             <div class="item-meta">

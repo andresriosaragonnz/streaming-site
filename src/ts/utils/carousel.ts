@@ -29,7 +29,7 @@ interface AlpineComponentContext {
     scrollList?: HTMLElement;
   };
   $store: {
-    review: {
+    player: {
       segments: Array<any>;
       currentIndex: number;
     };
@@ -104,11 +104,11 @@ export function registerCarousel(Alpine: any): void {
           return;
 
         // Reorder segments in store
-        const segments = [...this.$store.review.segments];
+        const segments = [...this.$store.player.segments];
         const [movedItem] = segments.splice(this.draggedIndex, 1);
         segments.splice(targetIdx, 0, movedItem);
 
-        this.$store.review.segments = segments;
+        this.$store.player.segments = segments;
         // Save reordered playlist to Local Storage
         const urlParams = new URLSearchParams(window.location.search);
         const playlistName = urlParams.get("name");

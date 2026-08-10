@@ -4,7 +4,6 @@ import {
   StatusSnapshot,
   createStatusSnapshot,
   hasStatusChanged,
-  getChangedSegments,
   filterSegmentsByStatus,
 } from "../utils/statusUtils.js";
 
@@ -18,8 +17,9 @@ export function initPrivateAlpineStores(Alpine: any): void {
           const initialSegments = parseSegmentsData(dataEl.textContent);
 
           // Populate segments
+          this.$store.player.segments = initialSegments;
           this.$store.review.segments = initialSegments;
-          this.$store.review.currentIndex = 0;
+          this.$store.player.currentIndex = 0;
 
           // Capture initial status snapshot
           this.$store.review.initialStatuses =
@@ -28,30 +28,18 @@ export function initPrivateAlpineStores(Alpine: any): void {
           console.log("✅ Private workspace store hydrated successfully.");
 
           if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(this.active, this.$store.review.mode);
+            window.setupMediaPlayback(
+              this.active,
+              this.$store.review.mode,
+              true,
+            );
           }
         }
-      });
-
-      this.$watch("$store.review.currentIndex", () => {
-        this.$nextTick(() => {
-          if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(this.active, this.$store.review.mode);
-          }
-        });
-      });
-
-      this.$watch("$store.review.mode", () => {
-        this.$nextTick(() => {
-          if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(this.active, this.$store.review.mode);
-          }
-        });
       });
     },
 
     get active(): Segment {
-      const store = Alpine.store("review");
+      const store = Alpine.store("player");
       if (!store || !store.segments || !store.segments[store.currentIndex]) {
         return {
           id: "",
@@ -64,43 +52,12 @@ export function initPrivateAlpineStores(Alpine: any): void {
     },
   }));
 
-  Alpine.store("toast", {
-    show: false,
-    message: "",
-    type: "success" as "success" | "error" | "info",
-    timeoutId: null as any,
-
-    trigger(
-      message: string,
-      type: "success" | "error" | "info" = "success",
-      duration = 3000,
-    ) {
-      // Clear any existing timeout if a new toast arrives quickly
-      if (this.timeoutId) {
-        clearTimeout(this.timeoutId);
-      }
-
-      this.message = message;
-      this.type = type;
-      this.show = true;
-
-      this.timeoutId = setTimeout(() => {
-        this.show = false;
-      }, duration);
-    },
-
-    dismiss() {
-      this.show = false;
-    },
-  });
-
   // 2. REGISTER DEDICATED PRIVATE REVIEW STORE
   Alpine.store("review", {
     segments: [] as Segment[],
     initialStatuses: {} as StatusSnapshot,
     mode: true,
     changed: false,
-    currentIndex: 0,
     isCommitModalOpen: false,
 
     openCommitModal() {
@@ -157,10 +114,6 @@ export function initPrivateAlpineStores(Alpine: any): void {
       } finally {
         this.closeCommitModal();
       }
-    },
-
-    togleMode() {
-      this.mode = !this.mode;
     },
 
     toggleStatus(targetIdx: number) {
