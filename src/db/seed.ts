@@ -18,7 +18,7 @@ function buildSeedSql(): string {
     const indexVal = item.index.replace(/'/g, "''");
     const hash = "";
     const performance = item.performance.replace(/'/g, "''");
-    const status = "public"; // (item.status || "public").replace(/'/g, "''");
+    const status = (item.status || "public").replace(/'/g, "''");
 
     sql += `INSERT OR REPLACE INTO segments (id, artistId, title, artistName, eventDate, venueName, "index", startTime, duration, hash, performance, status) VALUES ('${id}', '${artistId}', '${title}', '${artistName}', '${eventDate}', '${venueName}', '${indexVal}', ${item.startTime}, ${item.duration}, '${hash}', '${performance}', '${status}');\n`;
   }

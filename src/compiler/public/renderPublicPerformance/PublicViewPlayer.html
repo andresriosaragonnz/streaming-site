@@ -6,8 +6,8 @@
   <div class="meta-title-card">
     <div>{{> components/Menu.html}}</div>
     <div class="meta-title-card-right">
-      <div class="toggle" @click="$store.review.togleMode()">
-        <input type="checkbox" :checked="!$store.review.mode" />
+      <div class="toggle" @click="$store.player.togleMode()">
+        <input type="checkbox" :checked="!$store.player.mode" />
         <label></label>
       </div>
     </div>
@@ -16,13 +16,13 @@
   <div class="performance-title break-hyphens">{{studioTitle}}</div>
 
   <div
-    :class="$store.review.mode ? 'video-player-mock' : 'audio-player-mock'"
+    :class="$store.player.mode ? 'video-player-mock' : 'audio-player-mock'"
     style="position: relative; overflow: hidden; border-radius: 12px"
   >
     <!-- Video Player View -->
     <div
       x-cloak
-      x-show="$store.review.mode && active.source"
+      x-show="$store.player.mode && active.source"
       style="width: 100%; height: 100%; background: #000"
     >
       {{> components/common/VideoPlayer.html}}
@@ -31,7 +31,7 @@
     <!-- Audio Player View -->
     <div
       x-cloak
-      x-show="!$store.review.mode && active.source"
+      x-show="!$store.player.mode && active.source"
       class="audio-player"
       :style="active.heroImage ? `background-image: url('${active.heroImage}_desktop.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
     >

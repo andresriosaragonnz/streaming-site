@@ -3,8 +3,8 @@
     <a
       class="sidebar-artist-button"
       id="sidebar-artist-button"
-      :href="'/' + $store.review.active.artistName"
-      x-text="$store.review.active.formattedArtist"
+      :href="'/' + $store.player.active.artistName"
+      x-text="$store.player.active.formattedArtist"
     ></a>
     <button
       type="button"
@@ -31,7 +31,7 @@
       @scroll.debounce.50ms="checkScroll()"
     >
       <template
-        x-for="(seg, idx) in $store.review.segments"
+        x-for="(seg, idx) in $store.player.segments"
         :key="seg.id || idx"
       >
         {{cards}}

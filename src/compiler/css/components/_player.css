@@ -19,7 +19,46 @@
   text-transform: capitalize;
   font-size: x-large;
 }
+.player-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  z-index: 10;
+}
 
+.player-icon_container {
+  position: absolute;
+  top: 20%;
+  left: 30%;
+}
+/* Base size for mobile */
+.play-icon {
+  width: 80px;
+  height: 80px;
+  filter: drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+  transition:
+    width 0.2s ease,
+    height 0.2s ease;
+}
+
+@media (min-width: 1536px) {
+  .play-icon {
+    width: 340px;
+    height: 340px;
+  }
+  .player-icon_container {
+    position: absolute;
+    top: 50%;
+    left: 35%;
+  }
+}
 .break-hyphens {
   /* Allow normal line wrapping */
   white-space: normal;

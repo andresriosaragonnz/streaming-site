@@ -3,6 +3,7 @@ window.setupMediaPlayback = function (
   currentMode,
   isInitialLoad = false,
 ) {
+  console.log("here");
   const video = document.getElementById("r2-stream-player");
   const audio = document.getElementById("r2-audio-player");
 
@@ -29,7 +30,8 @@ window.setupMediaPlayback = function (
     if (video._onEndedHandler)
       video.removeEventListener("ended", video._onEndedHandler);
     video.pause();
-    if (video.src.startsWith("blob:")) URL.revokeObjectURL(video.src);
+    if (video.src && video.src.startsWith("blob:"))
+      URL.revokeObjectURL(video.src);
     video.src = "";
     video.removeAttribute("src");
     video.load();
@@ -49,6 +51,14 @@ window.setupMediaPlayback = function (
 
   if (!activeItem || !activeItem.source) return;
 
+  // 🛑 DEFER LOADING: Stop execution on initial page load so no requests fire
+  if (isInitialLoad) {
+    console.log(
+      "⏸️ Initial load detected. Deferring video/audio fetch until user interaction.",
+    );
+    return;
+  }
+
   const streamUrl = activeItem.source;
   const streamUrlMp3 = activeItem.sourceMp3;
 
@@ -59,20 +69,20 @@ window.setupMediaPlayback = function (
     video._onEndedHandler = triggerNext;
     video.addEventListener("ended", video._onEndedHandler);
 
+    // Native Safari HLS
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = streamUrl;
-      // Only play automatically if this is NOT the initial page load
-      if (!isInitialLoad) {
-        video.addEventListener("canplay", () => safePlay(video), {
-          once: true,
-        });
-      }
+      safePlay(video);
       return;
     }
 
+    // Custom MSE Pipeline
     if (window.MediaSource) {
       const mediaSource = new MediaSource();
       video.src = URL.createObjectURL(mediaSource);
+
+      // Call safePlay synchronously with the click gesture to reserve playback rights
+      safePlay(video);
 
       const controller = new AbortController();
       window.activeCustomMseController = controller;
@@ -139,13 +149,6 @@ window.setupMediaPlayback = function (
           };
 
           await queueAndFetchNext();
-
-          // Only play automatically if NOT initial load
-          if (!isInitialLoad) {
-            video.addEventListener("canplay", () => safePlay(video), {
-              once: true,
-            });
-          }
         } catch (err) {
           console.error("❌ MSE processing error:", err);
         }
@@ -161,10 +164,6 @@ window.setupMediaPlayback = function (
 
     audio.src = streamUrlMp3;
     audio.load();
-
-    // Only play automatically if NOT initial load
-    if (!isInitialLoad) {
-      audio.addEventListener("canplay", () => safePlay(audio), { once: true });
-    }
+    safePlay(audio);
   }
 };

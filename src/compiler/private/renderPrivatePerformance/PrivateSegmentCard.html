@@ -1,8 +1,8 @@
 <div
-  @click="$store.review.currentIndex = idx"
+  @click="$store.player.selectSegment(idx)"
   class="sidebar-item-card"
   :class="[
-    $store.review.currentIndex === idx ? 'item-active-highlight' : ''
+    $store.player.currentIndex === idx ? 'item-active-highlight' : ''
   ]"
 >
   <div class="item-meta">
