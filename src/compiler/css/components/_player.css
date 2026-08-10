@@ -15,6 +15,25 @@
   font-size: larger;
 }
 
+.performance-title-big {
+  text-transform: capitalize;
+  font-size: x-large;
+}
+
+.break-hyphens {
+  /* Allow normal line wrapping */
+  white-space: normal;
+
+  /* Force wrap on overflow if a segment is too long */
+  overflow-wrap: break-word;
+
+  /* Ensures hyphens act as natural break points */
+  word-break: normal;
+
+  /* Prevent automatic dictionary hyphenation */
+  hyphens: manual;
+}
+
 /* Cassette Image (Cover + Film Negative Effect) */
 .audio-player-hero {
   position: absolute;

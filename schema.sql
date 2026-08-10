@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS segments (
   "index" TEXT NOT NULL,
   startTime INTEGER NOT NULL,
   duration INTEGER NOT NULL,
+  published_at INTEGER NOT NULL DEFAULT (0),
   hash TEXT NOT NULL,
   performance TEXT NOT NULL,
   status TEXT DEFAULT 'private' CHECK(status IN ('public', 'private'))
 );
+

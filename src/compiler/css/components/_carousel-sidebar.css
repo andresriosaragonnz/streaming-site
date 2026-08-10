@@ -138,7 +138,19 @@
   right: 0.5rem;
   padding-left: 3px;
 }
+
+.sidebar-artist-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 .sidebar-artist-button {
+  border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  text-align: center;
   background-color: var(--bg-card);
   border-radius: 12px;
   font-size: 1.2rem;
@@ -154,6 +166,19 @@
 }
 
 @media (min-width: 1536px) {
+  .sidebar-artist-button {
+    /* 2. Ellipsis Truncation Rules */
+    max-width: 20ch; /* Limits width to ~20 characters based on font size */
+    white-space: nowrap; /* Prevents wrapping to a second line */
+    overflow: hidden; /* Hides overflowed text */
+    text-overflow: ellipsis; /* Appends "..." when text overflows */
+  }
+  .sidebar-artist-container {
+    display: "flex";
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: space-between;
+  }
   .playlist-sidebar {
     flex: 0 0 20%;
     max-height: 85vh;

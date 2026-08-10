@@ -116,12 +116,23 @@ export function initPrivateAlpineStores(Alpine: any): void {
     async submitCommit() {
       try {
         // 2. Send POST request to Hono /api/commit-status
+        const currentPrivate = Object.keys(this.initialStatuses).filter(
+          (key) => {
+            return this.initialStatuses[key] === "private";
+          },
+        );
+        const newPublic = this.segments
+          .filter((seg: any) => seg.status === "public")
+          .map((seg: any) => seg.id);
+        const changedStatus = currentPrivate.filter((id) =>
+          newPublic.includes(id),
+        );
         const response = await fetch("/api/commit-status", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ segments: this.segments }),
+          body: JSON.stringify({ segments: this.segments, changedStatus }),
         });
         if (!response.ok) {
           throw new Error(
@@ -181,6 +192,7 @@ export function initPrivateAlpineStores(Alpine: any): void {
       if (this.segments[targetIdx]) {
         this.segments[targetIdx].title = updatedTitle;
         this.broadcastChange(this.segments[targetIdx]);
+        this.changed = true;
       }
     },
 

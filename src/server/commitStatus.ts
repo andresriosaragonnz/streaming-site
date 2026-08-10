@@ -1,21 +1,36 @@
 import { renderPublicEcosystem } from "../compiler/public/renderPublicEcosystem/renderPublicEcosystem";
 import { savePagesToTarget } from "./savePagesToTarget";
 
+const now = Math.floor(Date.now() / 1000);
+const THIRTY_DAYS_SEC = 2_592_000;
 export const commitStatus = async (c: any) => {
-  const { segments } = await c.req.json();
+  const { segments, changedStatus } = await c.req.json();
   const artist = segments[0].artistId;
 
   try {
-    // 3. Execute both updates in a single atomic batch transaction
-    // Map each segment to its own UPDATE statement
-    const statements = segments.map((seg: any) =>
+    const updateStatements = segments.map((seg: any) =>
       c.env.DB.prepare(
         `UPDATE segments SET status = ?, title = ? WHERE id = ?`,
       ).bind(seg.status, seg.title, seg.id),
     );
 
-    // Execute all updates atomically in a single batch call
+    // 2. Separate query batch for changedStatus IDs to update published_at with 30-day guard
+    const publishStatements = (changedStatus || []).map((id: string | number) =>
+      c.env.DB.prepare(
+        `
+        UPDATE segments 
+        SET published_at = ?
+        WHERE id = ? 
+          AND (published_at IS NULL OR (? - published_at) >= ?)
+      `,
+      ).bind(now, id, now, THIRTY_DAYS_SEC),
+    );
+
+    // 3. Combine both statement sets into a single atomic batch transaction
+    const statements = [...updateStatements, ...publishStatements];
+
     if (statements.length > 0) {
+      // Execute all updates atomically in a single batch call
       await c.env.DB.batch(statements);
     }
 

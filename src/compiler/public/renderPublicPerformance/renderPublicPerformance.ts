@@ -12,7 +12,10 @@ export const renderPublicPerformance = (performance: any): string => {
     .join("");
   const cleanVenue = venueName.replaceAll("_", " ");
   const htmlContent = renderComponent(compiledTemplates.PublicPerformance, {
-    studioTitle: `${formattedArtist}-${cleanVenue}-${formattedDate}`,
+    studioTitle: `${formattedArtist}-${cleanVenue}-${formattedDate}`.replace(
+      / /g,
+      "\u00A0",
+    ),
     jsonSegments: JSON.stringify(segments),
     cards,
   });
