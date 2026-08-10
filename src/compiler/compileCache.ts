@@ -42,6 +42,10 @@ const compileCache = () => {
     "./public/myplaylists.html",
     readAndExpandTemplate("/playlist/playlistList/PlaylistPortfolio.html"),
   );
+  fs.writeFileSync(
+    "./public/feed.html",
+    readAndExpandTemplate("/feed/Feed.html"),
+  );
 };
 
 compileCache();

@@ -1,9 +1,18 @@
 <aside class="playlist-sidebar">
-  <a
-    class="sidebar-artist-button"
-    :href="'/' + $store.review.segments[$store.review.currentIndex].artistName"
-    x-text="$store.review.segments[$store.review.currentIndex].formattedArtist"
-  ></a>
+  <div id="sidebar-artist" class="sidebar-artist-container">
+    <a
+      class="sidebar-artist-button"
+      id="sidebar-artist-button"
+      :href="'/' + $store.review.active.artistName"
+      x-text="$store.review.active.formattedArtist"
+    ></a>
+    <button
+      type="button"
+      class="sidebar-artist-button"
+      x-on:click="$store.follows.toggleFollow()"
+      x-text="$store.follows.isFollowing() ? 'Unfollow':'Follow'"
+    ></button>
+  </div>
   <div class="carousel-wrapper" x-data="carousel">
     <button
       type="button"
