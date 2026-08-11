@@ -1,143 +1,153 @@
+// =========================================================================
+// INSTANT INLINE GRAPH RENDERER (PRE-CALCULATED SUB-NETWORKS)
+// =========================================================================
+
 const container = document.getElementById("graph");
 const resetBtn = document.getElementById("reset-btn");
-const orb = new Orb.Orb(container);
 
-let allNodes = [];
-let allEdges = [];
-let currentFocusId = null;
-
-// 1. Fetch pre-processed JSON output
-async function initNetwork() {
-  try {
-    const response = await fetch("/data/network.json");
-    const data = await response.json();
-    allNodes = data.nodes;
-    allEdges = data.edges;
-
-    // Sync initial view state with address bar
-    focusFromUrlParam();
-
-    // Handle browser Back/Forward navigation buttons
-    window.addEventListener("popstate", () => {
-      focusFromUrlParam();
-    });
-  } catch (err) {
-    console.error("Failed to load pre-processed network data:", err);
-  }
+if (
+  container &&
+  (container.clientHeight === 0 || container.clientWidth === 0)
+) {
+  container.style.width = "100%";
+  container.style.height = "100vh";
+  container.style.display = "block";
+  container.style.position = "relative";
 }
 
-// 2. Render Subgraph Cluster or Master Graph
-function renderGraph(targetNode = null) {
-  let displayNodes = allNodes;
-  let displayEdges = allEdges;
+const orb = new Orb.Orb(container, {
+  simulator: {
+    workerUrl: null, // Suppress worker loading
+  },
+  simulation: {
+    isPhysicsEnabled: false, // Static layout
+  },
+  transition: {
+    duration: 0,
+  },
+});
 
-  if (targetNode) {
-    currentFocusId = String(targetNode.id);
-    resetBtn.style.display = "block";
+let currentFocusId = null;
 
-    const connectedEdgeNodeIds = new Set(
-      allEdges
-        .filter(
-          (e) =>
-            String(e.source) === currentFocusId ||
-            String(e.target) === currentFocusId,
-        )
-        .map((e) =>
-          String(e.source) === currentFocusId
-            ? String(e.target)
-            : String(e.source),
-        ),
-    );
+function initNetwork() {
+  const rawData = window.__GRAPH_DATA__;
+  if (!rawData) {
+    requestAnimationFrame(initNetwork);
+    return;
+  }
 
-    const focusClusterIds = new Set([currentFocusId, ...connectedEdgeNodeIds]);
+  // Bind initial view directly from URL
+  focusFromUrlParam();
 
-    displayNodes = allNodes.filter((n) => focusClusterIds.has(String(n.id)));
-    displayEdges = allEdges.filter(
-      (e) =>
-        focusClusterIds.has(String(e.source)) &&
-        focusClusterIds.has(String(e.target)),
-    );
+  window.addEventListener("popstate", () => {
+    focusFromUrlParam();
+  });
+}
+
+function renderGraph(clusterData = null) {
+  const data = window.__GRAPH_DATA__ || {};
+  let displayNodes = [];
+  let displayEdges = [];
+
+  if (clusterData && clusterData.displayNodes) {
+    // 1. Direct O(1) Pre-calculated Sub-Network
+    currentFocusId = String(clusterData.targetNode.id);
+    if (resetBtn) resetBtn.style.display = "block";
+
+    displayNodes = clusterData.displayNodes;
+    displayEdges = clusterData.displayEdges;
 
     orb.data.setDefaultStyle({
       getNodeStyle(node) {
         const isTarget = String(node.id) === currentFocusId;
+        const nodeData = node.data || node;
         return {
           size: isTarget ? 16 : 9,
           color: isTarget ? "#ff3e3e" : "#00d2ff",
-          label: node.data.name,
+          label: nodeData.name || nodeData.label || "",
           fontSize: isTarget ? 7 : 4,
           fontColor: "#ffffff",
+          x: nodeData.x ?? node.x,
+          y: nodeData.y ?? node.y,
         };
       },
       getEdgeStyle(edge) {
+        const weight = edge.data?.weight ?? edge.weight ?? 1;
         return {
           color: "#ff3e3e",
-          width: Math.min(edge.data.weight * 1.5, 4),
+          width: Math.min(weight * 1.5, 4),
           opacity: 0.8,
         };
       },
     });
   } else {
+    // 2. Full Network fallback
     currentFocusId = null;
-    resetBtn.style.display = "none";
+    if (resetBtn) resetBtn.style.display = "none";
+
+    displayNodes = data.nodes || [];
+    displayEdges = data.edges || [];
 
     orb.data.setDefaultStyle({
       getNodeStyle(node) {
+        const nodeData = node.data || node;
         return {
           size: 7,
           color: "#0072d2",
-          label: node.data.name,
+          label: nodeData.name || nodeData.label || "",
           fontSize: 3.5,
           fontColor: "#ffffff",
+          x: nodeData.x ?? node.x,
+          y: nodeData.y ?? node.y,
         };
       },
       getEdgeStyle(edge) {
+        const weight = edge.data?.weight ?? edge.weight ?? 1;
         return {
-          color: edge.data.weight > 1 ? "#3b82f6" : "#ffffff",
-          width: Math.min(edge.data.weight * 0.6, 3),
+          color: weight > 1 ? "#3b82f6" : "#ffffff",
+          width: Math.min(weight * 0.6, 3),
           opacity: 0.5,
         };
       },
     });
   }
 
+  // Setup data directly
   orb.data.setup({ nodes: displayNodes, edges: displayEdges });
 
-  orb.view.setSettings({
-    simulation: {
-      isPhysicsEnabled: true,
-      gravity: targetNode ? -800 : -1200,
-      springLength: targetNode ? 120 : 90,
-    },
-  });
-
+  // Single pass canvas render and viewport centering
   orb.view.render(() => {
     orb.view.recenter();
+    if (container) container.style.opacity = "1";
   });
 }
 
-// 3. Navigate to URL on Click
 orb.events.on("node-click", (event) => {
   if (event && event.node) {
+    const nodeData = event.node.data || event.node;
     const rawArtist =
-      event.node.data.rawArtist || event.node.data.name.replace(/\s+/g, "_");
-    const newUrl = `${window.location.pathname}?artist=${encodeURIComponent(rawArtist)}`;
+      nodeData.rawArtist ||
+      (nodeData.name || "").toLowerCase().replace(/\s+/g, "_");
 
-    // Update address bar without triggering full page reload
+    const newUrl = `${window.location.pathname}?artist=${encodeURIComponent(rawArtist)}`;
     window.history.pushState({ artist: rawArtist }, "", newUrl);
 
-    // Render graph for selected artist
-    renderGraph(event.node);
+    const clusters = window.__GRAPH_DATA__?.artistClusters || {};
+    console.log({ clusters });
+    const cluster =
+      clusters[rawArtist] || clusters[rawArtist.replace(/_/g, " ")];
+
+    renderGraph(cluster);
   }
 });
 
-// 4. Reset Button Handler
-resetBtn.addEventListener("click", () => {
-  window.history.pushState({}, "", window.location.pathname);
-  renderGraph(null);
-});
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    window.history.pushState({}, "", window.location.pathname);
+    renderGraph(null);
+  });
+}
 
-// 5. URL Param Resolver
 function focusFromUrlParam() {
   const urlParams = new URLSearchParams(window.location.search);
   const targetArtistParam = urlParams.get("artist");
@@ -147,23 +157,21 @@ function focusFromUrlParam() {
     return;
   }
 
-  const normalizedTarget = targetArtistParam
-    .toLowerCase()
-    .replace(/[_]/g, " ")
-    .trim();
+  const rawKey = targetArtistParam.toLowerCase().trim();
+  const normalizedKey = rawKey.replace(/_/g, " ");
 
-  const targetNodeObj = allNodes.find(
-    (n) =>
-      n.name.toLowerCase() === normalizedTarget ||
-      n.rawArtist.toLowerCase() === targetArtistParam.toLowerCase(),
-  );
+  const clusters = window.__GRAPH_DATA__?.artistClusters || {};
+  const cluster = clusters[rawKey] || clusters[normalizedKey];
 
-  if (targetNodeObj) {
-    renderGraph(targetNodeObj);
+  if (cluster) {
+    renderGraph(cluster);
   } else {
     renderGraph(null);
   }
 }
 
-// Initialize
-initNetwork();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initNetwork);
+} else {
+  initNetwork();
+}
