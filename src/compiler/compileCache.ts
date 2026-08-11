@@ -36,6 +36,7 @@ const compileCache = () => {
     Playlist: readAndExpandTemplate("/playlist/renderPlaylist/Playlist.html"),
 
     Missing: readAndExpandTemplate("/public/Missing.html"),
+    Graph: readAndExpandTemplate("/graph/Graph.html"),
   };
   fs.writeFileSync("./templateCache.json", JSON.stringify(cache));
   fs.writeFileSync(

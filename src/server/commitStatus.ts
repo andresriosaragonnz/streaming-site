@@ -1,27 +1,36 @@
 import { renderPublicEcosystem } from "../compiler/public/renderPublicEcosystem/renderPublicEcosystem";
+import { renderGraph } from "../compiler/graph/renderGraph";
 import { savePagesToTarget } from "./savePagesToTarget";
+import { buildPublicNetworkGraph } from "./calculateNetwork";
 
-const now = Math.floor(Date.now() / 1000);
 const THIRTY_DAYS_SEC = 2_592_000;
+
 export const commitStatus = async (c: any) => {
   const { segments, changedStatus } = await c.req.json();
-  const artist = segments[0].artistId;
+  const artist = segments[0]?.artistId;
+
+  // Calculate timestamp at invocation time
+  const now = Math.floor(Date.now() / 1000);
 
   try {
-    const updateStatements = segments.map((seg: any) =>
+    const updateStatements = (segments || []).map((seg: any) =>
       c.env.DB.prepare(
         `UPDATE segments SET status = ?, title = ? WHERE id = ?`,
       ).bind(seg.status, seg.title, seg.id),
     );
 
-    // 2. Separate query batch for changedStatus IDs to update published_at with 30-day guard
+    // 2. Update published_at if NULL, 0, or older than 30 days
     const publishStatements = (changedStatus || []).map((id: string | number) =>
       c.env.DB.prepare(
         `
         UPDATE segments 
         SET published_at = ?
         WHERE id = ? 
-          AND (published_at IS NULL OR (? - published_at) >= ?)
+          AND (
+            published_at IS NULL 
+            OR published_at = 0 
+            OR (? - published_at) >= ?
+          )
       `,
       ).bind(now, id, now, THIRTY_DAYS_SEC),
     );
@@ -30,22 +39,28 @@ export const commitStatus = async (c: any) => {
     const statements = [...updateStatements, ...publishStatements];
 
     if (statements.length > 0) {
-      // Execute all updates atomically in a single batch call
       await c.env.DB.batch(statements);
     }
 
-    c.executionCtx.waitUntil(
-      (async () => {
-        const sql = `SELECT * FROM segments WHERE artistId = ?`;
-        const { results } = await c.env.DB.prepare(sql).bind(artist).all();
-        const kvPairs = renderPublicEcosystem(results);
-        // Write re-compiled pages directly to D1 table asynchronously
-        await savePagesToTarget(c.env, kvPairs);
-        console.log(
-          `Found ${results.length} segments. Compiling pages to D1...`,
-        );
-      })(),
-    );
+    if (artist) {
+      c.executionCtx.waitUntil(
+        (async () => {
+          const sql = `SELECT * FROM segments WHERE artistId = ?`;
+          const { results } = await c.env.DB.prepare(sql).bind(artist).all();
+          const kvPairs = renderPublicEcosystem(results);
+
+          await savePagesToTarget(c.env, kvPairs);
+          console.log(
+            `Found ${results.length} segments. Compiling pages to D1...`,
+          );
+
+          const graph = await buildPublicNetworkGraph(c.env.DB);
+          const graphPage = renderGraph(graph);
+          console.log({ graphPage });
+          await savePagesToTarget(c.env, [{ key: "graph", value: graphPage }]);
+        })(),
+      );
+    }
 
     return c.json({
       status: "ok",
