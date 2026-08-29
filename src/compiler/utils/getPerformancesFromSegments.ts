@@ -5,15 +5,15 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
   for (const segment of segments) {
     const {
       artistName,
-      cardImage,
       eventDate,
       formattedDate,
       heroImage,
-      id,
       performance,
       venueName,
       status,
       formattedArtist,
+      id,
+      duration,
     } = segment;
     const initial = {
       artistName: encodeURIComponent(artistName),
@@ -24,15 +24,15 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
       eventDate,
       formattedDate,
       segments: [segment],
-      heroImages: [heroImage],
-      cardImages: [cardImage],
+      images: duration > 60 ? [heroImage] : [],
       status,
       performance,
     };
     const currentPerformance = performancesIndex[performance];
     if (currentPerformance) {
-      currentPerformance.cardImages.push(cardImage);
-      currentPerformance.heroImages.push(heroImage);
+      if (duration > 60) {
+        currentPerformance.images.push(heroImage);
+      }
       currentPerformance.segments.push(segment);
     } else {
       performancesIndex[performance] = initial;
@@ -40,10 +40,11 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
   }
   const performances = Object.values(performancesIndex).map(
     (performance: any) => {
-      const { heroImages, cardImages } = performance;
-      const randomIndex = getRandomIndex(heroImages);
-      performance.heroImage = heroImages[randomIndex];
-      performance.cardImage = cardImages[randomIndex];
+      const { images } = performance;
+      const randomIndex = getRandomIndex(images);
+      const randomIndex2 = getRandomIndex(images);
+      performance.cardImage = `${images[randomIndex]}/card`;
+      performance.altImage = `${images[randomIndex2]}`;
       return performance;
     },
   );

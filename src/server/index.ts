@@ -10,3 +10,4 @@ export { serveClaim } from "./serveClaim";
 export { serveReset } from "./serveReset";
 export { serveOptions } from "./serveOptions";
 export { serveFeed } from "./serveFeed";
+export { servePlaylistPortfolio } from "./servePlaylistPortfolio";

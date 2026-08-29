@@ -11,36 +11,34 @@ import {
   serveReset,
   serveOptions,
   serveFeed,
+  servePlaylistPortfolio,
 } from "./server";
 
-// Define D1 Database binding type (No KV needed)
 type Bindings = {
   DB: D1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
 
+// 1. Explicit / Fixed API & Route handlers (Put these FIRST)
+app.get("/myplaylists", servePlaylistPortfolio); // Your test route
+app.get("/playlist", servePlaylist);
 app.get("/reset", serveReset);
-app.get("/api/search-options", serveOptions);
-app.post("/api/feed", serveFeed);
-
 app.get("/admin/generate-token", serveGenerateToken);
-
 app.get("/auth/claim", serveClaim);
 
-app.get("/private/performance/:slug", servePrivatePerformance);
-
-app.get("/playlist", servePlaylist);
-
-app.use("/private/:slug/*", usePrivate);
-app.use("/private/:slug", usePrivate);
-
-app.get("/private/:slug", servePrivateDashboard);
-
-app.get("/:slug", serveSlug);
-
+app.get("/api/search-options", serveOptions);
+app.post("/api/feed", serveFeed);
 app.post("/api/commit-status", commitStatus);
 
+// 2. Specific Parametric Routes
+app.get("/private/performance/:slug", servePrivatePerformance);
+app.get("/:slug", serveSlug);
+app.get("/private/:slug", servePrivateDashboard);
+
+// 3. Dynamic Middlewares (Must come AFTER fixed endpoints)
+app.use("/private/:slug/*", usePrivate);
+// 4. Fallback Root
 app.get("/", (c) => {
   return c.html("<h1>Archive Engine Server Running</h1>");
 });

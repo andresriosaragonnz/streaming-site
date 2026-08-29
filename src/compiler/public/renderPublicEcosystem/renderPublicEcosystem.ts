@@ -10,8 +10,8 @@ export const renderPublicEcosystem = (segments: any): any => {
   const performances = getPerformancesFromSegments(formatedSegments);
 
   const performanceIndex = {} as any;
-  performanceIndex[segments[0].artistId] = {
-    key: segments[0].artistId,
+  performanceIndex[segments[0].artistName] = {
+    key: segments[0].artistName,
     value: renderPublicPortfolio(performances, formatedSegments),
   };
 

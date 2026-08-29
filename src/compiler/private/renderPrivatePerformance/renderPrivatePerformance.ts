@@ -4,6 +4,7 @@ import compiledTemplates from "../../../../templateCache.json" with { type: "jso
 
 export const renderPrivatePerformance = (segments: any): string => {
   const formatedSegments = formatSegments(segments);
+
   const { formattedArtist, venueName, formattedDate } = formatedSegments[0];
   const cards = formatedSegments
     .map((segment) =>
@@ -14,6 +15,7 @@ export const renderPrivatePerformance = (segments: any): string => {
   const htmlContent = renderComponent(compiledTemplates.PrivatePerformance, {
     studioTitle: `${formattedArtist}-${cleanVenue}-${formattedDate}`,
     jsonSegments: JSON.stringify(formatedSegments),
+    cardImage: `${formatedSegments[0].cardImage}`,
     cards,
   });
   return htmlContent;

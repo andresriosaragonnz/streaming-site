@@ -121,7 +121,11 @@
   transition: all 0.15s ease;
   line-height: 1;
 }
-
+@media (pointer: coarse), (hover: none) {
+  .carousel-nav-btn {
+    display: none !important;
+  }
+}
 .carousel-nav-btn:hover {
   background: var(--accent-blue-hover);
   border-color: var(--accent-blue-hover);
@@ -178,6 +182,8 @@
     flex-direction: row;
     gap: 1rem;
     justify-content: space-between;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
   }
   .playlist-sidebar {
     flex: 0 0 20%;

@@ -3,7 +3,6 @@ window.setupMediaPlayback = function (
   currentMode,
   isInitialLoad = false,
 ) {
-  console.log("here");
   const video = document.getElementById("r2-stream-player");
   const audio = document.getElementById("r2-audio-player");
 
@@ -41,7 +40,6 @@ window.setupMediaPlayback = function (
     if (audio._onEndedHandler)
       audio.removeEventListener("ended", audio._onEndedHandler);
     audio.pause();
-    audio.src = "";
   }
 
   if (window.activeCustomMseController) {

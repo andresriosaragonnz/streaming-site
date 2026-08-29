@@ -1,62 +1,65 @@
 <div
   class="meta-workspace-card"
-  x-data="{ 
-    selectedPlaylist: Object.keys($store.playlists.playlists)[0] || 'favorites' 
-  }"
+  x-data="{ selectedPlaylist: 'favorites', customPlaylistName: '' }"
 >
   <div
-    class="header-row"
-    x-data="{ selectedPlaylist: 'favorites', customPlaylistName: '' }"
+    class="studio-controls-group"
+    style="display: flex; align-items: center; gap: 8px; min-height: 40px"
   >
-    <div class="studio-controls-group">
-      <!-- Playlist Selector -->
-      <div class="input-field-group">
-        <select x-model="selectedPlaylist">
-          <!-- Dynamic playlists from store -->
-          <template
-            x-for="(name, idx) in $store.playlists.getPlaylistOptions()"
-            :key="name"
-          >
+    <!-- Playlist Selector (Fixed min-width prevents width jump when store options load) -->
+    <div class="input-field-group" style="min-width: 160px">
+      <select x-model="selectedPlaylist" style="width: 100%">
+        <!-- Static fallback option rendered immediately on page load -->
+        <option value="favorites">favorites</option>
+
+        <!-- Dynamic options populated by Alpine after store loads -->
+        <template
+          x-for="name in $store.playlists.getPlaylistOptions()"
+          :key="name"
+        >
+          <!-- Skip rendering duplicate 'favorites' if it's returned by the store -->
+          <template x-if="name !== 'favorites'">
             <option :value="name" x-text="name"></option>
           </template>
-        </select>
-      </div>
-
-      <!-- Free Text Input (Appears only when "+ Create New Playlist..." is selected) -->
-      <div
-        class="input-field-group"
-        x-show="selectedPlaylist === '+ New Playlist...'"
-        x-cloak
-      >
-        <input
-          type="text"
-          x-model="customPlaylistName"
-          placeholder="Enter playlist name..."
-          class="input-public"
-        />
-      </div>
-
-      <!-- Add Button: Resolves whether to use selected item or custom text -->
-      <button
-        x-cloak
-        x-show="active.source"
-        @click="
-        const target = selectedPlaylist === '+ New Playlist...' ? customPlaylistName.trim() : selectedPlaylist;
-        if (target) {
-          $store.playlists.addActiveToPlaylist(target);
-          if (selectedPlaylist === '+ New Playlist...') {
-            selectedPlaylist = target; // Automatically switch select to the newly created playlist
-            customPlaylistName = '';   // Clear input
-          }
-        } else {
-          $store.toast.trigger('Please enter a valid playlist name.', 'error');
-        }
-      "
-        type="button"
-        class="btn-public"
-      >
-        <span>Add to playlist</span>
-      </button>
+        </template>
+      </select>
     </div>
+
+    <!-- Free Text Input (x-cloak + inline style prevents Frame 1 flash and height collapse) -->
+    <div
+      class="input-field-group"
+      x-show="selectedPlaylist === '+ New Playlist...'"
+      x-cloak
+      style="display: none; min-width: 180px"
+    >
+      <input
+        type="text"
+        x-model="customPlaylistName"
+        placeholder="Enter playlist name..."
+        class="input-public"
+        style="width: 100%"
+      />
+    </div>
+
+    <!-- Add Button -->
+    <button
+      @click="
+          const target = selectedPlaylist === '+ New Playlist...' ? customPlaylistName.trim() : selectedPlaylist;
+          if (target) {
+            $store.playlists.addActiveToPlaylist(target);
+            if (selectedPlaylist === '+ New Playlist...') {
+              selectedPlaylist = target;
+              customPlaylistName = '';
+            }
+          } else {
+            $store.toast.trigger('Please enter a valid playlist name.', 'error');
+          }
+        "
+      type="button"
+      class="btn-public"
+      style="white-space: nowrap"
+    >
+      <span>Add to playlist</span>
+    </button>
   </div>
 </div>

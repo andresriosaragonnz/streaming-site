@@ -1,6 +1,5 @@
 import { CLOUDFLARE_SOURCE } from "./constants.js";
 
-const getCardImage = (image: string) =>
-  `${CLOUDFLARE_SOURCE}/images/${image}_card`;
+const getCardImage = (image: string) => `${CLOUDFLARE_SOURCE}/${image}/card`;
 
 export { getCardImage };

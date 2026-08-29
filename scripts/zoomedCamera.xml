@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- SETUP SCREEN -->
+    <LinearLayout
+        android:id="@+id/setupScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SELECT NEXT SCENE"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <Spinner
+            android:id="@+id/sceneSpinner"
+            android:layout_width="300dp"
+            android:layout_height="48dp"
+            android:background="#FFFFFF"
+            android:layout_marginBottom="32dp" />
+
+        <Button
+            android:id="@+id/startCameraButton"
+            android:layout_width="300dp"
+            android:layout_height="64dp"
+            android:text="ENTER CAMERA"
+            android:backgroundTint="#424242"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- CAMERA SCREEN -->
+    <RelativeLayout
+        android:id="@+id/cameraScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <!-- Camera Preview Surface -->
+        <com.example.camera_poc_2.AutoFitSurfaceView
+            android:id="@+id/previewSurfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" />
+
+        <!-- Vertical ISO Slider (Left Side) -->
+        <SeekBar
+            android:id="@+id/isoSeekBar"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="-70dp"
+            android:rotation="270"
+            android:transformPivotX="110dp"
+            android:transformPivotY="10dp"
+            android:max="100"
+            android:progress="20" />
+
+        <!-- Vertical Focus Distance Slider (Right Side) -->
+        <SeekBar
+            android:id="@+id/focusSeekBar"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="-70dp"
+            android:rotation="270"
+            android:transformPivotX="110dp"
+            android:transformPivotY="10dp"
+            android:max="100"
+            android:progress="0" />
+
+        <!-- Shutter Speed Selector (Top-Left) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="80dp"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnShutter48"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="1/8s"
+                android:textSize="10sp"
+                android:backgroundTint="#80000000"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnShutter100"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:text="1/48s"
+                android:textSize="10sp"
+                android:backgroundTint="#80000000"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btnShutter200"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:text="1/200s"
+                android:textSize="10sp"
+                android:backgroundTint="#80000000"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <!-- Exit Button Overlay (Top-Right) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:padding="16dp">
+
+            <Button
+                android:id="@+id/closeAppButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="EXIT APP"
+                android:backgroundTint="#424242"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- Bottom Control Bar -->
+        <RelativeLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_alignParentBottom="true"
+            android:background="#80000000"
+            android:paddingHorizontal="32dp">
+
+            <!-- Record Button Container (Centered) -->
+            <FrameLayout
+                android:id="@+id/recordButtonContainer"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_centerInParent="true">
+
+                <Button
+                    android:id="@+id/recordButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:text=""
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <!-- Chapter Marker Pin Button (Positioned Left of Record Button) -->
+            <ImageButton
+                android:id="@+id/pinMarkerButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_toStartOf="@id/recordButtonContainer"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="32dp"
+                android:background="@android:drawable/btn_default"
+                android:src="@android:drawable/ic_input_add"
+                android:contentDescription="Add Chapter Marker" />
+
+            <!-- Scene Info Box (Positioned Right of Record Button) -->
+            <TextView
+                android:id="@+id/sceneInfoBox"
+                android:layout_width="160dp"
+                android:layout_height="36dp"
+                android:layout_toEndOf="@id/recordButtonContainer"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="32dp"
+                android:background="#FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:ellipsize="middle"
+                android:singleLine="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+</FrameLayout>

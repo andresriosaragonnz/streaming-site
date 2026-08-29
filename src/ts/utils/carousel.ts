@@ -1,41 +1,3 @@
-export interface CarouselComponent {
-  canScrollLeft: boolean;
-  canScrollRight: boolean;
-  draggedIndex: number | null;
-  init(this: CarouselComponent & AlpineComponentContext): void;
-  checkScroll(this: CarouselComponent & AlpineComponentContext): void;
-  scroll(
-    this: CarouselComponent & AlpineComponentContext,
-    direction: "left" | "right",
-  ): void;
-  // Drag and Drop handlers
-  handleDragStart(
-    this: CarouselComponent & AlpineComponentContext,
-    idx: number,
-    evt: DragEvent,
-  ): void;
-  handleDragOver(evt: DragEvent): void;
-  handleDrop(
-    this: CarouselComponent & AlpineComponentContext,
-    targetIdx: number,
-    evt: DragEvent,
-  ): void;
-  handleDragEnd(this: CarouselComponent & AlpineComponentContext): void;
-}
-
-interface AlpineComponentContext {
-  $nextTick(callback: () => void): void;
-  $refs: {
-    scrollList?: HTMLElement;
-  };
-  $store: {
-    player: {
-      segments: Array<any>;
-      currentIndex: number;
-    };
-  };
-}
-
 export function registerCarousel(Alpine: any): void {
   Alpine.data(
     "carousel",
@@ -43,6 +5,10 @@ export function registerCarousel(Alpine: any): void {
       canScrollLeft: false,
       canScrollRight: false,
       draggedIndex: null,
+
+      isBeingDragged(idx: number): boolean {
+        return this.draggedIndex === idx;
+      },
 
       init() {
         this.$nextTick(() => {
@@ -91,7 +57,6 @@ export function registerCarousel(Alpine: any): void {
       },
 
       handleDragOver(evt: DragEvent) {
-        // Necessary to allow dropping
         evt.preventDefault();
         if (evt.dataTransfer) {
           evt.dataTransfer.dropEffect = "move";
@@ -103,13 +68,11 @@ export function registerCarousel(Alpine: any): void {
         if (this.draggedIndex === null || this.draggedIndex === targetIdx)
           return;
 
-        // Reorder segments in store
         const segments = [...this.$store.player.segments];
         const [movedItem] = segments.splice(this.draggedIndex, 1);
         segments.splice(targetIdx, 0, movedItem);
 
         this.$store.player.segments = segments;
-        // Save reordered playlist to Local Storage
         const urlParams = new URLSearchParams(window.location.search);
         const playlistName = urlParams.get("name");
 

@@ -3,48 +3,39 @@
     <a
       class="sidebar-artist-button"
       id="sidebar-artist-button"
-      :href="'/' + $store.player.active.artistName"
-      x-text="$store.player.active.formattedArtist"
-    ></a>
+      href="/{{artistLink}}"
+    >
+      {{artistName}}
+    </a>
+
     <button
       type="button"
       class="sidebar-artist-button"
       x-on:click="$store.follows.toggleFollow()"
       x-text="$store.follows.isFollowing() ? 'Unfollow':'Follow'"
-    ></button>
+    >
+      Follow
+    </button>
   </div>
-  <div class="carousel-wrapper" x-data="carousel">
+
+  <div class="carousel-wrapper" id="sidebar-carousel">
     <button
       type="button"
       class="carousel-nav-btn nav-left"
-      x-show="canScrollLeft"
-      @click="scroll('left')"
-      x-transition
-      x-cloak
+      id="carousel-nav-left"
+      style="display: none"
     >
       ‹
     </button>
 
-    <div
-      class="sidebar-scroll-list"
-      x-ref="scrollList"
-      @scroll.debounce.50ms="checkScroll()"
-    >
-      <template
-        x-for="(seg, idx) in $store.player.segments"
-        :key="seg.id || idx"
-      >
-        {{cards}}
-      </template>
-    </div>
+    <!-- Delegated Click Listener Target -->
+    <div class="sidebar-scroll-list" id="sidebar-scroll-list">{{cards}}</div>
 
     <button
       type="button"
       class="carousel-nav-btn nav-right"
-      x-show="canScrollRight"
-      @click="scroll('right')"
-      x-transition
-      x-cloak
+      id="carousel-nav-right"
+      style="display: none"
     >
       ›
     </button>

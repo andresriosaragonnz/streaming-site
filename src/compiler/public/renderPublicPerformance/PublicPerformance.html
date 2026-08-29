@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+    </style>
+    <link rel="preload" as="image" href="{{cardImage}}.jpg" type="image/jpeg" />
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -14,8 +20,7 @@
   <body>
     {{> components/common/Toast.html}}
     <div class="studio-container" x-data="publicWorkspace">
-      {{> public/renderPublicPerformance/PublicViewPlayer.html}} {{>
-      public/renderPublicPerformance/PublicViewSidebar.html}}
+      {{> public/renderPublicPerformance/PublicViewPlayer.html}} {{sideBar}}
     </div>
 
     <script type="application/json" id="studio-segments-data">

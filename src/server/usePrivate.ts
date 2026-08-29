@@ -3,6 +3,7 @@ import { parseCookies } from "./parseCookie";
 import type { UserPayload } from "./types";
 
 export const usePrivate = async (c: any, next: any) => {
+  console.log("here");
   const cookies = parseCookies(c.req.header("Cookie"));
   const token = cookies["auth_token"];
   if (!token) {
@@ -27,6 +28,6 @@ export const usePrivate = async (c: any, next: any) => {
       403,
     );
   }
-
+  console.log("here");
   await next();
 };

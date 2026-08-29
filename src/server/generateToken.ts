@@ -1,8 +1,8 @@
 import { createAuthToken } from "./crypto";
 import type { UserPayload } from "./types";
-import { renderGrant } from "../compiler/admin/renderGrant";
 
 export const serveGenerateToken = async (c: any) => {
+  console.log("dakjdsakjdhsa");
   const mobileKey =
     c.req.header("X-Mobile-Admin-Key") || c.req.query("admin_key");
   console.log({ mobileKey, ex: c.env.MOBILE_ADMIN_SECRET });

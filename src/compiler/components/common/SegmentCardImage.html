@@ -1,9 +1,9 @@
 <picture class="item-thumbnail">
-  <source :srcset="`${seg.cardImage}.avif`" type="image/avif" />
-  <source :srcset="`${seg.cardImage}.webp`" type="image/webp" />
+  <source srcset="{{cardImage}}.avif" type="image/avif" />
+  <source srcset="{{cardImage}}.webp" type="image/webp" />
   <img
-    :src="`${seg.cardImage}.jpg`"
-    :alt="seg.title"
+    src="{{cardImage}}.jpg"
+    alt="{{title}}"
     loading="lazy"
     style="width: 100%; height: 100%; object-fit: cover; display: block"
   />

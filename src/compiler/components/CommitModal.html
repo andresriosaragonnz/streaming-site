@@ -26,9 +26,6 @@
           ></span>
         </li>
       </template>
-    </ul>
-    <!-- List of changed segments -->
-    <ul class="commit-segment-list">
       <template
         x-for="(seg, idx) in $store.review.gePrivateSegments()"
         :key="seg.id ?? idx"
@@ -43,7 +40,6 @@
         </li>
       </template>
     </ul>
-
     <!-- APRA AMCOS DIRECT LICENSING AGREEMENT -->
     <div
       x-data="{ agreed: false, expanded: false }"

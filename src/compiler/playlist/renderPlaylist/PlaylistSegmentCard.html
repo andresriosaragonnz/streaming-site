@@ -1,19 +1,22 @@
 <div
   class="sidebar-item-card"
-  :class="{ 'is-being-dragged': draggedIndex === idx }"
+  :class="{ 'is-being-dragged': draggedIndex === {{index}} }"
   draggable="true"
-  @dragstart="handleDragStart(idx, $event)"
+  @dragstart="handleDragStart({{index}}, $event)"
   @dragover="handleDragOver($event)"
-  @drop="handleDrop(idx, $event)"
+  @drop="handleDrop({{index}}, $event)"
   @dragend="handleDragEnd()"
 >
-  <div @click="$store.player.currentIndex = idx" class="sidebar-item-card">
+  <div
+    @click="$store.player.selectSegment({{index}})"
+    class="sidebar-item-card"
+  >
     <div class="item-meta">{{> components/common/SegmentCardImage.html}}</div>
     <div class="title-text">
-      <span x-text="seg.title"></span>
+      <span>{{title}}</span>
     </div>
     <div class="title-text">
-      <span x-text="seg.formattedArtist"></span>
+      <span>{{formattedArtist}}</span>
     </div>
   </div>
 </div>

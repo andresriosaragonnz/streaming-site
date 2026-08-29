@@ -26,14 +26,13 @@ const formatSegments = (rawSegments: any[]) => {
       formattedVenue: segment.venueName.replaceAll("_", " "),
       id: segment.id,
       performance: segment.performance,
-      source: getVideoSource(segment.index),
-      sourceMp3: getAudioSource(segment.index),
+      source: getVideoSource(segment.id),
+      sourceMp3: getAudioSource(segment.id),
       title: segment.title,
       venueName: segment.venueName,
       status: segment.status,
     };
   }
-
   return formattedSegments;
 };
 

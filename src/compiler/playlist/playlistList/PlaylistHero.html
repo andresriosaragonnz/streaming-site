@@ -1,60 +1,40 @@
-<div
-  class="artist-hero"
-  x-data="{ 
-    // Generates a random number between 1 and n (e.g., 5 total hero images)
-    heroImage: `/images/playlist_${Math.floor(Math.random() * 5) + 1}` 
-  }"
->
+<div class="artist-hero">
   <!-- 1. Responsive Picture Stack -->
   <picture class="hero-picture">
-    <!-- Mobile Portrait (4:5) (< 640px) -->
+    <!-- Mobile Portrait (< 640px) -->
     <source
+      id="hero-mobile-avif"
       type="image/avif"
       media="(max-width: 639px)"
-      :srcset="`${heroImage}_mobile.avif`"
+      srcset="{{heroImage}}/mobile.avif"
     />
+    <!-- Desktop Master (>= 1024px) -->
     <source
-      type="image/webp"
-      media="(max-width: 639px)"
-      :srcset="`${heroImage}_mobile.webp`"
-    />
-
-    <!-- Tablet (max-width: 1023px) -->
-    <source
+      id="hero-desktop-avif"
       type="image/avif"
-      media="(max-width: 1023px)"
-      :srcset="`${heroImage}_tablet.avif`"
+      srcset="{{heroImage}}/desktop.avif"
     />
-    <source
-      type="image/webp"
-      media="(max-width: 1023px)"
-      :srcset="`${heroImage}_tablet.webp`"
-    />
-
-    <!-- Desktop Master (16:9) (>= 1024px) -->
-    <source type="image/avif" :srcset="`${heroImage}_desktop.avif`" />
-    <source type="image/webp" :srcset="`${heroImage}_desktop.webp`" />
 
     <!-- Legacy Fallback JPG -->
     <img
-      :src="`${heroImage}_desktop.jpg`"
-      alt="My playlists"
+      id="hero-img"
+      src="{{heroImage}}/desktop.jpg"
+      alt="{{title}}"
       class="hero-img"
       loading="eager"
     />
   </picture>
 
+  <!-- Dedicated Hover Fade Overlay (Outside picture tag) -->
+  <img id="hero-img-fade" src="" alt="" class="hero-img-fade" />
+
   <!-- 2. Independent Gradient Overlay for Readability -->
   <div class="hero-gradient-overlay"></div>
 
-  <!-- 3. Foreground Content Overlay (Aligned to Bottom) -->
+  <!-- 3. Foreground Content Overlay -->
   <div class="hero-overlay">
-    <h1 class="capitalize-words">My playlists</h1>
-    <p class="performance-count">
-      <span x-text="Object.keys($store.playlists.playlists || {}).length"
-        >0</span
-      >
-      Playlists
-    </p>
+    <h1 class="capitalize-words">{{title}}</h1>
+    <p class="performance-count">{{count}} Documented</p>
+    <div id="performance-link" data-artist="{{link}}"></div>
   </div>
 </div>

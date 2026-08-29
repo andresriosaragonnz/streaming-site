@@ -245,7 +245,6 @@
 /* 150% Larger Modal on Desktop Layout */
 @media (min-width: 1024px) {
   .modal-card {
-    transform: scale(1.5);
     transform-origin: center center; /* Keeps it centered relative to backdrop */
     max-width: 780px; /* 520px * 1.5 = 780px */
     padding: 2.5rem;

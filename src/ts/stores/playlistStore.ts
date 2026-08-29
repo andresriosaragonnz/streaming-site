@@ -1,8 +1,12 @@
 import { PlaylistsMap } from "../types.js";
-import { createShareUrl, appendToPlaylist } from "../utils/playlistUtils.js";
+import {
+  createShareUrl,
+  appendToPlaylist,
+  generatePortfolioLink,
+  PLAYLIST_STORAGE_KEY,
+} from "../utils/playlistUtils.js";
 
 export function initPlaylistStore(Alpine: any): void {
-  const PLAYLIST_STORAGE_KEY = "user_playlists";
   Alpine.store("playlists", {
     // 1. Initial State (tries loading from LocalStorage first, defaults to empty arrays)
     playlists: (() => {
@@ -14,6 +18,12 @@ export function initPlaylistStore(Alpine: any): void {
         return { favorites: [], shared: [] };
       }
     })() as PlaylistsMap,
+
+    // 2. Alpine automatically calls init() when registering the store
+    init() {
+      console.log("here");
+      generatePortfolioLink();
+    },
 
     getPlaylistOptions() {
       const current = this.playlists;
@@ -48,22 +58,23 @@ export function initPlaylistStore(Alpine: any): void {
       }
     },
 
-    async generateShareLink(playlistName: string): Promise<void> {
+    getShareUrl(playlistName: string): string {
       const ids = this.playlists[playlistName];
+      if (!ids || ids.length === 0) return "#";
 
-      if (!ids || ids.length === 0) {
+      return createShareUrl(window.location.origin, ids, playlistName);
+    },
+
+    async generateShareLink(playlistName: string): Promise<void> {
+      const shareUrl = this.getShareUrl(playlistName);
+
+      if (shareUrl === "#") {
         Alpine.store("toast").trigger(
           "Cannot share an empty playlist.",
           "info",
         );
         return;
       }
-
-      const shareUrl = createShareUrl(
-        window.location.origin,
-        ids,
-        playlistName,
-      );
 
       try {
         await navigator.clipboard.writeText(shareUrl);
@@ -79,7 +90,6 @@ export function initPlaylistStore(Alpine: any): void {
         );
       }
     },
-
     getShareLink(playlistName: string): string {
       const ids = this.playlists[playlistName];
       const shareUrl = createShareUrl(
@@ -95,6 +105,7 @@ export function initPlaylistStore(Alpine: any): void {
       const activeSegment = playerStore.segments[playerStore.currentIndex];
       if (activeSegment && activeSegment.id) {
         this.addToPlaylist(activeSegment.id, playlistName);
+        generatePortfolioLink();
       }
     },
 

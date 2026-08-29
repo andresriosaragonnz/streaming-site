@@ -1,4 +1,33 @@
-/* src/css/components/_hero.css */
+.hero-picture {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-img,
+.hero-img-fade {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 20%; /* Keep both images aligned identically */
+  display: block;
+}
+
+.hero-img-fade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease-in-out;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-img-fade.is-active {
+  opacity: 1;
+}
 
 #menu-container {
   position: fixed;
@@ -34,8 +63,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
   z-index: 1;
+  object-position: 50% 00%; /* Shifts the image focal point upward */
 }
 
 /* Gradient Overlay sitting over the image but under text */

@@ -197,6 +197,22 @@
   user-select: none;
 }
 
+.share-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #f4f4f5;
+  user-select: none;
+  border: none;
+  background-color: var(--bg-deep);
+}
+
 .search-trigger:hover {
   background-color: #3f3f46;
   border-color: #52525b;

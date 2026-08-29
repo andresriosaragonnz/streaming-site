@@ -1,0 +1,26 @@
+<div class="card" data-bg="{{altImage}}">
+  <!-- Image Link -->
+  <a
+    href="#"
+    :href="$store.playlists.getShareUrl('{{playlistName}}')"
+    style="text-decoration: none; color: inherit; display: block"
+  >
+    {{> components/common/CardImage.html}}
+  </a>
+
+  <!-- Metadata Row -->
+  <div class="card-metadata">
+    <!-- Text Link -->
+    <a
+      href="#"
+      :href="$store.playlists.getShareUrl('{{playlistName}}')"
+      style="text-decoration: none; color: inherit"
+    >
+      <h3 class="capitalize-words h3">{{playlistName}}</h3>
+      <p class="date">{{playlistLength}} songs</p>
+    </a>
+
+    <!-- Separate Share Action (No Z-Index Stacking Required) -->
+    <div>{{> components/common/ShareIcon.html}}</div>
+  </div>
+</div>

@@ -22,3 +22,7 @@ id = "62705a56a0f745e985b2d712e8653903" # Put a placeholder or real KV ID here
 binding = "STATIC_BUCKET"
 bucket_name = "pages"
 
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "media"
+ 

@@ -15,6 +15,28 @@ body {
   overflow-x: hidden;
 }
 
+#dynamic-body-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    background-image 0.3s ease;
+  pointer-events: none;
+}
+
+/* Shown when a card is actively hovered */
+body.has-hover-bg #dynamic-body-bg {
+  opacity: 0.35; /* Adjust opacity as needed for readability */
+}
+
 /* 1. Modern Standard Syntax (Firefox & Future Standards) */
 html,
 body,

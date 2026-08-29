@@ -1,44 +1,41 @@
-<section
-  class="player-column"
-  x-data="publicWorkspace"
-  id="'publicPlayerColumn"
->
+<section class="player-column" x-data="publicWorkspace" id="publicPlayerColumn">
   <div class="meta-title-card">
     <div>{{> components/Menu.html}}</div>
     <div class="meta-title-card-right">
+      <!-- Toggle Mode -->
       <div class="toggle" @click="$store.player.togleMode()">
         <input type="checkbox" :checked="!$store.player.mode" />
         <label></label>
       </div>
     </div>
   </div>
-  <div class="performance-title-big">Playlist</div>
-  <div class="performance-title break-hyphens">{{studioTitle}}</div>
 
+  <div class="performance-title-big">{{studioTitle}}</div>
   <div
-    :class="$store.player.mode ? 'video-player-mock' : 'audio-player-mock'"
-    style="position: relative; overflow: hidden; border-radius: 12px"
+    class="performance-title break-hyphens"
+    x-text="$store.player.active?.formattedTitle || '{{firstTitle}}'"
   >
-    <!-- Video Player View -->
-    <div
-      x-cloak
-      x-show="$store.player.mode && active.source"
-      style="width: 100%; height: 100%; background: #000"
-    >
-      {{> components/common/VideoPlayer.html}}
-    </div>
-
-    <!-- Audio Player View -->
-    <div
-      x-cloak
-      x-show="!$store.player.mode && active.source"
-      class="audio-player"
-      :style="active.heroImage ? `background-image: url('${active.heroImage}_desktop.jpg')` : `background-image: url('/screenshots/card/card-fallback.jpg')`"
-    >
-      <!-- Audio Player Controls Pinned to the Bottom -->
-      {{> components/common/AudioPlayer.html}}
-    </div>
+    {{firstTitle}}
   </div>
 
-  {{> playlist/renderPlaylist/PlaylistPlayerControls.html}}
+  <!-- Outer wrapper with locked 16:9 ratio -->
+  <div
+    class="video-player-mock"
+    style="
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background-color: #000;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+    "
+  >
+    <!-- VIDEO VIEW: Native display: block on load. Alpine hides only if mode === false -->
+    {{> components/common/VideoPlayer.html}}
+
+    <!-- AUDIO VIEW: Cloaked natively so it NEVER renders on page boot -->
+    {{> components/common/AudioPlayer.html}}
+  </div>
+
+  {{> public/renderPublicPerformance/PublicPlayerControls.html}}
 </section>

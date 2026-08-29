@@ -1,0 +1,45 @@
+import {
+  generatePortfolioLink,
+  handleMyPlaylistsRedirect,
+} from "./utils/playlistUtils";
+
+import { initAlpineStores } from "./stores/publicStore.js";
+import { initPlaylistStore } from "./stores/playlistStore.js";
+import { initToastStore } from "./stores/toastStore.js";
+
+function bootAlpine() {
+  handleMyPlaylistsRedirect();
+  const Alpine = (window as any).Alpine;
+  if (!Alpine) return;
+
+  // Prevent double registration if already booted
+  if ((window as any).__alpineBooted) return;
+  (window as any).__alpineBooted = true;
+
+  generatePortfolioLink();
+  initAlpineStores(Alpine);
+  initPlaylistStore(Alpine);
+  initToastStore(Alpine);
+  console.log("🚀 Alpine stores successfully registered.");
+}
+
+// Listen for standard init event
+document.addEventListener("alpine:init", bootAlpine);
+
+// Dynamically load media engine -> then Alpine
+const mediaEngineScript = document.createElement("script");
+mediaEngineScript.src = "/js/mediaInit.js";
+
+mediaEngineScript.onload = () => {
+  const alpineScript = document.createElement("script");
+  alpineScript.src = "/js/alpine.js";
+
+  // Boot stores explicitly as soon as alpine.js loads
+  alpineScript.onload = () => {
+    bootAlpine();
+  };
+
+  document.head.appendChild(alpineScript);
+};
+
+document.head.appendChild(mediaEngineScript);
