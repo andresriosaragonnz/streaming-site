@@ -2,15 +2,6 @@ import { readAndExpandTemplate } from "./readAndExpandTemplate.js";
 import { compileStylesheets } from "./css.js";
 import fs from "fs";
 
-/**
- * Extracts all unique {{variable}} placeholders from an HTML string
- */
-function extractKeys(html: string): string[] {
-  const matches = html.match(/\{\{\s*([\w]+)\s*\}\}/g) || [];
-  const keys = matches.map((m) => m.replace(/[\{\}\s]/g, ""));
-  return Array.from(new Set(keys));
-}
-
 const compileCache = () => {
   compileStylesheets();
 
@@ -27,10 +18,6 @@ const compileCache = () => {
   tsCode += `}\n\n`;
 
   fs.writeFileSync("./templateCache.ts", tsCode);
-  fs.writeFileSync(
-    "./public/feed.html",
-    readAndExpandTemplate("/feed/Feed.html"),
-  );
 
   console.log("✓ Successfully generated typed renderers in templateCache.ts");
 };

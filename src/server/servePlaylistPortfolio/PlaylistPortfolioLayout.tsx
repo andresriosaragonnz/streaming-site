@@ -69,6 +69,7 @@ export const PlaylistPortfolioLayout = ({
           {cards}
         </main>
       </body>
+      <script type="module" src="/js/playlistPortfolioInit.js"></script>
       <script type="module" src="/js/portfolioApp.js"></script>
       <script type="module" src="/js/imageFade.js"></script>
     </html>

@@ -5,6 +5,11 @@
   padding: 0;
 }
 
+html {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--bg-deep);
   color: var(--text-main);
@@ -13,6 +18,7 @@ body {
     sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #dynamic-body-bg {

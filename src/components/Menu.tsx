@@ -91,7 +91,7 @@ export const Menu = () => (
 
       <ul id="drawer-target" class="drawer-links">
         <li>
-          <a href="/feed" class="drawer-link">
+          <a href="/feed" class="drawer-link" id="my-follows">
             My Feed
           </a>
         </li>

@@ -4,6 +4,7 @@ import {
   PublicPerformanceCard,
   PublicPerformanceCardProps,
 } from "./PublicPerformanceCard";
+import { GraphModal } from "./GraphModal";
 import type { Segment, PerformanceData } from "../../../ts/types";
 import { getRandomIndex } from "../../../compiler/utils/getRandomIndex";
 import { getRandomElements } from "../../../compiler/utils/getRandomElement";
@@ -11,11 +12,13 @@ import { getRandomElements } from "../../../compiler/utils/getRandomElement";
 export interface PublicPortfolioLayoutProps {
   performances: PerformanceData[];
   segments: Segment[];
+  graphDataJS?: Record<string, any> | Array<any>;
 }
 
 export const PublicPortfolioLayout = ({
   performances = [],
   segments,
+  graphDataJS = [],
 }: PublicPortfolioLayoutProps) => {
   const portfolioImages = [] as string[][];
   const { formattedArtist, artistId } = segments[0];
@@ -45,9 +48,10 @@ export const PublicPortfolioLayout = ({
   return (
     <html lang="en">
       <head>
-        <script safe type="application/json" id="page-images">
+        <script type="application/json" id="page-images">
           {JSON.stringify(flattedImagesArray)}
         </script>
+        <style>{`[x-cloak] { display: none !important; }`}</style>
         <link
           rel="icon"
           type="image/png"
@@ -66,8 +70,9 @@ export const PublicPortfolioLayout = ({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Performance</title>
         <link rel="stylesheet" href="/css/main.css" />
+        <script src="/js/orb.js"></script>
       </head>
-      <body>
+      <body x-data="{ isGraphDrawerOpen: false }">
         <div class="menu-container">
           <Menu />
         </div>
@@ -75,14 +80,20 @@ export const PublicPortfolioLayout = ({
         <PublicPortfolioHero
           heroImage={segments[getRandomIndex(segments)].heroImage as string}
           title={formattedArtist}
-          link={artistId}
+          link={formattedArtist}
           count={performances.length}
         />
 
         <main class="performance-grid">{cards}</main>
 
+        <GraphModal />
+
+        <script>
+          {`window.__GRAPH_DATA__ = ${JSON.stringify(graphDataJS)};`}
+        </script>
         <script type="module" src="/js/imageFade.js"></script>
         <script type="module" src="/js/portfolioApp.js"></script>
+        <script type="module" src="/js/network.js"></script>
       </body>
     </html>
   );

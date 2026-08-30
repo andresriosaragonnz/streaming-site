@@ -1,5 +1,3 @@
-// src/utils/graphBuilder.ts
-
 export interface GraphNode {
   id: string;
   name: string;
@@ -31,28 +29,70 @@ export interface OptimizedGraphData {
   artistLookup: Record<string, GraphNode>;
 }
 
-export async function buildPublicNetworkGraph(
-  db: D1Database,
-): Promise<OptimizedGraphData> {
-  // 1. Fetch public nodes from segments table
-  const { results: rawNodes } = await db
-    .prepare(
-      `
-    SELECT DISTINCT 
-      artistName AS name,
-      LOWER(REPLACE(artistName, ' ', '_')) AS rawArist
-    FROM segments
-    WHERE status = 'public'
-    ORDER BY artistName ASC
-  `,
-    )
-    .all();
+export interface Segment {
+  id: string;
+  artistId: string;
+  title: string;
+  artistName: string;
+  eventDate: string;
+  venueName: string;
+  status: "public" | "private" | string;
+  [key: string]: any;
+}
 
+// -------------------------------------------------------------------------
+// 1. In-Memory Edge Calculation (Replaces D1 SQL Query)
+// -------------------------------------------------------------------------
+export function calculateEdgesFromSegments(segments: Segment[]) {
+  const publicSegments = segments.filter((s) => s.status === "public");
+
+  // Group artists by event (date + venue)
+  const eventMap = new Map<string, Set<string>>();
+
+  for (const seg of publicSegments) {
+    const eventKey = `${seg.eventDate}_${seg.venueName}`;
+    if (!eventMap.has(eventKey)) {
+      eventMap.set(eventKey, new Set());
+    }
+    eventMap.get(eventKey)!.add(seg.artistName);
+  }
+
+  // Count unique co-performances for each artist pair
+  const pairCounts = new Map<string, number>();
+
+  for (const artistsSet of eventMap.values()) {
+    const artists = Array.from(artistsSet).sort();
+
+    for (let i = 0; i < artists.length; i++) {
+      for (let j = i + 1; j < artists.length; j++) {
+        const pairKey = `${artists[i]}:::${artists[j]}`;
+        pairCounts.set(pairKey, (pairCounts.get(pairKey) || 0) + 1);
+      }
+    }
+  }
+
+  const rawEdges: { artist1: string; artist2: string; weight: number }[] = [];
+
+  for (const [pairKey, weight] of pairCounts.entries()) {
+    const [artist1, artist2] = pairKey.split(":::");
+    rawEdges.push({ artist1, artist2, weight });
+  }
+
+  return rawEdges;
+}
+
+// -------------------------------------------------------------------------
+// 2. Full Network Graph Builder
+// -------------------------------------------------------------------------
+export function buildPublicNetworkGraph(
+  segments: Segment[],
+  rawNodes: { name: string; rawArtist: string }[],
+): OptimizedGraphData {
   const totalNodes = rawNodes.length;
   const artistToIdMap = new Map<string, string>();
 
-  // Generate clean radial fallback coordinates without d3-force
-  const nodes: GraphNode[] = rawNodes.map((n: any, idx: number) => {
+  // Step 1: Generate nodes with radial coordinates
+  const nodes: GraphNode[] = rawNodes.map((n, idx) => {
     const id = String(idx + 1);
     artistToIdMap.set(n.name, id);
 
@@ -69,12 +109,9 @@ export async function buildPublicNetworkGraph(
     };
   });
 
-  const nodeMap = new Map<string, GraphNode>();
   const artistLookup: Record<string, GraphNode> = {};
 
   nodes.forEach((node) => {
-    nodeMap.set(node.id, node);
-
     const rawKey = node.rawArtist.toLowerCase().trim();
     const nameKey = node.name.toLowerCase().trim();
 
@@ -85,33 +122,15 @@ export async function buildPublicNetworkGraph(
     }
   });
 
-  // 2. Fetch public edges (co-occurrences at same venue & eventDate)
-  const { results: rawEdges } = await db
-    .prepare(
-      `
-    SELECT 
-      s1.artistName AS artist1,
-      s2.artistName AS artist2,
-      COUNT(DISTINCT s1.eventDate || '_' || s1.venueName) AS weight
-    FROM segments s1
-    INNER JOIN segments s2 
-      ON s1.venueName = s2.venueName 
-      AND s1.eventDate = s2.eventDate 
-      AND s1.artistName < s2.artistName
-    WHERE s1.status = 'public' 
-      AND s2.status = 'public'
-    GROUP BY s1.artistName, s2.artistName
-  `,
-    )
-    .all();
+  // Step 2: Compute edges in-memory from segment array
+  const rawEdges = calculateEdgesFromSegments(segments);
 
   const edges: GraphEdge[] = [];
   const adjacencyNodesMap = new Map<string, Set<string>>();
-  const adjacencyEdgesMap = new Map<string, Set<string>>();
 
   let edgeCounter = 0;
 
-  for (const e of rawEdges as any[]) {
+  for (const e of rawEdges) {
     const src = artistToIdMap.get(e.artist1);
     const tgt = artistToIdMap.get(e.artist2);
 
@@ -123,24 +142,20 @@ export async function buildPublicNetworkGraph(
         target: tgt,
         start: src,
         end: tgt,
-        weight: Number(e.weight),
+        weight: e.weight,
       };
 
       edges.push(edgeObj);
 
       if (!adjacencyNodesMap.has(src)) adjacencyNodesMap.set(src, new Set());
       if (!adjacencyNodesMap.has(tgt)) adjacencyNodesMap.set(tgt, new Set());
-      if (!adjacencyEdgesMap.has(src)) adjacencyEdgesMap.set(src, new Set());
-      if (!adjacencyEdgesMap.has(tgt)) adjacencyEdgesMap.set(tgt, new Set());
 
       adjacencyNodesMap.get(src)!.add(tgt);
       adjacencyNodesMap.get(tgt)!.add(src);
-      adjacencyEdgesMap.get(src)!.add(edgeId);
-      adjacencyEdgesMap.get(tgt)!.add(edgeId);
     }
   }
 
-  // 3. Pre-calculate artist sub-networks directly on the server
+  // Step 3: Pre-calculate artist sub-networks directly in memory
   const artistClusters: Record<string, SubNetwork> = {};
 
   nodes.forEach((targetNode) => {

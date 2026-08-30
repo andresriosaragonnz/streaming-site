@@ -25,7 +25,6 @@ export const PublicPerformancePageLayout = ({
     formattedArtist,
     formattedPerformance,
   } = firstSegment;
-  console.log({ firstSegment });
   const cards = segments.map((segment, index) => (
     <PublicSegmentCard
       index={index}

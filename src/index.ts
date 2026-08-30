@@ -26,9 +26,9 @@ app.get("/playlist", servePlaylist);
 app.get("/reset", serveReset);
 app.get("/admin/generate-token", serveGenerateToken);
 app.get("/auth/claim", serveClaim);
+app.get("/feed", serveFeed);
 
 app.get("/api/search-options", serveOptions);
-app.post("/api/feed", serveFeed);
 app.post("/api/commit-status", commitStatus);
 
 // 2. Specific Parametric Routes

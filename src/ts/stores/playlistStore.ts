@@ -3,6 +3,7 @@ import {
   createShareUrl,
   appendToPlaylist,
   generatePortfolioLink,
+  generateFollowLink,
   PLAYLIST_STORAGE_KEY,
 } from "../utils/playlistUtils.js";
 
@@ -22,6 +23,7 @@ export function initPlaylistStore(Alpine: any): void {
     // 2. Alpine automatically calls init() when registering the store
     init() {
       generatePortfolioLink();
+      generateFollowLink();
     },
 
     getPlaylistOptions() {

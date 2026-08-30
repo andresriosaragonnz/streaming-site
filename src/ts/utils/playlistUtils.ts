@@ -2,6 +2,7 @@ import { PlaylistsMap } from "../types";
 import { getRandomIndex } from "../../compiler/utils/getRandomIndex.js";
 
 export const PLAYLIST_STORAGE_KEY = "user_playlists";
+export const FOLLOW_STORAGE_KEY = "user_subscriptions";
 
 export function createShareUrl(
   origin: string,
@@ -36,6 +37,12 @@ export const getPlaylistItems = () => {
   return { l, ids, listNames };
 };
 
+export const getFollowItems = () => {
+  const saved = localStorage.getItem(FOLLOW_STORAGE_KEY);
+  const finalList = saved ? JSON.parse(saved) : { favorites: [] };
+  return finalList;
+};
+
 export function createPortfolioUrl(
   origin: string,
   listNames: string[],
@@ -68,6 +75,25 @@ export const generatePortfolioLink = () => {
   playlistLink?.setAttribute("href", url);
 };
 
+export function createFollowUrl(origin: string, followItems: string[]): string {
+  if (!followItems || followItems.length === 0) {
+    return "";
+  }
+  const base64UrlSafe = btoa(followItems.join(","))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  return `${origin}/feed?art=${base64UrlSafe}`;
+}
+
+export const generateFollowLink = () => {
+  const playlistLink = document.getElementById("my-follows");
+  const followItems = getFollowItems();
+  const url = createFollowUrl(window.location.origin, followItems);
+  playlistLink?.setAttribute("href", url);
+};
+
 export function appendToPlaylist(
   playlistsMap: PlaylistsMap,
   playlistName: string,
@@ -84,6 +110,39 @@ export function appendToPlaylist(
     ...playlistsMap,
     [playlistName]: [...currentList, segmentId],
   };
+}
+/**
+ * Checks if /myplaylists was visited without search params.
+ * Assembles the full portfolio URL from localStorage and replaces the location.
+ */
+export function handleMyFollowsRedirect(): boolean {
+  if (typeof window === "undefined") return false;
+  console.log("dsadsa");
+  if (!window.location.pathname.includes("feed")) return false;
+  const performanceGrid = document
+    .getElementById("performance-grid")
+    ?.getElementsByClassName("card").length as number;
+
+  if (performanceGrid > 0) return false;
+  const searchParams = new URLSearchParams(window.location.search);
+  const hasParams = searchParams.has("art");
+
+  if (hasParams) {
+    return false;
+  }
+  const followItems = getFollowItems();
+
+  if (followItems.length === 0) {
+    return false;
+  }
+  const targetUrl = createFollowUrl(window.location.origin, followItems);
+
+  if (targetUrl) {
+    window.location.replace(targetUrl);
+    return true;
+  }
+
+  return false;
 }
 
 /**

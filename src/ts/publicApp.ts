@@ -4,6 +4,7 @@ import { initPlaylistStore } from "./stores/playlistStore.js";
 import { initFollowStore } from "./stores/followStore.js";
 import { initToastStore } from "./stores/toastStore.js";
 import { initPlayerStore } from "./stores/playerStore.js";
+import { clearSearchParams } from "./utils/playlistUtils";
 
 function bootAlpine() {
   const Alpine = (window as any).Alpine;
@@ -12,7 +13,7 @@ function bootAlpine() {
   // Prevent double registration if already booted
   if ((window as any).__alpineBooted) return;
   (window as any).__alpineBooted = true;
-
+  clearSearchParams();
   registerCarousel(Alpine);
   initPlayerStore(Alpine);
   initAlpineStores(Alpine);

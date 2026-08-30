@@ -64,16 +64,20 @@ export function initFollowStore(Alpine: any): void {
     toggleFollow(): void {
       const { segments, currentIndex } = Alpine.store("player");
 
-      const currentArtist = segments?.[currentIndex]?.artistId;
+      const { artistId: currentArtist, formattedArtist } =
+        segments?.[currentIndex];
       if (!currentArtist) return;
 
       if (this.artists.includes(currentArtist)) {
         this.artists = this.artists.filter((id: any) => id !== currentArtist);
-        Alpine.store("toast")?.trigger?.(`Unfollowed ${currentArtist}`, "info");
+        Alpine.store("toast")?.trigger?.(
+          `Unfollowed ${formattedArtist}`,
+          "info",
+        );
       } else {
         this.artists.push(currentArtist);
         Alpine.store("toast")?.trigger?.(
-          `Following ${currentArtist}!`,
+          `Following ${formattedArtist}!`,
           "success",
         );
       }

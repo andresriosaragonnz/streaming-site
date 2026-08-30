@@ -1,33 +1,66 @@
 // =========================================================================
-// INSTANT INLINE GRAPH RENDERER (PRE-CALCULATED SUB-NETWORKS)
+// INSTANT INLINE GRAPH RENDERER (LAZY MODAL INITIALIZATION)
 // =========================================================================
+
+let orb = null;
+let currentFocusId = null;
 
 const container = document.getElementById("graph");
 const resetBtn = document.getElementById("reset-btn");
 
-if (
-  container &&
-  (container.clientHeight === 0 || container.clientWidth === 0)
-) {
-  container.style.width = "100%";
-  container.style.height = "100vh";
-  container.style.display = "block";
-  container.style.position = "relative";
+function waitForDimensions(callback) {
+  if (!container) return;
+  const { clientWidth, clientHeight } = container;
+  if (clientWidth > 0 && clientHeight > 0) {
+    callback();
+  } else {
+    requestAnimationFrame(() => waitForDimensions(callback));
+  }
 }
 
-const orb = new Orb.Orb(container, {
-  simulator: {
-    workerUrl: null, // Suppress worker loading
-  },
-  simulation: {
-    isPhysicsEnabled: false, // Static layout
-  },
-  transition: {
-    duration: 0,
-  },
-});
+function initOrbInstance() {
+  if (orb || !container) return;
 
-let currentFocusId = null;
+  container.style.width = "100%";
+  container.style.height = "100%";
+  container.style.display = "block";
+  container.style.position = "relative";
+
+  orb = new Orb.Orb(container, {
+    simulator: {
+      workerUrl: null, // Suppress worker loading
+    },
+    simulation: {
+      isPhysicsEnabled: false, // Static pre-calculated layout
+    },
+    transition: {
+      duration: 0,
+    },
+  });
+
+  orb.events.on("node-click", (event) => {
+    if (event && event.node) {
+      const nodeData = event.node.data || event.node;
+      const rawArtist =
+        nodeData.rawArtist ||
+        (nodeData.name || "").toLowerCase().replace(/\s+/g, "_");
+
+      const newUrl = `${window.location.pathname}?artist=${encodeURIComponent(rawArtist)}`;
+      window.history.pushState({ artist: rawArtist }, "", newUrl);
+
+      // Notify Alpine GraphModal to update "See videos" link
+      window.dispatchEvent(
+        new CustomEvent("node-selected", { detail: { link: rawArtist } }),
+      );
+
+      const clusters = window.__GRAPH_DATA__?.artistClusters || {};
+      const cluster =
+        clusters[rawArtist] || clusters[rawArtist.replace(/_/g, " ")];
+
+      renderGraph(cluster);
+    }
+  });
+}
 
 function initNetwork() {
   const rawData = window.__GRAPH_DATA__;
@@ -36,15 +69,28 @@ function initNetwork() {
     return;
   }
 
-  // Bind initial view directly from URL
-  focusFromUrlParam();
-
   window.addEventListener("popstate", () => {
-    focusFromUrlParam();
+    if (orb) focusFromUrlParam();
+  });
+
+  // Open Graph Modal Listener dispatched by Alpine $nextTick
+  window.addEventListener("modal-ready", () => {
+    waitForDimensions(() => {
+      if (!orb) {
+        initOrbInstance();
+      }
+      focusFromUrlParam();
+      if (orb) {
+        orb.view.recenter();
+        orb.view.render();
+      }
+    });
   });
 }
 
 function renderGraph(clusterData = null) {
+  if (!orb) return;
+
   const data = window.__GRAPH_DATA__ || {};
   let displayNodes = [];
   let displayEdges = [];
@@ -122,35 +168,27 @@ function renderGraph(clusterData = null) {
   });
 }
 
-orb.events.on("node-click", (event) => {
-  if (event && event.node) {
-    const nodeData = event.node.data || event.node;
-    const rawArtist =
-      nodeData.rawArtist ||
-      (nodeData.name || "").toLowerCase().replace(/\s+/g, "_");
-
-    const newUrl = `${window.location.pathname}?artist=${encodeURIComponent(rawArtist)}`;
-    window.history.pushState({ artist: rawArtist }, "", newUrl);
-
-    const clusters = window.__GRAPH_DATA__?.artistClusters || {};
-    console.log({ clusters });
-    const cluster =
-      clusters[rawArtist] || clusters[rawArtist.replace(/_/g, " ")];
-
-    renderGraph(cluster);
-  }
-});
-
 if (resetBtn) {
   resetBtn.addEventListener("click", () => {
     window.history.pushState({}, "", window.location.pathname);
+    window.dispatchEvent(
+      new CustomEvent("node-selected", { detail: { link: "" } }),
+    );
     renderGraph(null);
   });
 }
 
 function focusFromUrlParam() {
   const urlParams = new URLSearchParams(window.location.search);
-  const targetArtistParam = urlParams.get("artist");
+  let targetArtistParam = urlParams.get("artist");
+
+  // Fallback to current portfolio page's artist if URL query parameter is absent
+  if (!targetArtistParam) {
+    const perfLink = document.getElementById("performance-link");
+    if (perfLink) {
+      targetArtistParam = perfLink.getAttribute("data-artist");
+    }
+  }
 
   if (!targetArtistParam) {
     renderGraph(null);
@@ -164,6 +202,10 @@ function focusFromUrlParam() {
   const cluster = clusters[rawKey] || clusters[normalizedKey];
 
   if (cluster) {
+    // Dispatch selected node link to reflect in Alpine modal UI
+    window.dispatchEvent(
+      new CustomEvent("node-selected", { detail: { link: rawKey } }),
+    );
     renderGraph(cluster);
   } else {
     renderGraph(null);

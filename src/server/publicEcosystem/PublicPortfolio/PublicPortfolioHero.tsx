@@ -14,12 +14,17 @@ export const PublicPortfolioHero = ({
   count,
 }: PublicPortfolioHeroProps) => (
   <div class="artist-hero">
+    {/* Responsive Picture Stack */}
     <HeroImage heroImage={heroImage} />
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>
-      <a href={`/graph?artist=${link}`} class="btn-back">
+      <button
+        type="button"
+        class="btn-back"
+        x-on:click="isGraphDrawerOpen = true; $dispatch('open-graph-modal')"
+      >
         See network
-      </a>
+      </button>
       <p class="performance-count">{count} Documented</p>
       <div id="performance-link" data-artist={link}></div>
     </div>

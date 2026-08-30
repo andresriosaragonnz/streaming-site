@@ -1,5 +1,5 @@
-import { renderPublicEcosystem } from "../compiler/public/renderPublicEcosystem/renderPublicEcosystem";
-import { renderGraph } from "../compiler/graph/renderGraph";
+import { renderPublicEcosystem } from "./publicEcosystem/renderPublicEcosystem";
+
 import { savePagesToTarget } from "./savePagesToTarget";
 import { buildPublicNetworkGraph } from "./calculateNetwork";
 
@@ -13,6 +13,26 @@ export const commitStatus = async (c: any) => {
   const now = Math.floor(Date.now() / 1000);
 
   try {
+    const sql = `SELECT * FROM segments`;
+    const { results: allSegments } = await c.env.DB.prepare(sql).all();
+
+    // 2. Extract unique nodes/artists across the full dataset
+    const artistMap = new Map<string, { name: string; rawArtist: string }>();
+
+    for (const seg of allSegments) {
+      if (seg.artistName && !artistMap.has(seg.artistName)) {
+        artistMap.set(seg.artistName, {
+          name: seg.artistName,
+          rawArtist: seg.artistName,
+        });
+      }
+    }
+
+    const rawNodes = Array.from(artistMap.values());
+
+    // 3. Build the full public network graph in-memory
+    const graphDataJS = buildPublicNetworkGraph(allSegments, rawNodes);
+
     const updateStatements = (segments || []).map((seg: any) =>
       c.env.DB.prepare(
         `UPDATE segments SET status = ?, title = ? WHERE id = ?`,
@@ -47,16 +67,12 @@ export const commitStatus = async (c: any) => {
         (async () => {
           const sql = `SELECT * FROM segments WHERE artistId = ?`;
           const { results } = await c.env.DB.prepare(sql).bind(artist).all();
-          const kvPairs = renderPublicEcosystem(results);
+          const kvPairs = renderPublicEcosystem(results, graphDataJS);
 
           await savePagesToTarget(c.env, kvPairs);
           console.log(
             `Found ${results.length} segments. Compiling pages to D1...`,
           );
-
-          const graph = await buildPublicNetworkGraph(c.env.DB);
-          const graphPage = renderGraph(graph);
-          await savePagesToTarget(c.env, [{ key: "graph", value: graphPage }]);
         })(),
       );
     }

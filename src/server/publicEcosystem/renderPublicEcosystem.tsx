@@ -4,7 +4,7 @@ import { PublicPortfolioLayout } from "./PublicPortfolio/PublicPortfolioLayout";
 import { PublicPerformancePageLayout } from "./PublicPerformance/PublicPerformancePageLayout";
 import { NotFoundPageLayout } from "./Missing";
 
-export const renderPublicEcosystem = (segments: any): any => {
+export const renderPublicEcosystem = (segments: any, graphDataJS: any): any => {
   const { formattedSegments } = formatSegments(segments);
   const performances = getPerformancesFromSegments(formattedSegments);
 
@@ -17,6 +17,7 @@ export const renderPublicEcosystem = (segments: any): any => {
         <PublicPortfolioLayout
           performances={performances.public}
           segments={formattedSegments}
+          graphDataJS={graphDataJS}
         />
       ),
   };

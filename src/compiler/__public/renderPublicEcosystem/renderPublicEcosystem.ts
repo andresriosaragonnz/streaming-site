@@ -5,7 +5,7 @@ import { renderPublicPerformance } from "../renderPublicPerformance/renderPublic
 import { renderComponent } from "../../renderPage.js";
 import compiledTemplates from "../../../../templateCache.json" with { type: "json" };
 
-export const renderPublicEcosystem = (segments: any): any => {
+export const renderPublicEcosystem = (segments: any, graph: any): any => {
   const { formattedSegments } = formatSegments(segments);
   const performances = getPerformancesFromSegments(formattedSegments);
 

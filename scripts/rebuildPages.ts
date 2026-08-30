@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import data from "../data.json";
 // Import your rendering engine
-import { renderPublicEcosystem } from "../src/compiler/public/renderPublicEcosystem/renderPublicEcosystem";
+import { renderPublicEcosystem } from "../src/compiler/__public/renderPublicEcosystem/renderPublicEcosystem";
 
 async function rebuildAllPages() {
   console.log("🚀 Starting full static page rebuild...");

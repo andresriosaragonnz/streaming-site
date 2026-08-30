@@ -1,6 +1,6 @@
 import { createAuthToken, verifyAuthToken } from "./crypto";
 import { parseCookies } from "./parseCookie";
-import { renderClaim } from "../compiler/private/renderClaim/renderClaim";
+// import { renderClaim } from "../compiler/private/renderClaim/renderClaim";
 
 interface UserPayload {
   sub: string;
@@ -58,6 +58,6 @@ export const serveClaim = async (c: any) => {
   );
 
   // 5. Pass combined permissions to render function
-  const html = renderClaim(mergedAllowed);
+  const html = ""; //renderClaim(mergedAllowed);
   return c.html(html);
 };

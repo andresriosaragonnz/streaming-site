@@ -16,7 +16,7 @@
     "seed-local": "bunx wrangler d1 execute DB --local --file=seed.sql",
     "kv:reset": "rm -rf .wrangler/state/v3/kv",
     "db:reset": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --local --file=./schema.sql && bunx wrangler d1 execute DB --local --file=./seed.sql",
-    "compile-js": "bun build src/ts/privateApp.ts --outdir ./public/js --minify --target browser && bun build src/ts/publicApp.ts --outdir ./public/js --minify --target browser && bun build src/ts/portfolioApp.ts --outdir ./public/js --minify --target browser"
+    "compile-js": "bun build src/ts/privateApp.ts --outdir ./public/js --minify --target browser && bun build src/ts/publicApp.ts --outdir ./public/js --minify --target browser && bun build src/ts/portfolioApp.ts --outdir ./public/js --minify --target browser && bun build src/ts/playlistPortfolioInit.ts --outdir ./public/js --minify --target browser && bun build src/ts/feedInit.ts --outdir ./public/js --minify --target browser"
   },
   "type": "module",
   "devDependencies": {
