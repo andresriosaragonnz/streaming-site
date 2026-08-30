@@ -1,5 +1,5 @@
-import { renderPlaylist } from "../compiler/playlist/renderPlaylist/renderPlaylist";
-import { formatSegments } from "../compiler/formatSegments/index.js";
+import { formatSegments } from "../../compiler/formatSegments/index";
+import { PlaylistPageLayout } from "./PlaylistPageLayout";
 
 // Helper to escape HTML characters
 function escapeHtml(str: string): string {
@@ -61,22 +61,24 @@ export const servePlaylist = async (c: any) => {
     const found = ids.map((id) => resultMap.get(id)).filter(Boolean); // Cleanly drop missing IDs
     const formatted = formatSegments(found);
     // 7. Sanitize DB record fields to guard against Second-Order XSS
-    const sanitizedSegments = formatted.map((segment: any) => ({
-      ...segment,
-      title: escapeHtml(segment.title),
-      formattedTitle: escapeHtml(segment.formattedTitle),
-      formattedArtist: escapeHtml(segment.formattedArtist),
-      formattedVenue: escapeHtml(segment.formattedVenue),
-      artistName: escapeHtml(segment.artistName),
-      venueName: escapeHtml(segment.venueName),
-    }));
-    // 8. Render HTML page
-    const html = renderPlaylist(
-      {
-        segments: sanitizedSegments,
-      },
-      nameParam,
+    const sanitizedSegments = formatted.formattedSegments.map(
+      (segment: any) => ({
+        ...segment,
+        title: escapeHtml(segment.title),
+        formattedTitle: escapeHtml(segment.formattedTitle),
+        formattedArtist: escapeHtml(segment.formattedArtist),
+        formattedVenue: escapeHtml(segment.formattedVenue),
+        artistName: escapeHtml(segment.artistName),
+        venueName: escapeHtml(segment.venueName),
+      }),
     );
+    // 8. Render HTML page
+    // const html = renderPlaylistPage(
+    //   {
+    //     segments: sanitizedSegments,
+    //   },
+    //   nameParam,
+    // );
 
     // 9. Set defensive headers (Cache-Control & Content Security Policy)
     c.header("Cache-Control", "private, no-store, max-age=0");
@@ -84,8 +86,11 @@ export const servePlaylist = async (c: any) => {
     //   "Content-Security-Policy",
     //   "default-src 'self'; media-src 'self' https://*.r2.dev http://localhost:* http://192.168.1.*; img-src 'self' data: https://*.r2.dev; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
     // );
-
-    return c.html(html);
+    return c.html(
+      "<!doctype html>\n" +
+      <PlaylistPageLayout pageTitle={nameParam} segments={sanitizedSegments} />,
+    );
+    // return c.html(html);
   } catch (err) {
     console.error("Failed to parse playlist share parameter:", err);
     return c.text("Invalid share payload", 400);

@@ -27,7 +27,6 @@ export function initFollowStore(Alpine: any): void {
     },
 
     getFeed() {
-      console.log(this.stories);
       return this.stories;
     },
     // 3. Separate async method to fetch latest artist updates

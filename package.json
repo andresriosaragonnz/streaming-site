@@ -31,6 +31,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@kitajs/html": "^4.2.13",
     "date-fns-tz": "^3.2.0",
     "hono": "^4.12.32"
   }

@@ -6,13 +6,13 @@ import { renderComponent } from "../../renderPage.js";
 import compiledTemplates from "../../../../templateCache.json" with { type: "json" };
 
 export const renderPublicEcosystem = (segments: any): any => {
-  const formatedSegments = formatSegments(segments);
-  const performances = getPerformancesFromSegments(formatedSegments);
+  const { formattedSegments } = formatSegments(segments);
+  const performances = getPerformancesFromSegments(formattedSegments);
 
   const performanceIndex = {} as any;
   performanceIndex[segments[0].artistName] = {
     key: segments[0].artistName,
-    value: renderPublicPortfolio(performances, formatedSegments),
+    value: renderPublicPortfolio(performances, formattedSegments),
   };
 
   for (const performance of performances.private) {

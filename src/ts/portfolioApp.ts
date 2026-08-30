@@ -1,6 +1,7 @@
 import {
   generatePortfolioLink,
   handleMyPlaylistsRedirect,
+  clearSearchParams,
 } from "./utils/playlistUtils";
 
 import { initAlpineStores } from "./stores/publicStore.js";
@@ -9,6 +10,7 @@ import { initToastStore } from "./stores/toastStore.js";
 
 function bootAlpine() {
   handleMyPlaylistsRedirect();
+  clearSearchParams();
   const Alpine = (window as any).Alpine;
   if (!Alpine) return;
 

@@ -21,7 +21,6 @@ export function initPlaylistStore(Alpine: any): void {
 
     // 2. Alpine automatically calls init() when registering the store
     init() {
-      console.log("here");
       generatePortfolioLink();
     },
 

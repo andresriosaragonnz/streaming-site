@@ -13,7 +13,6 @@ export const serveSlug = async (c: any) => {
             if (textChunk.text.trim()) {
               try {
                 const images = JSON.parse(textChunk.text);
-                console.log({ images });
                 if (Array.isArray(images) && images.length > 0) {
                   selectedImage =
                     images[Math.floor(Math.random() * images.length)];

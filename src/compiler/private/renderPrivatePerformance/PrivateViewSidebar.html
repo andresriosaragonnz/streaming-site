@@ -16,12 +16,7 @@
       x-ref="scrollList"
       @scroll.debounce.50ms="checkScroll()"
     >
-      <template
-        x-for="(seg, idx) in $store.player.segments"
-        :key="seg.id || idx"
-      >
-        {{cards}}
-      </template>
+      {{cards}}
     </div>
 
     <button

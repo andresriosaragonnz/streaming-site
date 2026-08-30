@@ -1,4 +1,4 @@
-import { renderPublicEcosystem } from "../compiler/public/renderPublicEcosystem/renderPublicEcosystem";
+import { renderPublicEcosystem } from "./publicEcosystem/renderPublicEcosystem";
 import { savePagesToTarget } from "./savePagesToTarget";
 
 export const serveReset = async (c: any) => {

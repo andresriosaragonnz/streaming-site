@@ -56,7 +56,6 @@ export const commitStatus = async (c: any) => {
 
           const graph = await buildPublicNetworkGraph(c.env.DB);
           const graphPage = renderGraph(graph);
-          console.log({ graphPage });
           await savePagesToTarget(c.env, [{ key: "graph", value: graphPage }]);
         })(),
       );

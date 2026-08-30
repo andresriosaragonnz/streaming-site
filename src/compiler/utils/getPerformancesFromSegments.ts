@@ -1,4 +1,5 @@
 import { getRandomIndex } from "../utils/getRandomIndex.js";
+import { formatTime } from "../formatSegments/formatTime.js";
 
 const getPerformancesFromSegmentsStatus = (segments: any) => {
   const performancesIndex = {} as any;
@@ -27,9 +28,11 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
       images: duration > 60 ? [heroImage] : [],
       status,
       performance,
+      duration: duration,
     };
     const currentPerformance = performancesIndex[performance];
     if (currentPerformance) {
+      currentPerformance.duration += duration;
       if (duration > 60) {
         currentPerformance.images.push(heroImage);
       }
@@ -45,6 +48,7 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
       const randomIndex2 = getRandomIndex(images);
       performance.cardImage = `${images[randomIndex]}/card`;
       performance.altImage = `${images[randomIndex2]}`;
+      performance.duration = formatTime(performance.duration);
       return performance;
     },
   );

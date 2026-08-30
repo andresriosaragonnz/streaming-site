@@ -8,10 +8,15 @@ import { formatTime } from "./formatTime.js";
 const formatSegments = (rawSegments: any[]) => {
   const len = rawSegments.length;
   const formattedSegments = new Array(len);
+  let totalDuration = 0;
 
   for (let i = 0; i < len; i++) {
     const segment = rawSegments[i];
-
+    totalDuration += parseInt(segment.duration);
+    const formattedDate = dateFromString(segment.eventDate).formated;
+    const formattedArtist = segment.artistName.replaceAll("_", " ");
+    const formattedVenue = segment.venueName.replaceAll("_", " ");
+    const formattedPerformance = `${formattedArtist}-${formattedVenue}-${formattedDate}`;
     formattedSegments[i] = {
       artistName: segment.artistName,
       artistId: segment.artistId,
@@ -20,12 +25,13 @@ const formatSegments = (rawSegments: any[]) => {
       duration: segment.duration,
       eventDate: segment.eventDate,
       formatedDuration: formatTime(segment.duration),
-      formattedArtist: segment.artistName.replaceAll("_", " "),
-      formattedDate: dateFromString(segment.eventDate).formated,
+      formattedArtist,
+      formattedDate,
       formattedTitle: segment.title ? segment.title.replaceAll("_", " ") : "",
-      formattedVenue: segment.venueName.replaceAll("_", " "),
+      formattedVenue,
       id: segment.id,
       performance: segment.performance,
+      formattedPerformance,
       source: getVideoSource(segment.id),
       sourceMp3: getAudioSource(segment.id),
       title: segment.title,
@@ -33,7 +39,7 @@ const formatSegments = (rawSegments: any[]) => {
       status: segment.status,
     };
   }
-  return formattedSegments;
+  return { totalDuration: formatTime(totalDuration), formattedSegments };
 };
 
 export { formatSegments };

@@ -1,39 +1,45 @@
-import { renderComponent } from "../../renderPage.js";
 import { formatSegments } from "../../formatSegments/index.js";
 import { getPerformancesFromSegments } from "../../utils/getPerformancesFromSegments.js";
-import compiledTemplates from "../../../../templateCache.json" with { type: "json" };
 import { getRandomIndex } from "../../utils/getRandomIndex.js";
+import {
+  renderPrivateDashboard,
+  renderPrivatePerformanceCard,
+} from "../../../../templateCache";
 
 const getRandomElements = (arr: any[], n: number) => {
   const safeN = n < arr.length ? n : arr.length;
   return [...arr].sort(() => 0.5 - Math.random()).slice(0, safeN);
 };
 
-export const renderPrivateDashboard = (segments: any): string => {
-  const formatedSegments = formatSegments(segments);
-  const { formattedArtist, artistId } = formatedSegments[0];
-  const performances = getPerformancesFromSegments(formatedSegments);
+export const renderPrivateDashboardPage = (segments: any): string => {
+  const { formattedSegments, totalDuration } = formatSegments(segments);
+  const { formattedArtist, artistId } = formattedSegments[0];
+  const performances = getPerformancesFromSegments(formattedSegments);
   const portfolioImages = [] as string[][];
 
   const gridHtml = performances.private
     .map((performance) => {
-      const random = getRandomElements(performance.images, 8);
+      const { segments, images } = performance;
+      const publicSegments = segments.filter(
+        (seg: any) => (seg.status = "public"),
+      ).length;
+      const privateSegments = segments.length - publicSegments;
+      const random = getRandomElements(images, 8);
       portfolioImages.push(random);
-      return renderComponent(
-        compiledTemplates.PrivatePerformanceCard,
-        performance,
-      );
+      return renderPrivatePerformanceCard({
+        ...performance,
+        privateSegments,
+        publicSegments,
+      });
     })
     .join("");
-  const flattedImagesArray = portfolioImages.flat();
-  const htmlContent = renderComponent(compiledTemplates.PrivateDashboard, {
+  const htmlContent = renderPrivateDashboard({
     title: `${formattedArtist}`,
     count: performances.private.length,
     gridHtml,
-    heroImages: JSON.stringify(flattedImagesArray),
-    heroImage: formatedSegments[getRandomIndex(formatedSegments)].heroImage,
-    heroBackTitle: "See public Profile",
-    heroBackLink: artistId,
+    heroImage: formattedSegments[getRandomIndex(formattedSegments)].heroImage,
+    link: artistId,
+    totalDuration,
   });
   return htmlContent;
 };

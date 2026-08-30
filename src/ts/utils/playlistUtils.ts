@@ -92,7 +92,12 @@ export function appendToPlaylist(
  */
 export function handleMyPlaylistsRedirect(): boolean {
   if (typeof window === "undefined") return false;
+  if (!window.location.pathname.includes("myplaylists")) return false;
+  const performanceGrid = document
+    .getElementById("performance-grid")
+    ?.getElementsByClassName("card").length as number;
 
+  if (performanceGrid > 0) return false;
   const searchParams = new URLSearchParams(window.location.search);
   const hasParams =
     searchParams.has("seg") &&
@@ -102,7 +107,6 @@ export function handleMyPlaylistsRedirect(): boolean {
   if (hasParams) {
     return false;
   }
-
   const saved = localStorage.getItem(PLAYLIST_STORAGE_KEY);
   const playlists = saved ? JSON.parse(saved) : {};
 

@@ -1,5 +1,5 @@
-import { renderPrivateDashboard } from "../compiler/private/renderPrivateDashboard/renderPrivateDashboard";
-import { hashNameToId } from "../utils/makeId";
+import { hashNameToId } from "../../utils/makeId";
+import { PrivateDashboardLayout } from "./PrivateDashboardLayout";
 
 export const servePrivateDashboard = async (c: any) => {
   const slug = c.req.param("slug");
@@ -9,6 +9,7 @@ export const servePrivateDashboard = async (c: any) => {
 
   const { results } = await c.env.DB.prepare(sql).bind(id).all();
 
-  const html = renderPrivateDashboard(results);
-  return c.html(html);
+  return c.html(
+    "<!doctype html>\n" + <PrivateDashboardLayout segments={results} />,
+  );
 };

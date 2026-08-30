@@ -11,12 +11,9 @@ type TrimKey<K extends string> = K extends ` ${infer Rest}`
 
 export type TemplateProps<S extends string> = Record<
   ExtractTemplateKeys<S>,
-  string | number | boolean | null | undefined
+  string
 >;
 
-/**
- * Creates a type-safe renderer function for a specific template string.
- */
 export function createRenderer<const S extends string>(htmlTemplate: S) {
   const matches = htmlTemplate.match(/\{\{\s*([\w]+)\s*\}\}/g) || [];
   const keys = Array.from(

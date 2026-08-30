@@ -6,7 +6,14 @@
   {{> components/common/CardImage.html}}
 
   <div class="card-metadata">
-    <h3 class="capitalize-words">{{formattedVenueName}}</h3>
-    <p class="date">{{formattedDate}}</p>
+    <div>
+      <h3 class="capitalize-words">{{formattedVenueName}}</h3>
+      <p class="date">{{formattedDate}}</p>
+      <h3 class="">{{duration}}</p>
+    </div>
+    <div>
+      <h3 class="">Public:{{publicSegments}}</h3>
+      <h3 class="">Private:{{privateSegments}}</p>
+    </div>
   </div>
 </a>

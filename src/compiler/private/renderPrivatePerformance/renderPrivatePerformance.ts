@@ -1,21 +1,21 @@
-import { renderComponent } from "../../renderPage.js";
 import { formatSegments } from "../../formatSegments/index.js";
-import compiledTemplates from "../../../../templateCache.json" with { type: "json" };
+import {
+  renderPrivatePerformance,
+  renderPrivateSegmentCard,
+} from "../../../../templateCache";
 
-export const renderPrivatePerformance = (segments: any): string => {
-  const formatedSegments = formatSegments(segments);
+export const renderPrivatePerformancePage = (segments: any): string => {
+  const { formattedSegments } = formatSegments(segments);
 
-  const { formattedArtist, venueName, formattedDate } = formatedSegments[0];
-  const cards = formatedSegments
-    .map((segment) =>
-      renderComponent(compiledTemplates.PrivateSegmentCard, segment),
-    )
+  const { formattedArtist, venueName, formattedDate } = formattedSegments[0];
+  const cards = formattedSegments
+    .map((segment) => renderPrivateSegmentCard(segment))
     .join("");
   const cleanVenue = venueName.replaceAll("_", " ");
-  const htmlContent = renderComponent(compiledTemplates.PrivatePerformance, {
+  const htmlContent = renderPrivatePerformance({
     studioTitle: `${formattedArtist}-${cleanVenue}-${formattedDate}`,
-    jsonSegments: JSON.stringify(formatedSegments),
-    cardImage: `${formatedSegments[0].cardImage}`,
+    jsonSegments: JSON.stringify(formattedSegments),
+    posterImage: `${formattedSegments[0].cardImage}`,
     cards,
   });
   return htmlContent;

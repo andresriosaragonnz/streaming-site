@@ -1,20 +1,22 @@
 <div
-  @click="$store.player.selectSegment(idx)"
+  @click="$store.player.selectSegment({{index}})"
   class="sidebar-item-card"
-  :class="[
-    $store.player.currentIndex === idx ? 'item-active-highlight' : ''
-  ]"
+  :class="$store.player.currentIndex === {{index}} ? 'item-active-highlight' : ''"
 >
   <div class="item-meta">
     {{> components/common/SegmentCardImage.html}}
+
     <div class="status-text">
-      <span x-text="seg.status === 'public' ? 'Public' : 'Private'"></span>
-      <span x-text="seg.formatedDuration"></span>
+      <span
+        x-text="$store.player.segments[{{index}}]?.status === 'public' ? 'Public' : 'Private'"
+      >
+        {{status}}
+      </span>
+      <span>{{formatedDuration}}</span>
     </div>
   </div>
 
   <div class="title-text">
-    <!-- FIXED: Linked to the dynamic, reactive title string -->
-    <span x-text="seg.title"></span>
+    <span x-text="$store.player.segments[{{index}}]?.title">{{title}}</span>
   </div>
 </div>

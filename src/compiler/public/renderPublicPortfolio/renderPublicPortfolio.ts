@@ -30,7 +30,6 @@ export const renderPublicPortfolio = (
     .join("");
 
   const flattedImagesArray = portfolioImages.flat();
-  console.log({ formatedSegments });
   const htmlContent = renderComponent(compiledTemplates.PublicPortfolio, {
     title: `${formattedArtist}`,
     link: artistId,
