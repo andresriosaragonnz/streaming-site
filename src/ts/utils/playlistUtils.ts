@@ -1,4 +1,5 @@
-import { PlaylistsMap } from "../types";
+// public/js/utils/playlistUtils.ts
+import { PlaylistsMap } from "../types.js";
 import { getRandomIndex } from "../../compiler/utils/getRandomIndex.js";
 
 export const PLAYLIST_STORAGE_KEY = "user_playlists";
@@ -16,16 +17,15 @@ export function createShareUrl(
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
-
   return `${origin}/playlist?share=${base64UrlSafe}&name=${name}`;
 }
 
 export const getPlaylistItems = () => {
   const saved = localStorage.getItem(PLAYLIST_STORAGE_KEY);
   const finalList = saved ? JSON.parse(saved) : { favorites: [] };
-  const listNames = [];
-  const ids = [];
-  const l = [];
+  const listNames: string[] = [];
+  const ids: string[] = [];
+  const l: number[] = [];
   const keys = Object.keys(finalList);
   for (const key of keys) {
     listNames.push(key);
@@ -39,7 +39,7 @@ export const getPlaylistItems = () => {
 
 export const getFollowItems = () => {
   const saved = localStorage.getItem(FOLLOW_STORAGE_KEY);
-  const finalList = saved ? JSON.parse(saved) : { favorites: [] };
+  const finalList = saved ? JSON.parse(saved) : [];
   return finalList;
 };
 
@@ -79,6 +79,7 @@ export function createFollowUrl(origin: string, followItems: string[]): string {
   if (!followItems || followItems.length === 0) {
     return "";
   }
+  console.log({ followItems });
   const base64UrlSafe = btoa(followItems.join(","))
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
@@ -101,7 +102,6 @@ export function appendToPlaylist(
 ): PlaylistsMap {
   const currentList = playlistsMap[playlistName] || [];
 
-  // Prevent duplicate track IDs in the same playlist
   if (currentList.includes(segmentId)) {
     return playlistsMap;
   }
@@ -111,13 +111,9 @@ export function appendToPlaylist(
     [playlistName]: [...currentList, segmentId],
   };
 }
-/**
- * Checks if /myplaylists was visited without search params.
- * Assembles the full portfolio URL from localStorage and replaces the location.
- */
+
 export function handleMyFollowsRedirect(): boolean {
   if (typeof window === "undefined") return false;
-  console.log("dsadsa");
   if (!window.location.pathname.includes("feed")) return false;
   const performanceGrid = document
     .getElementById("performance-grid")
@@ -145,10 +141,6 @@ export function handleMyFollowsRedirect(): boolean {
   return false;
 }
 
-/**
- * Checks if /myplaylists was visited without search params.
- * Assembles the full portfolio URL from localStorage and replaces the location.
- */
 export function handleMyPlaylistsRedirect(): boolean {
   if (typeof window === "undefined") return false;
   if (!window.location.pathname.includes("myplaylists")) return false;
@@ -198,4 +190,79 @@ export function clearSearchParams(): void {
 
   const cleanUrl = window.location.origin + window.location.pathname;
   window.history.replaceState(null, "", cleanUrl);
+}
+
+/**
+ * Handles dropdown change to show/hide the custom playlist name input field.
+ */
+export function handlePlaylistSelectChange(selectEl: HTMLSelectElement): void {
+  const customInputGroup = document.getElementById("custom-playlist-group");
+  if (customInputGroup) {
+    customInputGroup.style.display =
+      selectEl.value === "+ New Playlist..." ? "block" : "none";
+  }
+}
+
+/**
+ * Validates inputs, adds the current active segment to the playlist,
+ * updates select options dynamically, and triggers notifications.
+ */
+export function handleAddToPlaylistSubmit(event?: Event): void {
+  // Find container relative to button click, falling back to global document
+  const btn = event?.currentTarget as HTMLElement | null;
+  const container = btn?.closest(".studio-controls-group") || document;
+
+  const selectEl = container.querySelector(
+    "#playlist-select",
+  ) as HTMLSelectElement | null;
+  const customEl = container.querySelector(
+    "#custom-playlist-name",
+  ) as HTMLInputElement | null;
+
+  if (!selectEl) {
+    console.warn("Could not find #playlist-select element in container.");
+    return;
+  }
+
+  // Ensure select value is properly resolved
+  const selectedValue =
+    selectEl.value || selectEl.options[selectEl.selectedIndex]?.value || "";
+  const customValue = customEl ? customEl.value.trim() : "";
+
+  const targetPlaylist =
+    selectedValue === "+ New Playlist..." ? customValue : selectedValue;
+
+  if (targetPlaylist) {
+    window.playlistStore?.addActiveToPlaylist(targetPlaylist);
+
+    if (selectedValue === "+ New Playlist...") {
+      const existingOptions = Array.from(selectEl.options);
+      let existingOpt = existingOptions.find(
+        (opt) => opt.value === targetPlaylist,
+      );
+
+      if (!existingOpt) {
+        const newOpt = document.createElement("option");
+        newOpt.value = targetPlaylist;
+        newOpt.textContent = targetPlaylist;
+        selectEl.insertBefore(
+          newOpt,
+          selectEl.options[selectEl.options.length - 1],
+        );
+      }
+
+      selectEl.value = targetPlaylist;
+
+      if (customEl) customEl.value = "";
+      const customInputGroup = container.querySelector(
+        "#custom-playlist-group",
+      ) as HTMLElement | null;
+      if (customInputGroup) customInputGroup.style.display = "none";
+    }
+  } else {
+    window.playlistsStore?.showNotification(
+      "Please enter a valid playlist name.",
+      "error",
+    );
+  }
 }

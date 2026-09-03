@@ -5,15 +5,15 @@ export interface PublicSegmentCardProps {
   title: string;
   cardImage: string;
 }
-
 export const PublicSegmentCard = ({
   index,
   title,
   cardImage,
 }: PublicSegmentCardProps) => (
   <div
-    x-on:click={`$store.player.selectSegment(${index})`}
     class="sidebar-item-card"
+    data-action="select-segment"
+    data-index={index}
   >
     <div class="item-meta">
       <CardThumbnail cardImage={cardImage} altText={title} />

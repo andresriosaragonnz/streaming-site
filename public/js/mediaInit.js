@@ -1,12 +1,16 @@
 window.setupMediaPlayback = function (
   activeItem,
   currentMode,
-  isInitialLoad = false,
+  shouldPlay = true,
+  seekTime = 0,
 ) {
   const video = document.getElementById("r2-stream-player");
   const audio = document.getElementById("r2-audio-player");
 
   const safePlay = async (mediaEl) => {
+    // 🛑 Strictly enforce user click requirement
+    if (!shouldPlay) return;
+
     try {
       await mediaEl.play();
     } catch (err) {
@@ -16,13 +20,37 @@ window.setupMediaPlayback = function (
     }
   };
 
-  // Auto-advance callback (ALWAYS auto-plays next tracks)
+  const isMobile = () =>
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent,
+    ) || window.innerWidth <= 768;
+
+  const isFullscreen = () =>
+    Boolean(
+      document.fullscreenElement ||
+      document.webkitFullscreenElement ||
+      (video && video.webkitDisplayingFullscreen),
+    );
+
   const triggerNext = () => {
     console.log("🏁 Playback ended. Auto-advancing...");
-    if (window.Alpine && window.Alpine.store("review")) {
-      window.Alpine.store("review").nextSegment();
+    if (window.playerStore) {
+      window.playerStore.nextSegment();
     }
   };
+
+  if (!activeItem) return;
+
+  // Select cardVideoSource on mobile whenever not in fullscreen
+  const useMobileVideo =
+    isMobile() && !isFullscreen() && Boolean(activeItem.cardVideoSource);
+
+  const streamUrl = useMobileVideo
+    ? activeItem.cardVideoSource
+    : activeItem.source;
+  const streamUrlMp3 = activeItem.sourceMp3;
+
+  if (!streamUrl) return;
 
   // Reset ongoing streams
   if (video) {
@@ -47,18 +75,19 @@ window.setupMediaPlayback = function (
     window.activeCustomMseController = null;
   }
 
-  if (!activeItem || !activeItem.source) return;
-
-  // 🛑 DEFER LOADING: Stop execution on initial page load so no requests fire
-  if (isInitialLoad) {
-    console.log(
-      "⏸️ Initial load detected. Deferring video/audio fetch until user interaction.",
-    );
-    return;
-  }
-
-  const streamUrl = activeItem.source;
-  const streamUrlMp3 = activeItem.sourceMp3;
+  // Restore playback position seamlessly across source switches
+  const restoreSeekTime = (mediaEl) => {
+    if (seekTime > 0) {
+      const applyTime = () => {
+        mediaEl.currentTime = seekTime;
+      };
+      if (mediaEl.readyState >= 1) {
+        applyTime();
+      } else {
+        mediaEl.addEventListener("loadedmetadata", applyTime, { once: true });
+      }
+    }
+  };
 
   // 1. VIDEO MODE ACTIVE
   if (currentMode) {
@@ -67,10 +96,47 @@ window.setupMediaPlayback = function (
     video._onEndedHandler = triggerNext;
     video.addEventListener("ended", video._onEndedHandler);
 
-    // Native Safari HLS
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    // Dynamic stream swapper: toggles between 1080p (Fullscreen) and cardVideoSource (Inline Mobile)
+    const handleFullscreenChange = () => {
+      const currentTime = video.currentTime || 0;
+      const currentlyFullscreen = isFullscreen();
+
+      if (currentlyFullscreen && useMobileVideo) {
+        console.log("📺 Entering Fullscreen: Upgrading to 1080p stream.");
+        window.setupMediaPlayback(activeItem, currentMode, true, currentTime);
+      } else if (
+        !currentlyFullscreen &&
+        !useMobileVideo &&
+        activeItem.cardVideoSource &&
+        isMobile()
+      ) {
+        console.log(
+          "📱 Exiting Fullscreen: Reverting to lightweight cardVideoSource stream.",
+        );
+        window.setupMediaPlayback(activeItem, currentMode, true, currentTime);
+      }
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange, {
+      once: true,
+    });
+    video.addEventListener("webkitbeginfullscreen", handleFullscreenChange, {
+      once: true,
+    });
+    video.addEventListener("webkitendfullscreen", handleFullscreenChange, {
+      once: true,
+    });
+
+    // Native HLS / Direct MP4 Playback
+    if (
+      video.canPlayType("application/vnd.apple.mpegurl") ||
+      streamUrl.endsWith(".mp4")
+    ) {
       video.src = streamUrl;
-      safePlay(video);
+      restoreSeekTime(video);
+      if (shouldPlay) {
+        safePlay(video);
+      }
       return;
     }
 
@@ -79,8 +145,10 @@ window.setupMediaPlayback = function (
       const mediaSource = new MediaSource();
       video.src = URL.createObjectURL(mediaSource);
 
-      // Call safePlay synchronously with the click gesture to reserve playback rights
-      safePlay(video);
+      restoreSeekTime(video);
+      if (shouldPlay) {
+        safePlay(video);
+      }
 
       const controller = new AbortController();
       window.activeCustomMseController = controller;
@@ -162,6 +230,9 @@ window.setupMediaPlayback = function (
 
     audio.src = streamUrlMp3;
     audio.load();
-    safePlay(audio);
+    restoreSeekTime(audio);
+    if (shouldPlay) {
+      safePlay(audio);
+    }
   }
 };

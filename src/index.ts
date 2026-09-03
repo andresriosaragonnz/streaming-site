@@ -20,27 +20,47 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// 1. Explicit / Fixed API & Route handlers (Put these FIRST)
-app.get("/myplaylists", servePlaylistPortfolio); // Your test route
+// ---------------------------------------------------------
+// 1. Root Endpoint
+// ---------------------------------------------------------
+app.get("/", (c) => {
+  return c.html("<h1>Archive Engine Server Running</h1>");
+});
+
+// ---------------------------------------------------------
+// 2. Fixed API & Static Endpoints (MUST precede parametric routes)
+// ---------------------------------------------------------
+app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
 app.get("/reset", serveReset);
 app.get("/admin/generate-token", serveGenerateToken);
 app.get("/auth/claim", serveClaim);
 app.get("/feed", serveFeed);
 
-app.get("/api/search-options", serveOptions);
+// Explicit POST routes
 app.post("/api/commit-status", commitStatus);
 
-// 2. Specific Parametric Routes
-app.get("/private/performance/:slug", servePrivatePerformance);
-app.get("/:slug", serveSlug);
+// API GET routes
+app.get("/api/search-options", serveOptions);
+
+// ---------------------------------------------------------
+// 3. Middlewares (Must be attached BEFORE the routes they protect)
+// ---------------------------------------------------------
+// Replace "/private/*" with "/private/:slug/*" or "/private/:slug"
+app.use("/private/performance/:slug/", usePrivate);
+app.use("/private/:slug", usePrivate);
+
 app.get("/private/:slug", servePrivateDashboard);
 
-// 3. Dynamic Middlewares (Must come AFTER fixed endpoints)
-app.use("/private/:slug/*", usePrivate);
-// 4. Fallback Root
-app.get("/", (c) => {
-  return c.html("<h1>Archive Engine Server Running</h1>");
-});
+// ---------------------------------------------------------
+// 4. Specific Parametric Private Routes
+// ---------------------------------------------------------
+app.get("/private/performance/:slug", servePrivatePerformance);
+app.get("/private/:slug", servePrivateDashboard);
+
+// ---------------------------------------------------------
+// 5. Catch-All Parametric Route (MUST BE ABSOLUTE LAST)
+// ---------------------------------------------------------
+app.get("/:slug", serveSlug);
 
 export default app;

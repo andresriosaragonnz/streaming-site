@@ -1,3 +1,5 @@
+import { devMemoryCache } from "./savePagesToTarget";
+
 export const serveSlug = async (c: any) => {
   const slug = c.req.param("slug");
 
@@ -52,18 +54,26 @@ export const serveSlug = async (c: any) => {
   });
 
   // -------------------------------------------------------------
-  // 1. LOCAL DEV: Fetch from PAGE_CACHE (KV) & Randomize Image
+  // 1. LOCAL DEV: Fast In-Memory Map Check -> Fallback to PAGE_CACHE (KV)
   // -------------------------------------------------------------
   if (process.env.NODE_ENV === "development") {
-    if (c.env.PAGE_CACHE) {
-      const cachedHtml = await c.env.PAGE_CACHE.get(slug);
-      if (cachedHtml) {
-        const rewriter = createRandomImageRewriter();
-        const response = new Response(cachedHtml, { status: 200, headers });
-        return rewriter.transform(response);
-      }
+    let rawHtml: string | null = null;
+
+    // Check in-memory Map first (< 1ms lookup)
+    if (devMemoryCache.has(slug)) {
+      rawHtml = devMemoryCache.get(slug)!;
+    } else if (c.env.PAGE_CACHE) {
+      // Fallback to KV emulator if not in memory
+      rawHtml = await c.env.PAGE_CACHE.get(slug);
     }
-    return c.html("<h1>404 - Page Not Found (Dev KV)</h1>", 404);
+
+    if (rawHtml) {
+      const rewriter = createRandomImageRewriter();
+      const response = new Response(rawHtml, { status: 200, headers });
+      return rewriter.transform(response);
+    }
+
+    return c.html("<h1>404 - Page Not Found (Dev KV/Memory)</h1>", 404);
   }
 
   // -------------------------------------------------------------

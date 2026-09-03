@@ -8,7 +8,7 @@ import { PrivatePerformanceCard } from "./PrivatePerformanceCard";
 
 export const PrivateDashboardLayout = ({ segments = [] }) => {
   const { formattedSegments, totalDuration } = formatSegments(segments);
-  const { formattedArtist, artistId } = formattedSegments[0];
+  const { formattedArtist, artistName, artistLink } = formattedSegments[0];
   const performances = getPerformancesFromSegments(formattedSegments);
   const portfolioImages = [] as string[][];
 
@@ -46,7 +46,7 @@ export const PrivateDashboardLayout = ({ segments = [] }) => {
             formattedSegments[getRandomIndex(formattedSegments)].heroImage
           }
           title={formattedArtist}
-          link={artistId}
+          link={artistName}
           count={performances.private.length}
           totalDuration={totalDuration}
         />

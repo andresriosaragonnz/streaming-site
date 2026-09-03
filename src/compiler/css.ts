@@ -70,3 +70,5 @@ export function compileStylesheets(): void {
     throw error;
   }
 }
+
+compileStylesheets();

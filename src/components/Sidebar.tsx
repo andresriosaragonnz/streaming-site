@@ -3,8 +3,7 @@ export interface SidebarProps {
   header?: JSX.Element;
   carouselId?: string;
   listId?: string;
-  listRef?: string;
-  onScroll?: string;
+  playlistName?: string;
 }
 
 export const Sidebar = ({
@@ -12,33 +11,38 @@ export const Sidebar = ({
   header,
   carouselId = "sidebar-carousel",
   listId = "sidebar-scroll-list",
-  listRef = "scrollList",
+  playlistName,
 }: SidebarProps) => (
-  <div class="carousel-wrapper" id={carouselId} x-data="carousel">
+  <div
+    class="carousel-wrapper"
+    id={carouselId}
+    data-playlist-name={playlistName}
+  >
+    {header}
+
+    {/* Left scroll arrow (initially hidden until scrolled) */}
     <button
       type="button"
       class="carousel-nav-btn nav-left"
       id="carousel-nav-left"
-      x-show="canScrollLeft"
-      x-on:click="scroll('left')"
-      x-transition
-      x-cloak
+      aria-label="Scroll left"
+      style="display: none;"
     >
       ‹
     </button>
 
-    <div class="sidebar-scroll-list" id={listId} x-ref={listRef}>
+    {/* Scroll container */}
+    <div class="sidebar-scroll-list" id={listId}>
       {cards}
     </div>
 
+    {/* Right scroll arrow */}
     <button
       type="button"
       class="carousel-nav-btn nav-right"
       id="carousel-nav-right"
-      x-show="canScrollRight"
-      x-on:click="scroll('right')"
-      x-transition
-      x-cloak
+      aria-label="Scroll right"
+      style="display: none;"
     >
       ›
     </button>

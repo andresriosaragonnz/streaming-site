@@ -1,4 +1,5 @@
 import { VideoPlayer } from "../../components/VideoPlayer";
+import { AudioToggle } from "../../components/AudioToggle";
 import { AudioPlayer } from "../../components/AudioPlayer";
 import { PlaylistPlayerControls } from "./PlaylistPlayerControls";
 import { Menu } from "../../components/Menu";
@@ -16,27 +17,20 @@ export const PlaylistViewPlayer = ({
   posterImage,
   firstMp3,
 }: PlaylistViewPlayerProps) => (
-  <section
-    class="player-column"
-    x-data="publicWorkspace"
-    id="publicPlayerColumn"
-  >
+  <section class="player-column" id="publicPlayerColumn">
     <div class="meta-title-card">
       <div>
         <Menu />
       </div>
       <div class="meta-title-card-right">
-        <div class="toggle" x-on:click="$store.player.togleMode()">
-          <input type="checkbox" x-bind:checked="!$store.player.mode" />
-          <label></label>
-        </div>
+        <AudioToggle />
       </div>
     </div>
 
     <div class="performance-title-big">{pageTitle}</div>
     <div
       class="performance-title break-hyphens"
-      x-text={`$store.player.active?.formattedTitle || '${firstTitle}'`}
+      data-bind-text="player.currentTitle"
     >
       {firstTitle}
     </div>

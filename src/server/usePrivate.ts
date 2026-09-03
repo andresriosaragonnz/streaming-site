@@ -8,7 +8,6 @@ export const usePrivate = async (c: any, next: any) => {
   if (!token) {
     return c.text("403 Forbidden: Missing authentication cookie", 403);
   }
-
   const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
   if (!payload) {
     return c.text("403 Forbidden: Invalid token", 403);
@@ -20,6 +19,7 @@ export const usePrivate = async (c: any, next: any) => {
   }
 
   const requestedGroup = c.req.param("slug"); // e.g. "queen" from /private/queen/...
+  console.log({ token, requestedGroup });
   // Check if requested group is in user's privilege list
   if (!payload.allowed.includes(requestedGroup)) {
     return c.text(

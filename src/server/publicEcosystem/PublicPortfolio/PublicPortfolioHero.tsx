@@ -14,14 +14,15 @@ export const PublicPortfolioHero = ({
   count,
 }: PublicPortfolioHeroProps) => (
   <div class="artist-hero">
-    {/* Responsive Picture Stack */}
     <HeroImage heroImage={heroImage} />
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>
       <button
         type="button"
         class="btn-back"
-        x-on:click="isGraphDrawerOpen = true; $dispatch('open-graph-modal')"
+        data-action="toggle-drawer"
+        data-drawer-id="graph-drawer-container"
+        style="cursor: pointer;"
       >
         See network
       </button>

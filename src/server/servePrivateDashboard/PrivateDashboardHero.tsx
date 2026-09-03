@@ -20,8 +20,8 @@ export const PrivateDashboardHero = ({
     {/* 3. Foreground Content Overlay */}
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>
-      <a href={`/graph?artist=${link}`} class="btn-back">
-        See network
+      <a href={`/${link}`} class="btn-back">
+        See public profile
       </a>
       <p class="performance-count">{count} Documented</p>
       <p class="performance-count">{totalDuration}</p>

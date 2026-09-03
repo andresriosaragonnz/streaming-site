@@ -1,113 +1,64 @@
-export function registerCarousel(Alpine: any): void {
-  Alpine.data(
-    "carousel",
-    (): CarouselComponent => ({
-      canScrollLeft: false,
-      canScrollRight: false,
-      draggedIndex: null,
+// public/js/carousel.ts
 
-      isBeingDragged(idx: number): boolean {
-        return this.draggedIndex === idx;
-      },
+export interface CarouselOptions {
+  listId?: string;
+  leftBtnId?: string;
+  rightBtnId?: string;
+  scrollOffset?: number;
+}
 
-      init() {
-        this.$nextTick(() => {
-          this.checkScroll();
-        });
+export function initCarouselScroll(options: CarouselOptions = {}): () => void {
+  const {
+    listId = "sidebar-scroll-list",
+    leftBtnId = "carousel-nav-left",
+    rightBtnId = "carousel-nav-right",
+    scrollOffset = 300,
+  } = options;
 
-        window.addEventListener("resize", () => this.checkScroll());
+  const scrollList = document.getElementById(listId);
+  const navLeft = document.getElementById(leftBtnId);
+  const navRight = document.getElementById(rightBtnId);
 
-        this.$nextTick(() => {
-          if (window.ResizeObserver && this.$refs.scrollList) {
-            const observer = new ResizeObserver(() => this.checkScroll());
-            observer.observe(this.$refs.scrollList);
-          }
-        });
-      },
+  if (!scrollList || !navLeft || !navRight) {
+    // Return dummy cleanup if elements are not present on the current page
+    return () => {};
+  }
 
-      checkScroll() {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        this.canScrollLeft = el.scrollLeft > 5;
-        this.canScrollRight =
-          el.scrollLeft + el.clientWidth < el.scrollWidth - 5;
-      },
+  // Check scroll boundary state to toggle visibility of nav arrows
+  const checkScroll = () => {
+    const maxScroll = scrollList.scrollWidth - scrollList.clientWidth;
 
-      scroll(direction: "left" | "right") {
-        const el = this.$refs.scrollList;
-        if (!el) return;
-        const scrollAmount = 252;
-        el.scrollBy({
-          left: direction === "left" ? -scrollAmount : scrollAmount,
-          behavior: "smooth",
-        });
-      },
+    // Show left arrow if scrolled past start
+    navLeft.style.display = scrollList.scrollLeft > 5 ? "block" : "none";
 
-      handleDragStart(idx: number, evt: DragEvent) {
-        this.draggedIndex = idx;
-        const el = this.$refs.scrollList;
-        if (el) {
-          el.classList.add("is-dragging");
-        }
+    // Show right arrow if not reached the end
+    navRight.style.display =
+      scrollList.scrollLeft < maxScroll - 5 ? "block" : "none";
+  };
 
-        if (evt.dataTransfer) {
-          evt.dataTransfer.effectAllowed = "move";
-          evt.dataTransfer.setData("text/plain", idx.toString());
-        }
-      },
+  // Scroll handlers
+  const onLeftClick = () => {
+    scrollList.scrollBy({ left: -scrollOffset, behavior: "smooth" });
+  };
 
-      handleDragOver(evt: DragEvent) {
-        evt.preventDefault();
-        if (evt.dataTransfer) {
-          evt.dataTransfer.dropEffect = "move";
-        }
-      },
+  const onRightClick = () => {
+    scrollList.scrollBy({ left: scrollOffset, behavior: "smooth" });
+  };
 
-      handleDrop(targetIdx: number, evt: DragEvent) {
-        evt.preventDefault();
-        if (this.draggedIndex === null || this.draggedIndex === targetIdx)
-          return;
+  // Passive listener for native scrolling performance
+  scrollList.addEventListener("scroll", checkScroll, { passive: true });
+  window.addEventListener("resize", checkScroll, { passive: true });
+  navLeft.addEventListener("click", onLeftClick);
+  navRight.addEventListener("click", onRightClick);
 
-        const segments = [...this.$store.player.segments];
-        const [movedItem] = segments.splice(this.draggedIndex, 1);
-        segments.splice(targetIdx, 0, movedItem);
+  // Initial visibility check
+  checkScroll();
 
-        this.$store.player.segments = segments;
-        const urlParams = new URLSearchParams(window.location.search);
-        const playlistName = urlParams.get("name");
-
-        if (playlistName) {
-          try {
-            const storageKey = `${playlistName}`;
-            console.log({ segments, storageKey });
-            const newSegments = segments.map((segment) => segment.id);
-            const currentPlaylistjson =
-              localStorage.getItem("user_playlists") || "";
-            const currentPlaylists = JSON.parse(currentPlaylistjson);
-            localStorage.setItem(
-              "user_playlists",
-              JSON.stringify({
-                ...currentPlaylists,
-                [storageKey]: newSegments,
-              }),
-            );
-          } catch (e) {
-            console.log(e);
-          }
-        }
-
-        this.$nextTick(() => {
-          this.checkScroll();
-        });
-      },
-
-      handleDragEnd() {
-        this.draggedIndex = null;
-        const el = this.$refs.scrollList;
-        if (el) {
-          el.classList.remove("is-dragging");
-        }
-      },
-    }),
-  );
+  // Return cleanup function for teardown/SPA view swaps if needed
+  return () => {
+    scrollList.removeEventListener("scroll", checkScroll);
+    window.removeEventListener("resize", checkScroll);
+    navLeft.removeEventListener("click", onLeftClick);
+    navRight.removeEventListener("click", onRightClick);
+  };
 }

@@ -40,7 +40,6 @@ export const FeedLayout = ({ updates = [] }: any) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>My updates</title>
         <link rel="stylesheet" href="/css/main.css" />
-        <style>{`[x-cloak] { display: none !important; }`}</style>
       </head>
       <body>
         <div class="menu-container">
@@ -49,9 +48,7 @@ export const FeedLayout = ({ updates = [] }: any) => {
 
         <FeedHero heroImage={updates[0]?.heroImage} />
 
-        <main class="performance-grid" x-data="">
-          {cards}
-        </main>
+        <main class="performance-grid">{cards}</main>
         <script type="module" src="/js/feedInit.js"></script>
         <script type="module" src="/js/portfolioApp.js"></script>
       </body>

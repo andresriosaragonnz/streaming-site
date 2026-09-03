@@ -94,11 +94,6 @@ body,
   background: transparent;
 }
 
-/* Prevent Alpine flashing templates before initialization */
-[x-cloak] {
-  display: none;
-}
-
 /* Typography Utility Shards */
 .capitalize-words {
   text-transform: capitalize;

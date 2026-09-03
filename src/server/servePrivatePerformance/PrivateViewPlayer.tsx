@@ -5,11 +5,13 @@ import { PrivatePlayerControls } from "./PrivatePlayerControls";
 export interface PrivateViewPlayerProps {
   studioTitle: string;
   posterImage: string;
+  segments: any;
 }
 
 export const PrivateViewPlayer = ({
   studioTitle,
   posterImage,
+  segments,
 }: PrivateViewPlayerProps) => (
   <section class="player-column">
     <div class="meta-title-card">
@@ -22,13 +24,14 @@ export const PrivateViewPlayer = ({
 
     <div class="video-player-mock">
       <div
-        x-show="active.source"
-        style="width: 100%; height: 100%; background: #000"
+        class="video-container"
+        data-bind-style-display="review.active.source ? 'block' : 'none'"
+        style="width: 100%; height: 100%; background: #000; display: block;"
       >
         <VideoPlayer posterImage={posterImage} />
       </div>
     </div>
 
-    <PrivatePlayerControls />
+    <PrivatePlayerControls segments={segments} />
   </section>
 );

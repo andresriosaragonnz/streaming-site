@@ -9,6 +9,7 @@ export interface Segment {
   artistLink: string;
   artistId: string;
   heroImage: string;
+  artistName: string;
   formattedPerformance: string;
   [key: string]: unknown;
 }

@@ -16,20 +16,21 @@ export const PublicViewPlayer = ({
   posterImage,
   firstMp3,
 }: PublicViewPlayerProps) => (
-  <section
-    class="player-column"
-    x-data="publicWorkspace"
-    id="publicPlayerColumn"
-  >
+  <section class="player-column" id="publicPlayerColumn">
     <div class="meta-title-card">
       <div>
         <Menu />
       </div>
       <div class="meta-title-card-right">
         {/* Toggle Mode */}
-        <div class="toggle" x-on:click="$store.player.togleMode()">
-          <input type="checkbox" x-bind:checked="!$store.player.mode" />
-          <label></label>
+        <div class="toggle">
+          <input
+            type="checkbox"
+            id="player-mode-toggle"
+            data-action="toggle-audio-mode"
+            data-bind-checked="player.isAudioMode"
+          />
+          <label for="player-mode-toggle"></label>
         </div>
       </div>
     </div>
@@ -38,7 +39,7 @@ export const PublicViewPlayer = ({
     <div class="performance-title break-hyphens">{studioTitle}</div>
     <div
       class="performance-title break-hyphens"
-      x-text={`$store.player.active?.formattedTitle || '${firstTitle}'`}
+      data-bind-text="player.currentTitle"
     >
       {firstTitle}
     </div>

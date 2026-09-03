@@ -5,7 +5,7 @@ export const HeroImage = ({ heroImage }: { heroImage: string }) => (
       <source
         id="hero-mobile-avif"
         type="image/avif"
-        media="(max-width: 639px)"
+        media="(max-width: 1000px)"
         srcset={`${heroImage}/mobile.avif`}
       />
       {/* Desktop Master (>= 1024px) */}

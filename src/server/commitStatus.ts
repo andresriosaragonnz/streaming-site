@@ -1,9 +1,7 @@
-import { renderPublicEcosystem } from "./publicEcosystem/renderPublicEcosystem";
-
-import { savePagesToTarget } from "./savePagesToTarget";
-import { buildPublicNetworkGraph } from "./calculateNetwork";
+import { rebuildPages } from "./rebuildPages";
 
 const THIRTY_DAYS_SEC = 2_592_000;
+const D1_BATCH_LIMIT = 80; // Hard limit safety threshold (D1 max is 100)
 
 export const commitStatus = async (c: any) => {
   const { segments, changedStatus } = await c.req.json();
@@ -13,26 +11,7 @@ export const commitStatus = async (c: any) => {
   const now = Math.floor(Date.now() / 1000);
 
   try {
-    const sql = `SELECT * FROM segments`;
-    const { results: allSegments } = await c.env.DB.prepare(sql).all();
-
-    // 2. Extract unique nodes/artists across the full dataset
-    const artistMap = new Map<string, { name: string; rawArtist: string }>();
-
-    for (const seg of allSegments) {
-      if (seg.artistName && !artistMap.has(seg.artistName)) {
-        artistMap.set(seg.artistName, {
-          name: seg.artistName,
-          rawArtist: seg.artistName,
-        });
-      }
-    }
-
-    const rawNodes = Array.from(artistMap.values());
-
-    // 3. Build the full public network graph in-memory
-    const graphDataJS = buildPublicNetworkGraph(allSegments, rawNodes);
-
+    // 1. Prepare segment status and title updates
     const updateStatements = (segments || []).map((seg: any) =>
       c.env.DB.prepare(
         `UPDATE segments SET status = ?, title = ? WHERE id = ?`,
@@ -55,31 +34,42 @@ export const commitStatus = async (c: any) => {
       ).bind(now, id, now, THIRTY_DAYS_SEC),
     );
 
-    // 3. Combine both statement sets into a single atomic batch transaction
+    // 3. Combine both statement sets into a unified list
     const statements = [...updateStatements, ...publishStatements];
 
+    // 4. Safely process statements in chunks under D1 batch limits
     if (statements.length > 0) {
-      await c.env.DB.batch(statements);
+      for (let i = 0; i < statements.length; i += D1_BATCH_LIMIT) {
+        const chunk = statements.slice(i, i + D1_BATCH_LIMIT);
+        await c.env.DB.batch(chunk);
+      }
     }
 
+    // 5. Trigger background page regeneration safely with error logging
     if (artist) {
       c.executionCtx.waitUntil(
         (async () => {
-          const sql = `SELECT * FROM segments WHERE artistId = ?`;
-          const { results } = await c.env.DB.prepare(sql).bind(artist).all();
-          const kvPairs = renderPublicEcosystem(results, graphDataJS);
-
-          await savePagesToTarget(c.env, kvPairs);
-          console.log(
-            `Found ${results.length} segments. Compiling pages to D1...`,
-          );
+          try {
+            console.log(
+              `⚡ [Commit] Triggering background page rebuild via rebuildPages...`,
+            );
+            const { pagesCount, totalTimeMs } = await rebuildPages(c.env);
+            console.log(
+              `✅ [Commit] Rebuilt ${pagesCount} pages in ${totalTimeMs}ms`,
+            );
+          } catch (err) {
+            console.error(
+              `❌ [Commit] Background rebuild failed in waitUntil:`,
+              err,
+            );
+          }
         })(),
       );
     }
 
     return c.json({
       status: "ok",
-      message: `Updated segment(s)`,
+      message: `Updated ${statements.length} operation(s) successfully`,
     });
   } catch (error) {
     console.error("❌ Failed to update D1 database:", error);

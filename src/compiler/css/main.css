@@ -14,6 +14,7 @@
 @import "./components/_network.css";
 @import "./components/_menu.css";
 @import "./components/_toast.css";
+@import "./components/_graph.css";
 @import "./components/_cards.css";
 @import "./components/_PrivatePlayerControls.css";
 @import "./components/_player.css";

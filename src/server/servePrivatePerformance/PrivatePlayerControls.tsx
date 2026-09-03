@@ -1,50 +1,64 @@
 import { CommitModal } from "./CommitModal";
 
-export interface PrivatePlayerControlsProps {}
+export interface PrivatePlayerControlsProps {
+  segments: any[];
+}
 
-export const PrivatePlayerControls = () => (
-  <div class="meta-workspace-card">
-    <div class="studio-controls-group">
-      <div class="input-field-group">
-        <input
-          type="text"
-          x-model="active.title"
-          x-on:input="$store.review.syncStore($store.player.currentIndex, active.title)"
-        />
-      </div>
+export const PrivatePlayerControls = ({
+  segments,
+}: PrivatePlayerControlsProps) => (
+  <>
+    <div class="meta-workspace-card">
+      <div class="studio-controls-group">
+        <div class="input-field-group">
+          <input
+            type="text"
+            data-action="sync-track-title"
+            data-bind-value="review.active?.title || ''"
+          />
+        </div>
 
-      <button
-        x-on:click="$store.review.toggleStatus($store.player.currentIndex)"
-        type="button"
-        class="btn-status"
-        x-bind:class="active.status === 'public' ? 'btn-public' : 'btn-private'"
-      >
-        <span x-text="active.status === 'public' ? 'Public' : 'Private'"></span>
-      </button>
-
-      <div class="studio-controls-status-count-container">
-        <span
-          x-text="$store.review.getCount()"
-          class="studio-controls-status-count"
-        ></span>
-        <span
-          x-text="$store.review.getCountPrivate()"
-          class="studio-controls-status-count"
-        ></span>
-      </div>
-
-      <div class="status-action-wrapper">
-        {/* Commit Action */}
         <button
-          x-show="$store.review.changed"
-          x-on:click="$store.review.openCommitModal()"
           type="button"
-          class="btn-status btn-public"
+          class="btn-status"
+          data-action="toggle-track-status"
+          data-bind-class="review.isCurrentPublic ? 'btn-public-green' : 'btn-private-red'"
         >
-          <span>Commit</span>
+          <span data-bind-text="review.isCurrentPublic ? 'Public' : 'Private'">
+            Public
+          </span>
         </button>
+
+        <div class="studio-controls-status-count-container">
+          <span
+            class="studio-controls-status-count"
+            data-bind-text="`public:${review.publicCount}`"
+          >
+            public:0
+          </span>
+          <span
+            class="studio-controls-status-count"
+            data-bind-text="`private:${review.privateCount}`"
+          >
+            private:0
+          </span>
+        </div>
+
+        <div class="status-action-wrapper">
+          <button
+            type="button"
+            class="btn-status btn-public-green"
+            data-action="open-modal"
+            data-modal-id="commit-modal-container"
+            data-bind-show="review.hasUncommittedChanges"
+          >
+            <span>Commit</span>
+          </button>
+        </div>
       </div>
     </div>
-    <CommitModal />
-  </div>
+
+    {/* Placed at root level to leverage position: fixed .modal-backdrop */}
+    <CommitModal segments={segments} />
+  </>
 );

@@ -1,7 +1,10 @@
 export interface ModalTermsTextProps {}
 
 export const ModalTermsText = () => (
-  <div x-show="expanded" x-collapse class="contract-body">
+  <div
+    class="contract-body"
+    data-bind-style-display="review.state.isTermsExpanded ? 'block' : 'none'"
+  >
     <h4>DIRECT SYNCHRONISATION AND ONLINE STREAMING LICENCE AGREEMENT</h4>
 
     <p>
@@ -18,8 +21,10 @@ export const ModalTermsText = () => (
       direct licence to:
       <br />
       a) Synchronize the musical composition and sound recording entitled{" "}
-      <strong x-text="active?.title || 'the selected works'"></strong> with
-      video footage uploaded by the videographer.
+      <strong data-bind-text="review.activeTrackTitle">
+        the selected works
+      </strong>{" "}
+      with video footage uploaded by the videographer.
       <br />
       b) Stream, transmit, and display the resulting audiovisual work on the
       Platform's website and related non-commercial channels.

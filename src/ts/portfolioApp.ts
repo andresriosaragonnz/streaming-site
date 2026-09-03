@@ -1,47 +1,44 @@
-import {
-  generatePortfolioLink,
-  clearSearchParams,
-  generateFollowLink,
-} from "./utils/playlistUtils";
+import { UI } from "./binder.js";
+import { createPlaylistStore } from "./stores/playlistStore.js";
+import { createGraphStore } from "./stores/graphStore.js";
+import { initCarouselScroll } from "./utils/carousel.js";
+import * as playlistUtils from "./utils/playlistUtils.js";
 
-import { initAlpineStores } from "./stores/publicStore.js";
-import { initPlaylistStore } from "./stores/playlistStore.js";
-import { initToastStore } from "./stores/toastStore.js";
-
-function bootAlpine() {
-  clearSearchParams();
-  const Alpine = (window as any).Alpine;
-  if (!Alpine) return;
-
-  // Prevent double registration if already booted
-  if ((window as any).__alpineBooted) return;
-  (window as any).__alpineBooted = true;
-
-  generatePortfolioLink();
-  generateFollowLink();
-  initAlpineStores(Alpine);
-  initPlaylistStore(Alpine);
-  initToastStore(Alpine);
-  console.log("🚀 Alpine stores successfully registered.");
+// 1. Extend Window interface for clean TS definitions
+declare global {
+  interface Window {
+    playlistStore: ReturnType<typeof createPlaylistStore>;
+    graphStore: ReturnType<typeof createGraphStore>;
+    playlistUtils: typeof playlistUtils;
+  }
 }
 
-// Listen for standard init event
-document.addEventListener("alpine:init", bootAlpine);
+// 2. Expose utility functions globally for inline HTML event handlers
+window.playlistUtils = playlistUtils;
 
-// Dynamically load media engine -> then Alpine
-const mediaEngineScript = document.createElement("script");
-mediaEngineScript.src = "/js/mediaInit.js";
+// 3. Handle redirects based on query parameters
+playlistUtils.handleMyPlaylistsRedirect();
 
-mediaEngineScript.onload = () => {
-  const alpineScript = document.createElement("script");
-  alpineScript.src = "/js/alpine.js";
+// 4. Initialize DOM components & hydrate stores
+const initPortfolioApp = () => {
+  // Initialize carousel controls
+  initCarouselScroll();
 
-  // Boot stores explicitly as soon as alpine.js loads
-  alpineScript.onload = () => {
-    bootAlpine();
-  };
+  // Instantiate global reactive stores
+  window.playlistStore = createPlaylistStore();
+  window.graphStore = createGraphStore();
 
-  document.head.appendChild(alpineScript);
+  // Wire store event dispatches directly to the UI binder
+  window.addEventListener("playlist-state-changed", () => UI.requestSync());
+  window.addEventListener("graph-state-changed", () => UI.requestSync());
+
+  // Force an initial sync pass now that stores are hydrated on window
+  UI.requestSync();
 };
 
-document.head.appendChild(mediaEngineScript);
+// 5. Execution entry point
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initPortfolioApp);
+} else {
+  initPortfolioApp();
+}

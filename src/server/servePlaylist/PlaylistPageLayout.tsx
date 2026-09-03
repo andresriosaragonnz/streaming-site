@@ -1,8 +1,8 @@
-import { ToastNotification } from "../../components/ToastNotification";
 import { PlaylistViewPlayer } from "./PlaylistViewPlayer";
 import { PlaylistViewSidebar } from "./PlaylistViewSidebar";
 import { PlaylistSegmentCard } from "./PlaylistSegmentCard";
 import type { Segment } from "../../ts/types";
+import { ToastContainer } from "../../components/ToastContainer";
 
 export interface PlaylistPageLayoutProps {
   segments: Segment[];
@@ -30,6 +30,7 @@ export const PlaylistPageLayout = ({
       title={segment.title}
       formattedArtist={segment.formattedArtist}
       cardImage={segment.cardImage}
+      id={segment.id}
     />
   ));
 
@@ -56,8 +57,8 @@ export const PlaylistPageLayout = ({
         <link rel="stylesheet" href="/css/review-studio.css" />
       </head>
       <body>
-        <ToastNotification />
-        <div class="studio-container" x-data="publicWorkspace">
+        <ToastContainer />
+        <div class="studio-container">
           <PlaylistViewPlayer
             pageTitle={pageTitle}
             firstTitle={formattedTitle}
@@ -68,6 +69,7 @@ export const PlaylistPageLayout = ({
             artistLink={artistLink}
             artistName={formattedArtist}
             cards={cards}
+            pageTitle={pageTitle}
           />
         </div>
 
@@ -75,7 +77,7 @@ export const PlaylistPageLayout = ({
           {JSON.stringify(segments)}
         </script>
       </body>
-      <script type="module" src="/js/publicApp.js"></script>
+      <script type="module" src="/js/playlistApp.js"></script>
     </html>
   );
 };

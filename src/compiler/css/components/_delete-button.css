@@ -1,0 +1,26 @@
+/* Delete Button Base */
+.btn-delete-icon {
+  background-color: #18181b;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 0;
+  padding: 6px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease-out,
+    color 0.12s ease-out;
+}
+
+/* Hover & Focus States */
+.btn-delete-icon:hover {
+  background-color: #b91c1c !important; /* Flat Red */
+  color: #ffffff !important;
+  border-color: #ffffff !important;
+}
+
+.btn-delete-icon:active {
+  transform: translateY(1px);
+}

@@ -14,27 +14,30 @@ export const PrivateSegmentCard = ({
   status,
   formatedDuration,
   cardImage,
-}: PrivateSegmentCardProps) => (
-  <div
-    x-on:click={`$store.player.selectSegment(${index})`}
-    class="sidebar-item-card"
-    x-bind:class={`$store.player.currentIndex === ${index} ? 'item-active-highlight' : ''`}
-  >
-    <div class="item-meta">
-      <CardThumbnail cardImage={cardImage} altText={title} />
+}: PrivateSegmentCardProps) => {
+  return (
+    <div
+      class="sidebar-item-card"
+      data-action="select-segment"
+      data-index={index}
+      data-bind-active-class={`player.currentIndex === ${index} ? 'item-active-highlight' : ''`}
+    >
+      <div class="item-meta">
+        <CardThumbnail cardImage={cardImage} altText={title} />
 
-      <div class="status-text">
-        <span
-          x-text={`$store.player.segments[${index}]?.status === 'public' ? 'Public' : 'Private'`}
-        >
-          {status}
-        </span>
-        <span>{formatedDuration}</span>
+        <div class="status-text">
+          <span
+            data-bind-text={`review.tracks[${index}]?.isPublic ? 'Public' : 'Private'`}
+          >
+            {status === "public" ? "Public" : "Private"}
+          </span>
+          <span>{formatedDuration}</span>
+        </div>
+      </div>
+
+      <div class="title-text">
+        <span data-bind-text={`review.tracks[${index}]?.title`}>{title}</span>
       </div>
     </div>
-
-    <div class="title-text">
-      <span x-text={`$store.player.segments[${index}]?.title`}>{title}</span>
-    </div>
-  </div>
-);
+  );
+};

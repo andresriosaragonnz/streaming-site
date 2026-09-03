@@ -1,10 +1,12 @@
 import { ItemThumbnail } from "../../components/ItemThumbnail";
+import { DeleteButton } from "../../components/DeleteButton";
 
 export interface PlaylistSegmentCardProps {
   index: number;
   title: string;
   formattedArtist: string;
   cardImage: string;
+  id: string;
 }
 
 export const PlaylistSegmentCard = ({
@@ -12,19 +14,22 @@ export const PlaylistSegmentCard = ({
   title,
   formattedArtist,
   cardImage,
-}: PlaylistSegmentCardProps) => (
-  <div
-    class="sidebar-item-card"
-    x-bind:class={`{ 'is-being-dragged': draggedIndex === ${index} }`}
-    draggable="true"
-    x-on:dragstart={`handleDragStart(${index}, $event)`}
-    x-on:dragover="handleDragOver($event)"
-    x-on:drop={`handleDrop(${index}, $event)`}
-    x-on:dragend="handleDragEnd()"
-  >
+  id,
+}: PlaylistSegmentCardProps) => {
+  const cardId = `playlist-segment-card-${index}`;
+
+  return (
     <div
-      x-on:click={`$store.player.selectSegment(${index})`}
+      id={cardId}
       class="sidebar-item-card"
+      draggable="true"
+      data-bind-class-toggle={`is-active:player.isSegmentActive_${index}`}
+      onclick={`window.playerStore.selectSegment(${index})`}
+      ondragstart={`window.playlistDragEngine?.handleDragStart(${index}, event)`}
+      /* CRITICAL: event.preventDefault() MUST run on dragover */
+      ondragover="event.preventDefault(); window.playlistDragEngine?.handleDragOver(event)"
+      ondrop={`window.playlistDragEngine?.handleDrop(${index}, event)`}
+      ondragend="window.playlistDragEngine?.handleDragEnd()"
     >
       <div class="item-meta">
         <ItemThumbnail cardImage={cardImage} title={title} />
@@ -32,9 +37,17 @@ export const PlaylistSegmentCard = ({
       <div class="title-text">
         <span>{title}</span>
       </div>
-      <div class="title-text">
+      <div class="title-text justified-line">
         <span>{formattedArtist}</span>
+        <DeleteButton
+          itemKey={`${index}`}
+          actionPath="playlist.deleteItemFromActivePlaylist"
+          onclick={`
+            event.stopPropagation();
+            window.playlistStore?.deleteItemFromActivePlaylist("${id}");
+          `}
+        />
       </div>
     </div>
-  </div>
-);
+  );
+};

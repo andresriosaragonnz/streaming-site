@@ -32,6 +32,7 @@ const countByArtist = (segments: any[]) => {
 };
 
 export const serveFeed = async (c: any) => {
+  console.log("here");
   try {
     let shareParam = c.req.query("art");
     console.log({ shareParam });

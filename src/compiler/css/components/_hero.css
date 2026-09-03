@@ -40,6 +40,16 @@
   font-size: 2.25rem;
   font-weight: 700;
   color: var(--text-muted, #9ca3af);
+
+  /* Reset button defaults to ensure transparent background */
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
 }
 .artist-hero {
   position: relative;
@@ -66,7 +76,39 @@
   z-index: 1;
   object-position: 50% 00%; /* Shifts the image focal point upward */
 }
+@media (max-width: 800px) {
+  /* Base Image Positioning */
+  .hero-picture,
+  .hero-img {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 75%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0) 0%
+    );
+  }
+}
 
+@media (max-width: 1500px) {
+  /* Base Image Positioning */
+  .hero-picture,
+  .hero-img {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 10%,
+      rgba(0, 0, 0, 0) 85%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 1) 50%,
+      rgba(0, 0, 0, 0) 95%
+    );
+  }
+}
 /* Gradient Overlay sitting over the image but under text */
 .hero-gradient-overlay {
   position: absolute;

@@ -19,7 +19,6 @@ export const PlaylistPortfolioLayout = ({
   let count = 0;
 
   const portfolioImages = [] as string[];
-
   const cards = ids.map((id, index) => {
     const image = getCardImage(id);
     count += parseInt(ls[index]);
@@ -65,7 +64,7 @@ export const PlaylistPortfolioLayout = ({
           heroImage={portfolioImages[getRandomIndex(portfolioImages)]}
           count={ids.length}
         />
-        <main class="performance-grid" id="performance-grid" x-data>
+        <main class="performance-grid" id="performance-grid">
           {cards}
         </main>
       </body>

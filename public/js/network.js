@@ -1,219 +1,138 @@
-// =========================================================================
-// INSTANT INLINE GRAPH RENDERER (LAZY MODAL INITIALIZATION)
-// =========================================================================
+import { Orb } from "orb-js";
 
-let orb = null;
-let currentFocusId = null;
-
-const container = document.getElementById("graph");
-const resetBtn = document.getElementById("reset-btn");
-
-function waitForDimensions(callback) {
-  if (!container) return;
-  const { clientWidth, clientHeight } = container;
-  if (clientWidth > 0 && clientHeight > 0) {
-    callback();
-  } else {
-    requestAnimationFrame(() => waitForDimensions(callback));
+declare global {
+  interface Window {
+    __GRAPH_DATA__?: {
+      nodes: Array<{ id: string; name: string; label: string; x?: number; y?: number }>;
+      edges: Array<{ id: string; source: string; target: string; weight?: number }>;
+      artistClusters?: Record<string, any>;
+      artistLookup?: Record<string, any>;
+    };
+    renderGraph?: (data?: any) => void;
   }
 }
 
-function initOrbInstance() {
-  if (orb || !container) return;
+let orbInstance: Orb | null = null;
 
-  container.style.width = "100%";
-  container.style.height = "100%";
-  container.style.display = "block";
-  container.style.position = "relative";
+/**
+ * Initializes or re-renders the Orb.js graph visualization inside #graph.
+ */
+export function renderGraph(customData?: any): void {
+  const container = document.getElementById("graph");
+  if (!container) {
+    console.warn("⚠️ [Network] Container #graph not found in DOM.");
+    return;
+  }
 
-  orb = new Orb.Orb(container, {
-    simulator: {
-      workerUrl: null, // Suppress worker loading
-    },
-    simulation: {
-      isPhysicsEnabled: false, // Static pre-calculated layout
-    },
-    transition: {
-      duration: 0,
-    },
-  });
+  // Ensure container has visible dimensions before rendering
+  const rect = container.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) {
+    console.warn("⚠️ [Network] #graph container has 0 dimensions. Render deferred.");
+    return;
+  }
 
-  orb.events.on("node-click", (event) => {
-    if (event && event.node) {
-      const nodeData = event.node.data || event.node;
-      const rawArtist =
-        nodeData.rawArtist ||
-        (nodeData.name || "").toLowerCase().replace(/\s+/g, "_");
+  const graphData = customData || window.__GRAPH_DATA__;
+  if (!graphData || !graphData.nodes || !graphData.edges) {
+    console.warn("⚠️ [Network] No valid __GRAPH_DATA__ found.");
+    return;
+  }
 
-      const newUrl = `${window.location.pathname}?artist=${encodeURIComponent(rawArtist)}`;
-      window.history.pushState({ artist: rawArtist }, "", newUrl);
+  // Clean up existing instance before re-initializing
+  if (orbInstance) {
+    try {
+      orbInstance.destroy();
+    } catch (e) {
+      console.error("Error destroying previous Orb instance:", e);
+    }
+    orbInstance = null;
+  }
 
-      // Notify Alpine GraphModal to update "See videos" link
+  container.innerHTML = "";
+
+  try {
+    orbInstance = new Orb(container);
+
+    // Load graph payload
+    orbInstance.data.setup({
+      nodes: graphData.nodes,
+      edges: graphData.edges,
+    });
+
+    // Default graph styling and view configuration
+    orbInstance.views.setup({
+      node: (node) => ({
+        label: node.data.label || node.data.name,
+        color: "#13bf11",
+        size: 6,
+      }),
+      edge: () => ({
+        color: "#2a324b",
+        width: 1,
+      }),
+    });
+
+    // Node click delegation
+    orbInstance.events.on("node-click", (event: any) => {
+      const node = event.node;
+      if (!node) return;
+
+      const artistName = node.data.rawArtist || node.data.name;
+      const targetLink = `/artist/${encodeURIComponent(artistName)}`;
+
+      if (window.reviewStore?.state) {
+        window.reviewStore.state.activeNodeLink = targetLink;
+      }
+
       window.dispatchEvent(
-        new CustomEvent("node-selected", { detail: { link: rawArtist } }),
+        new CustomEvent("node-selected", {
+          detail: { link: targetLink, artist: artistName },
+        }),
       );
 
-      const clusters = window.__GRAPH_DATA__?.artistClusters || {};
-      const cluster =
-        clusters[rawArtist] || clusters[rawArtist.replace(/_/g, " ")];
+      window.dispatchEvent(new CustomEvent("review-state-changed"));
+    });
 
-      renderGraph(cluster);
-    }
-  });
+    orbInstance.render();
+    console.log("🕸️ [Network] Orb graph rendered successfully.");
+  } catch (err) {
+    console.error("❌ [Network] Failed to render Orb graph:", err);
+  }
 }
 
-function initNetwork() {
-  const rawData = window.__GRAPH_DATA__;
-  if (!rawData) {
-    requestAnimationFrame(initNetwork);
-    return;
-  }
+// Global window handle for binder invocation
+window.renderGraph = renderGraph;
 
-  window.addEventListener("popstate", () => {
-    if (orb) focusFromUrlParam();
-  });
-
-  // Open Graph Modal Listener dispatched by Alpine $nextTick
+/**
+ * Event Listeners & Lifecycle Triggers
+ */
+if (typeof window !== "undefined") {
+  // Trigger render whenever the drawer emits modal-ready
   window.addEventListener("modal-ready", () => {
-    waitForDimensions(() => {
-      if (!orb) {
-        initOrbInstance();
-      }
-      focusFromUrlParam();
-      if (orb) {
-        orb.view.recenter();
-        orb.view.render();
-      }
+    requestAnimationFrame(() => {
+      renderGraph();
     });
   });
-}
 
-function renderGraph(clusterData = null) {
-  if (!orb) return;
+  // Handle window resize events
+  window.addEventListener("resize", () => {
+    if (
+      orbInstance &&
+      document.getElementById("graph-drawer-container")?.classList.contains("is-open")
+    ) {
+      renderGraph();
+    }
+  });
 
-  const data = window.__GRAPH_DATA__ || {};
-  let displayNodes = [];
-  let displayEdges = [];
-
-  if (clusterData && clusterData.displayNodes) {
-    // 1. Direct O(1) Pre-calculated Sub-Network
-    currentFocusId = String(clusterData.targetNode.id);
-    if (resetBtn) resetBtn.style.display = "block";
-
-    displayNodes = clusterData.displayNodes;
-    displayEdges = clusterData.displayEdges;
-
-    orb.data.setDefaultStyle({
-      getNodeStyle(node) {
-        const isTarget = String(node.id) === currentFocusId;
-        const nodeData = node.data || node;
-        return {
-          size: isTarget ? 16 : 9,
-          color: isTarget ? "#ff3e3e" : "#00d2ff",
-          label: nodeData.name || nodeData.label || "",
-          fontSize: isTarget ? 7 : 4,
-          fontColor: "#ffffff",
-          x: nodeData.x ?? node.x,
-          y: nodeData.y ?? node.y,
-        };
-      },
-      getEdgeStyle(edge) {
-        const weight = edge.data?.weight ?? edge.weight ?? 1;
-        return {
-          color: "#ff3e3e",
-          width: Math.min(weight * 1.5, 4),
-          opacity: 0.8,
-        };
-      },
+  // Initial load pass if container is already visible
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      if (document.getElementById("graph-drawer-container")?.classList.contains("is-open")) {
+        renderGraph();
+      }
     });
   } else {
-    // 2. Full Network fallback
-    currentFocusId = null;
-    if (resetBtn) resetBtn.style.display = "none";
-
-    displayNodes = data.nodes || [];
-    displayEdges = data.edges || [];
-
-    orb.data.setDefaultStyle({
-      getNodeStyle(node) {
-        const nodeData = node.data || node;
-        return {
-          size: 7,
-          color: "#0072d2",
-          label: nodeData.name || nodeData.label || "",
-          fontSize: 3.5,
-          fontColor: "#ffffff",
-          x: nodeData.x ?? node.x,
-          y: nodeData.y ?? node.y,
-        };
-      },
-      getEdgeStyle(edge) {
-        const weight = edge.data?.weight ?? edge.weight ?? 1;
-        return {
-          color: weight > 1 ? "#3b82f6" : "#ffffff",
-          width: Math.min(weight * 0.6, 3),
-          opacity: 0.5,
-        };
-      },
-    });
-  }
-
-  // Setup data directly
-  orb.data.setup({ nodes: displayNodes, edges: displayEdges });
-
-  // Single pass canvas render and viewport centering
-  orb.view.render(() => {
-    orb.view.recenter();
-    if (container) container.style.opacity = "1";
-  });
-}
-
-if (resetBtn) {
-  resetBtn.addEventListener("click", () => {
-    window.history.pushState({}, "", window.location.pathname);
-    window.dispatchEvent(
-      new CustomEvent("node-selected", { detail: { link: "" } }),
-    );
-    renderGraph(null);
-  });
-}
-
-function focusFromUrlParam() {
-  const urlParams = new URLSearchParams(window.location.search);
-  let targetArtistParam = urlParams.get("artist");
-
-  // Fallback to current portfolio page's artist if URL query parameter is absent
-  if (!targetArtistParam) {
-    const perfLink = document.getElementById("performance-link");
-    if (perfLink) {
-      targetArtistParam = perfLink.getAttribute("data-artist");
+    if (document.getElementById("graph-drawer-container")?.classList.contains("is-open")) {
+      renderGraph();
     }
   }
-
-  if (!targetArtistParam) {
-    renderGraph(null);
-    return;
-  }
-
-  const rawKey = targetArtistParam.toLowerCase().trim();
-  const normalizedKey = rawKey.replace(/_/g, " ");
-
-  const clusters = window.__GRAPH_DATA__?.artistClusters || {};
-  const cluster = clusters[rawKey] || clusters[normalizedKey];
-
-  if (cluster) {
-    // Dispatch selected node link to reflect in Alpine modal UI
-    window.dispatchEvent(
-      new CustomEvent("node-selected", { detail: { link: rawKey } }),
-    );
-    renderGraph(cluster);
-  } else {
-    renderGraph(null);
-  }
-}
-
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initNetwork);
-} else {
-  initNetwork();
 }

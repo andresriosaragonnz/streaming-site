@@ -91,6 +91,10 @@
   color: var(--text-main);
   text-overflow: ellipsis;
 }
+.justified-line {
+  display: flex;
+  justify-content: space-between;
+}
 
 .sidebar-item-card .status-text {
   display: flex;

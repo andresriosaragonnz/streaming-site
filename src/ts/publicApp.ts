@@ -1,45 +1,66 @@
-import { registerCarousel } from "./utils/carousel.js";
-import { initAlpineStores } from "./stores/publicStore.js";
-import { initPlaylistStore } from "./stores/playlistStore.js";
-import { initFollowStore } from "./stores/followStore.js";
-import { initToastStore } from "./stores/toastStore.js";
-import { initPlayerStore } from "./stores/playerStore.js";
-import { clearSearchParams } from "./utils/playlistUtils";
+// public/js/publicApp.ts
+import { UI } from "./binder.js";
+import { createPlayerStore } from "./stores/playerStore.js";
+import { createPlaylistStore } from "./stores/playlistStore.js";
+import { initCarouselScroll } from "./utils/carousel.js";
+import * as playlistUtils from "./utils/playlistUtils.js";
+import { initToastListener } from "./utils/toastUtils.js";
 
-function bootAlpine() {
-  const Alpine = (window as any).Alpine;
-  if (!Alpine) return;
-
-  // Prevent double registration if already booted
-  if ((window as any).__alpineBooted) return;
-  (window as any).__alpineBooted = true;
-  clearSearchParams();
-  registerCarousel(Alpine);
-  initPlayerStore(Alpine);
-  initAlpineStores(Alpine);
-  initPlaylistStore(Alpine);
-  initFollowStore(Alpine);
-  initToastStore(Alpine);
-  console.log("🚀 Alpine stores successfully registered.");
+(window as any).playlistUtils = playlistUtils;
+// 1. Extend Window interface for clean TS types across inline handlers
+declare global {
+  interface Window {
+    playerStore: ReturnType<typeof createPlayerStore>;
+    playlistStore: ReturnType<typeof createPlaylistStore>;
+    setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
+  }
 }
 
-// Listen for standard init event
-document.addEventListener("alpine:init", bootAlpine);
+// 2. Initialize DOM-only components (Carousel) once DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => initCarouselScroll());
+} else {
+  initCarouselScroll();
+}
 
-// Dynamically load media engine -> then Alpine
+// 3. Dynamically inject mediaInit.js and hydrate reactive stores
 const mediaEngineScript = document.createElement("script");
 mediaEngineScript.src = "/js/mediaInit.js";
 
 mediaEngineScript.onload = () => {
-  const alpineScript = document.createElement("script");
-  alpineScript.src = "/js/alpine.js";
+  initToastListener();
+  // Read static segment JSON embedded by KitaJS
+  const segmentsDataEl = document.getElementById("studio-segments-data");
+  let initialSegments: any[] = [];
 
-  // Boot stores explicitly as soon as alpine.js loads
-  alpineScript.onload = () => {
-    bootAlpine();
+  if (segmentsDataEl && segmentsDataEl.textContent) {
+    try {
+      initialSegments = JSON.parse(segmentsDataEl.textContent);
+    } catch (err) {
+      console.error("Failed to parse #studio-segments-data JSON:", err);
+    }
+  }
+
+  // Instantiate global reactive stores
+  window.playerStore = createPlayerStore(initialSegments);
+  window.playlistStore = createPlaylistStore();
+
+  const appState = {
+    player: window.playerStore,
+    playlists: window.playlistStore,
   };
 
-  document.head.appendChild(alpineScript);
+  // Bind reactive store mutations to DOM updates
+  UI.bind(appState, "player-track-changed");
+
+  // Load initial segment if available
+  if (window.playerStore.active?.id) {
+    window.playerStore.selectSegment(0);
+  }
+};
+
+mediaEngineScript.onerror = () => {
+  console.error("Failed to load /js/mediaInit.js engine script.");
 };
 
 document.head.appendChild(mediaEngineScript);

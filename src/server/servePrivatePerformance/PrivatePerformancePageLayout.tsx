@@ -2,7 +2,7 @@ import { PrivateViewPlayer } from "./PrivateViewPlayer";
 import { PrivateViewSidebar } from "./PrivateViewSidebar";
 import { formatSegments } from "../../compiler/formatSegments/index";
 import { PrivateSegmentCard } from "./PrivateSegmentCard";
-import { ToastNotification } from "../../components/ToastNotification";
+import { ToastContainer } from "../../components/ToastContainer";
 
 export interface SegmentDataItem {
   title: string;
@@ -39,10 +39,12 @@ export const PrivatePerformancePageLayout = ({
         <link rel="stylesheet" href="/css/review-studio.css" />
       </head>
       <body>
-        <div class="studio-container" x-data="privateWorkspace">
+        <ToastContainer />
+        <div class="studio-container">
           <PrivateViewPlayer
             studioTitle={`${formattedArtist}-${venueName}-${formattedDate}`}
             posterImage={cardImage}
+            segments={formattedSegments}
           />
           <PrivateViewSidebar cards={cards} />
         </div>
@@ -50,8 +52,6 @@ export const PrivatePerformancePageLayout = ({
         <script type="application/json" id="studio-segments-data">
           {JSON.stringify(formattedSegments)}
         </script>
-
-        <ToastNotification />
       </body>
       <script type="module" src="/js/privateApp.js"></script>
     </html>

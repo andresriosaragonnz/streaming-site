@@ -1,156 +1,175 @@
-import { Segment } from "../types.js";
-import { parseSegmentsData } from "../utils/segmentUtils.js";
-import {
-  StatusSnapshot,
-  createStatusSnapshot,
-  hasStatusChanged,
-  filterSegmentsByStatus,
-} from "../utils/statusUtils.js";
+// src/client/stores/reviewStore.ts
 
-export function initPrivateAlpineStores(Alpine: any): void {
-  // 1. REGISTER privateWorkspace DATA COMPONENT
-  Alpine.data("privateWorkspace", () => ({
-    init(this: any) {
-      this.$nextTick(() => {
-        const dataEl = document.getElementById("studio-segments-data");
-        if (dataEl && dataEl.textContent) {
-          const initialSegments = parseSegmentsData(dataEl.textContent);
+export interface TrackSegment {
+  id: string;
+  title: string;
+  status: "public" | "private";
+  isPublic: boolean;
+  [key: string]: any;
+}
 
-          // Populate segments
-          this.$store.player.segments = initialSegments;
-          this.$store.review.segments = initialSegments;
-          this.$store.player.currentIndex = 0;
+export function createStatusSnapshot(
+  segments: TrackSegment[],
+): Record<string, string> {
+  const snapshot: Record<string, string> = {};
+  segments.forEach((seg) => {
+    snapshot[seg.id] =
+      seg.isPublic || seg.status === "public" ? "public" : "private";
+  });
+  return snapshot;
+}
 
-          // Capture initial status snapshot
-          this.$store.review.initialStatuses =
-            createStatusSnapshot(initialSegments);
+export function createReviewStore(initialSegments: any[] = []) {
+  // Preserve full segment objects while assigning computed isPublic and status flags
+  const initialReviewTracks: TrackSegment[] = initialSegments.map((s) => {
+    const isPublic = s.status === "public" || Boolean(s.isPublic);
+    return {
+      ...s,
+      title: s.title || "",
+      isPublic,
+      status: isPublic ? "public" : "private",
+    };
+  });
 
-          console.log("✅ Private workspace store hydrated successfully.");
+  // Capture initial status snapshot to track uncommitted changes
+  let initialStatuses = createStatusSnapshot(initialReviewTracks);
 
-          if (typeof window.setupMediaPlayback === "function") {
-            window.setupMediaPlayback(
-              this.active,
-              this.$store.review.mode,
-              true,
-            );
-          }
-        }
+  const rawState = {
+    tracks: initialReviewTracks,
+    isCommitModalOpen: false,
+    isGraphDrawerOpen: false,
+    isSubmitting: false,
+    notificationMessage: "",
+    notificationType: "info" as "info" | "success" | "error",
+  };
+
+  const notify = () => {
+    window.dispatchEvent(new CustomEvent("review-state-changed"));
+  };
+
+  const state = new Proxy(rawState, {
+    set(target, prop, value) {
+      (target as any)[prop] = value;
+      notify();
+      return true;
+    },
+  });
+
+  return {
+    state,
+
+    get publicCount(): number {
+      return state.tracks.filter((t) => t.isPublic).length;
+    },
+
+    get privateCount(): number {
+      return state.tracks.filter((t) => !t.isPublic).length;
+    },
+
+    get hasUncommittedChanges(): boolean {
+      return state.tracks.some((t) => {
+        const orig = initialStatuses[t.id];
+        const current = t.isPublic ? "public" : "private";
+        return orig !== current;
       });
     },
 
-    get active(): Segment {
-      const store = Alpine.store("player");
-      if (!store || !store.segments || !store.segments[store.currentIndex]) {
-        return {
-          id: "",
-          title: "",
-          cardImage: "",
-          status: "private",
-        };
-      }
-      return store.segments[store.currentIndex];
-    },
-  }));
-
-  // 2. REGISTER DEDICATED PRIVATE REVIEW STORE
-  Alpine.store("review", {
-    segments: [] as Segment[],
-    initialStatuses: {} as StatusSnapshot,
-    mode: true,
-    changed: false,
-    isCommitModalOpen: false,
-
-    openCommitModal() {
-      if (this.changed) {
-        this.isCommitModalOpen = true;
-      }
+    /**
+     * Triggers notification toast banners
+     */
+    showNotification(
+      message: string,
+      type: "success" | "info" | "error" = "info",
+    ): void {
+      window.dispatchEvent(
+        new CustomEvent("app-toast-trigger", {
+          detail: { message, type },
+        }),
+      );
     },
 
-    closeCommitModal() {
-      this.isCommitModalOpen = false;
+    toggleStatus(index: number) {
+      if (!state.tracks[index]) return;
+      const track = state.tracks[index];
+      track.isPublic = !track.isPublic;
+      track.status = track.isPublic ? "public" : "private";
+      notify();
     },
 
+    syncStore(index: number, newTitle: string) {
+      if (!state.tracks[index]) return;
+      state.tracks[index].title = newTitle;
+      notify();
+    },
+
+    /**
+     * Sends complete segment objects to /api/commit-status and notifies user via toast
+     */
     async submitCommit() {
+      if (state.isSubmitting) return;
+
       try {
-        // 2. Send POST request to Hono /api/commit-status
-        const currentPrivate = Object.keys(this.initialStatuses).filter(
-          (key) => {
-            return this.initialStatuses[key] === "private";
-          },
+        state.isSubmitting = true;
+
+        // 1. Calculate IDs transitioning from private -> public
+        const currentPrivateIds = Object.keys(initialStatuses).filter(
+          (id) => initialStatuses[id] === "private",
         );
-        const newPublic = this.segments
-          .filter((seg: any) => seg.status === "public")
-          .map((seg: any) => seg.id);
-        const changedStatus = currentPrivate.filter((id) =>
-          newPublic.includes(id),
+
+        const newPublicIds = state.tracks
+          .filter((seg) => seg.isPublic)
+          .map((seg) => seg.id);
+
+        const changedStatus = currentPrivateIds.filter((id) =>
+          newPublicIds.includes(id),
         );
+
+        // 2. Spread full track objects ensuring status string aligns with isPublic
+        const payloadSegments = state.tracks.map((t) => ({
+          ...t,
+          status: t.isPublic ? "public" : "private",
+        }));
+
+        console.log("📤 [Commit] Sending complete store payload:", {
+          totalSegments: payloadSegments.length,
+          changedStatusCount: changedStatus.length,
+          changedStatus,
+        });
+
+        // 3. Dispatch POST request
         const response = await fetch("/api/commit-status", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ segments: this.segments, changedStatus }),
+          body: JSON.stringify({
+            segments: payloadSegments,
+            changedStatus,
+          }),
         });
+
         if (!response.ok) {
           throw new Error(
             `Commit status failed with status ${response.status}`,
           );
         }
+
         const data = await response.json();
-        Alpine.store("toast").trigger(
-          "Changes committed successfully!",
-          "success",
-        );
         console.log("✅ Commit successful:", data);
 
-        // 2. RESET STATE AFTER COMMIT
-        // Re-capture the initial status snapshot so hasStatusChanged evaluates to false
-        this.initialStatuses = createStatusSnapshot(this.segments);
+        // 4. Reset snapshot reference
+        initialStatuses = createStatusSnapshot(payloadSegments);
 
-        // Reset change flag
-        this.changed = false;
+        // 5. Trigger notification toast
+        this.showNotification("Changes committed successfully!", "success");
       } catch (error) {
         console.error("❌ Failed to submit commit status:", error);
+        this.showNotification("Failed to commit changes", "error");
       } finally {
-        this.closeCommitModal();
+        state.isSubmitting = false;
+        state.isCommitModalOpen = false;
+        notify();
       }
     },
-
-    toggleStatus(targetIdx: number) {
-      if (this.segments[targetIdx]) {
-        const currentStatus = this.segments[targetIdx].status;
-        this.segments[targetIdx].status =
-          currentStatus === "public" ? "private" : "public";
-        this.broadcastChange(this.segments[targetIdx]);
-        this.changed = hasStatusChanged(this.segments, this.initialStatuses);
-      }
-    },
-
-    getPublicSegments(): Segment[] {
-      return filterSegmentsByStatus(this.segments, "public");
-    },
-
-    gePrivateSegments(): Segment[] {
-      return filterSegmentsByStatus(this.segments, "private");
-    },
-    getCount(): string {
-      return `public:${filterSegmentsByStatus(this.segments, "public").length}`;
-    },
-
-    getCountPrivate(): string {
-      return `private:${filterSegmentsByStatus(this.segments, "private").length}`;
-    },
-
-    syncStore(targetIdx: number, updatedTitle: string) {
-      if (this.segments[targetIdx]) {
-        this.segments[targetIdx].title = updatedTitle;
-        this.broadcastChange(this.segments[targetIdx]);
-        this.changed = true;
-      }
-    },
-
-    broadcastChange(trackItem: Segment) {
-      console.log("📡 Private State Synchronized:", JSON.stringify(trackItem));
-    },
-  });
+  };
 }
