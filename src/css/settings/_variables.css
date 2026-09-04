@@ -1,0 +1,50 @@
+/* src/css/settings/_variables.css */
+:root {
+  /* Cinematic Dark Palette */
+  --bg-deep: #040714;
+  --bg-card: #1a1d29;
+  --bg-card-hover: rgba(249, 249, 249, 0.2);
+  --bg-card-private: #ef444457;
+  --bg-card-private-hover: #f3575785;
+  --bg-private: #ef4444;
+  --bg-private-hover: #dc2626;
+  --bg-public: #10b981;
+  --bg-public-hover: #059669;
+  --bg-selected: #0063e5;
+
+  /* Form & UI Elements */
+  --bg-input: #0d1117;
+  --bg-surface: #18181b;
+  --bg-surface-elevated: #27272a;
+  --bg-surface-hover: #374151;
+  --bg-surface-active: #3f3f46;
+
+  /* Accent Colors */
+  --accent-blue: #0063e5;
+  --accent-blue-hover: #0072ff;
+  --accent-blue-subtle: rgba(88, 166, 255, 0.3);
+  --accent-brand: #1ea7fd;
+  --accent-green: #13bf11;
+  --accent-green-subtle: rgba(19, 191, 17, 0.15);
+
+  /* Typography */
+  --text-main: #f9f9f9;
+  --text-muted: #cacaca;
+  --text-subtle: #8b949e;
+  --text-dim: #71717a;
+  --text-dark: #d4d4d8;
+
+  /* Borders & Dividers */
+  --border-color: #30363d;
+  --border-subtle: #27272a;
+  --border-focus: #58a6ff;
+  --section-border: #1f2937;
+  --button-border: rgba(255, 255, 255, 0.15);
+
+  /* Overlays & Shadows */
+  --overlay-dark: rgba(0, 0, 0, 0.6);
+  --overlay-dim: rgba(0, 0, 0, 0.35);
+  --shadow-main: 0 15px 30px rgba(0, 0, 0, 0.5);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.16);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
+}

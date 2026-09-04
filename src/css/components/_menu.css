@@ -8,7 +8,7 @@
 
 .menu-container {
   position: fixed;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.5rem;
   z-index: 20;
 }
 

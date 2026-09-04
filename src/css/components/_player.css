@@ -14,7 +14,7 @@
 .video-player-mock {
   width: 100%;
   aspect-ratio: 16 / 9;
-  background-color: #000000;
+  background-color: var(--bg-deep);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -43,7 +43,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background-color: #000000;
+  background-color: var(--bg-deep);
 }
 
 .audio-player {
@@ -55,7 +55,7 @@
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  background-color: #000000;
+  background-color: var(--bg-deep);
   overflow: hidden;
   cursor: pointer;
 }
@@ -111,7 +111,7 @@
   height: 100%;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--overlay-dim);
   cursor: pointer;
   z-index: 10;
 }
@@ -210,8 +210,8 @@
   width: 76px;
   height: 36px;
   padding: 0 6px;
-  background-color: var(--bg-card, #161b22);
-  border: 1px solid var(--border-color, #30363d);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   cursor: pointer;
   box-sizing: border-box;
@@ -228,7 +228,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  color: var(--text-muted, #8b949e);
+  color: var(--text-subtle);
   transition: opacity 0.2s ease;
 }
 
@@ -239,7 +239,7 @@
   left: 4px;
   width: 26px;
   height: 26px;
-  background-color: #ffffff;
+  background-color: var(--text-main);
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
   transition:
@@ -249,30 +249,31 @@
 
 /* Hover & Focus States */
 .toggle label:hover {
-  border-color: #58a6ff;
+  border-color: var(--border-focus);
 }
 
 .toggle input[type="checkbox"]:focus-visible + label {
-  outline: 2px solid #58a6ff;
+  outline: 2px solid var(--border-focus);
   outline-offset: 2px;
 }
 
 /* Active State: Audio Mode Checked */
 .toggle input[type="checkbox"]:checked + label {
-  background-color: rgba(19, 191, 17, 0.15);
-  border-color: #13bf11;
+  background-color: var(--accent-green-subtle);
+  border-color: var(--accent-green);
 }
 
 .toggle input[type="checkbox"]:checked + label::before {
   left: 10px;
   right: auto;
-  color: #13bf11;
+  color: var(--accent-green);
 }
 
 .toggle input[type="checkbox"]:checked + label::after {
   transform: translateX(40px);
-  background-color: #13bf11;
+  background-color: var(--accent-green);
 }
+
 .meta-title-card {
   background: var(--bg-deep);
   border-radius: 8px;

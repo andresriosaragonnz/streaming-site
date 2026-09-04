@@ -8,7 +8,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "db:fetch": "bun scripts/fetch-data.js",
-    "pages:build": "bun src/compiler/css.ts &&  bun run compile-js",
+    "pages:build": "bun src/css/css.ts &&  bun run compile-js",
     "build:all": "bun run db:fetch && bun run pages:build",
     "pages:deploy": "aws s3 sync ./dist/pages s3://pages --endpoint-url https://8a48bde066e009089f9f8e944792d619.r2.cloudflarestorage.com --content-type \"text/html; charset=utf-8\" --profile r2",
     "seed-remote": "bunx wrangler d1 execute db --remote --file=./seed.sql",
