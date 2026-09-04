@@ -1,4 +1,4 @@
-import { Menu } from "../../../components/Menu";
+import { TitleBar } from "../../../components/TitleBar";
 import { VideoPlayer } from "../../../components/VideoPlayer";
 import { AudioPlayer } from "../../../components/AudioPlayer";
 import { PublicPlayerControls } from "./PublicPlayerControls";
@@ -17,52 +17,31 @@ export const PublicViewPlayer = ({
   firstMp3,
 }: PublicViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
-    <div class="meta-title-card">
-      <div>
-        <Menu />
-      </div>
-      <div class="meta-title-card-right">
-        {/* Toggle Mode */}
-        <div class="toggle">
-          <input
-            type="checkbox"
-            id="player-mode-toggle"
-            data-action="toggle-audio-mode"
-            data-bind-checked="player.isAudioMode"
-          />
-          <label for="player-mode-toggle"></label>
-        </div>
-      </div>
-    </div>
-
-    <div class="performance-title-big">Performance</div>
-    <div class="performance-title break-hyphens">{studioTitle}</div>
-    <div
-      class="performance-title break-hyphens"
-      data-bind-text="player.currentTitle"
-    >
-      {firstTitle}
-    </div>
-
-    {/* Outer wrapper with locked 16:9 ratio */}
+    {/* Navigation & Mode Toggle Header */}
+    <TitleBar player />
+    {/* Metadata Information Section */}
+    <header class="player-metadata">
+      <span class="performance-title-big">Performance</span>
+      <h2 class="performance-title break-hyphens">{studioTitle}</h2>
+      <h3
+        class="performance-subtitle break-hyphens"
+        data-bind-text="player.currentTitle"
+      >
+        {firstTitle}
+      </h3>
+    </header>
+    {/* Player Canvas Wrapper (Controlled via player.isAudioMode class) */}
     <div
       class="video-player-mock"
-      style="
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        background-color: #000;
-        position: relative;
-        overflow: hidden;
-        border-radius: 12px;
-      "
+      data-bind-class-toggle="is-audio-mode:player.isAudioMode"
     >
-      {/* VIDEO VIEW */}
+      {/* Video View Context */}
       <VideoPlayer posterImage={posterImage} />
 
-      {/* AUDIO VIEW */}
+      {/* Audio View Context */}
       <AudioPlayer firstMp3={firstMp3} />
     </div>
-
+    {/* Control Action Bar */}
     <PublicPlayerControls />
   </section>
 );

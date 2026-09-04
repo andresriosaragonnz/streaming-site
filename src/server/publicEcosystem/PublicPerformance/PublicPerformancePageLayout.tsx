@@ -1,7 +1,7 @@
 import { PublicViewPlayer } from "./PublicViewPlayer";
 import { PublicViewSidebar } from "./PublicViewSidebar";
 import { PublicSegmentCard } from "./PublicSegmentCard";
-import { ToastContainer } from "../../../components/ToastContainer";
+import { Toast } from "../../../components/ToastContainer";
 import type { Segment } from "../../../ts/types";
 
 // 1. Raw static HTML shell
@@ -29,7 +29,7 @@ const PERFORMANCE_SHELL_RAW = (
       <link rel="stylesheet" href="/css/review-studio.css" />
     </head>
     <body>
-      <ToastContainer />
+      <Toast />
       <div class="studio-container">
         {"<!-- SLOT -->"}
         {"<!-- SLOT -->"}
@@ -80,9 +80,10 @@ export const PublicPerformancePageLayout = ({
     .map((segment, index) =>
       (
         <PublicSegmentCard
-          index={index}
+          id={segment.id}
           title={segment.formattedTitle}
           cardImage={segment.cardImage}
+          duration={segment.formatedDuration}
         />
       ).toString(),
     )
@@ -105,9 +106,8 @@ export const PublicPerformancePageLayout = ({
       artistName={formattedArtist}
     />
   ).toString();
-
   const preloadHtml = cardImage
-    ? `<link rel="preload" as="image" href="${cardImage}.jpg" type="image/jpeg" />`
+    ? `<link rel="preload" as="image" fetchpriority="high" href="${cardImage}.jpg" type="image/jpeg" />`
     : "";
 
   // 3. Fast Zero-Copy Assembly via Array.join()

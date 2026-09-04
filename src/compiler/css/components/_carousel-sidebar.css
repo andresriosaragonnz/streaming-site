@@ -90,6 +90,8 @@
   white-space: normal;
   color: var(--text-main);
   text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
 }
 .justified-line {
   display: flex;

@@ -20,10 +20,15 @@ export const savePagesToTarget = async (env: Env, pages: RenderedPage[]) => {
   const isDev = process.env.NODE_ENV === "development";
 
   // ---------------------------------------------------------------------------
-  // 1. Localhost Dev Path (In-Memory Map with Hash Diffing)
+  // 1. Localhost Dev Path (In-Memory Map + KV Persistence with Hash Diffing)
   // ---------------------------------------------------------------------------
   if (isDev) {
     let devWrittenCount = 0;
+
+    // ⚡ Match binding name in wrangler.toml (`PAGE_CACHE`) with fallbacks
+    const kv = (env.PAGE_CACHE || (env as any).KV || (env as any).CACHE_KV) as
+      | KVNamespace
+      | undefined;
 
     await Promise.all(
       pages.map(async (page) => {
@@ -33,13 +38,19 @@ export const savePagesToTarget = async (env: Env, pages: RenderedPage[]) => {
         if (existingHash !== newHash) {
           devHashCache.set(page.key, newHash);
           devMemoryCache.set(page.key, page.value);
+
+          // ⚡ Persist to Cloudflare KV in Dev if binding exists
+          if (kv) {
+            await kv.put(page.key, page.value);
+          }
+
           devWrittenCount++;
         }
       }),
     );
 
     console.log(
-      `💾 [Dev Cache] ${devWrittenCount}/${pages.length} pages updated in memory.`,
+      `💾 [Dev Cache] ${devWrittenCount}/${pages.length} pages updated in memory${kv ? " & KV (PAGE_CACHE)" : ""}.`,
     );
     return;
   }

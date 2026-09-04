@@ -10,7 +10,7 @@ export const ItemThumbnail = ({ cardImage, title }: ItemThumbnailProps) => (
     <img
       src={`${cardImage}.jpg`}
       alt={title}
-      loading="lazy"
+      loading="eager"
       style="width: 100%; height: 100%; object-fit: cover; display: block"
     />
   </picture>

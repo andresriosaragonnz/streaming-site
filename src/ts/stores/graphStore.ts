@@ -1,40 +1,82 @@
-// Inside createGraphStore() in public/js/stores/graphStore.ts
+// =============================================================================
+// Graph Store Architecture
+// =============================================================================
 
-export function createGraphStore() {
-  const rawState = {
+export interface GraphState {
+  isGraphDrawerOpen: boolean;
+  activeNodeLink: string;
+}
+
+export class GraphStore {
+  public state: GraphState = {
     isGraphDrawerOpen: false,
     activeNodeLink: "",
   };
 
-  const state = new Proxy(rawState, {
-    set(target, prop, value) {
-      (target as any)[prop] = value;
-      window.dispatchEvent(
-        new CustomEvent("graph-state-changed", { detail: store }),
-      );
-      return true;
-    },
-  });
+  /**
+   * Emits custom event to notify binder.ts and network.js of reactive state updates.
+   */
+  private notify(): void {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("graph-state-changed"));
+    }
+  }
 
-  const store = {
-    state,
+  // ---------------------------------------------------------------------------
+  // Getters for Binder & UI Expressions
+  // ---------------------------------------------------------------------------
 
-    get activeNodeHref(): string {
-      return state.activeNodeLink ? `/${state.activeNodeLink}` : "#";
-    },
+  get isDrawerOpen(): boolean {
+    return this.state.isGraphDrawerOpen;
+  }
 
-    openDrawer(): void {
-      state.isGraphDrawerOpen = true;
-    },
+  get activeNodeLink(): string {
+    return this.state.activeNodeLink;
+  }
 
-    closeDrawer(): void {
-      state.isGraphDrawerOpen = false;
-    },
+  get activeNodeHref(): string {
+    return this.state.activeNodeLink ? `/${this.state.activeNodeLink}` : "#";
+  }
 
-    setActiveNode(link: string): void {
-      state.activeNodeLink = link;
-    },
-  };
+  // ---------------------------------------------------------------------------
+  // Store Actions
+  // ---------------------------------------------------------------------------
 
+  public openDrawer(): void {
+    this.state.isGraphDrawerOpen = true;
+    this.notify();
+  }
+
+  public closeDrawer(): void {
+    this.state.isGraphDrawerOpen = false;
+    this.notify();
+  }
+
+  public toggleDrawer(): void {
+    this.state.isGraphDrawerOpen = !this.state.isGraphDrawerOpen;
+    this.notify();
+  }
+
+  public setActiveNode(link: string): void {
+    this.state.activeNodeLink = link;
+    this.notify();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Global Singleton Interface
+// ---------------------------------------------------------------------------
+
+declare global {
+  interface Window {
+    graphStore?: GraphStore;
+  }
+}
+
+export function initGraphStore(): GraphStore {
+  const store = new GraphStore();
+  if (typeof window !== "undefined") {
+    window.graphStore = store;
+  }
   return store;
 }

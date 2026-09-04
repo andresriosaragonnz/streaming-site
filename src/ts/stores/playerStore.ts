@@ -1,177 +1,219 @@
-import { Segment } from "../types.js";
+// =============================================================================
+// Player Store Architecture (ID-Based State Management)
+// =============================================================================
 
-const PLAYLIST_STORAGE_KEY = "user_playlists";
+import {
+  getSegmentVideoSource,
+  getTargetQuality,
+  VideoQuality,
+} from "../utils/mediaController.js";
 
-export function createPlayerStore(initialSegments: Segment[] = []) {
-  const rawState = {
-    segments: initialSegments,
-    currentIndex: 0,
-    mode: true, // true = video, false = audio
+export interface MediaSegment {
+  id: string;
+  title: string;
+  formattedArtist: string;
+  artistName: string;
+  sourceMp3: string;
+  sourceVideo1080p?: string;
+  sourceVideo480p?: string;
+  sourceVideo?: string; // Fallback
+  cardImage?: string;
+  duration?: number;
+}
+
+export interface PlayerState {
+  activeId: string | null;
+  isPlaying: boolean;
+  isAudioMode: boolean; // false = video mode, true = audio mode
+  segments: MediaSegment[];
+  currentTime: number;
+  duration: number;
+}
+
+export class PlayerStore {
+  public state: PlayerState = {
+    activeId: null,
+    isPlaying: false,
+    isAudioMode: false,
+    segments: [],
+    currentTime: 0,
+    duration: 0,
   };
 
-  const state = new Proxy(rawState, {
-    set(target, prop, value) {
-      (target as any)[prop] = value;
+  constructor(initialSegments: MediaSegment[] = []) {
+    this.state.segments = [...initialSegments];
+    if (this.state.segments.length > 0) {
+      this.state.activeId = this.state.segments[0].id;
+    }
+  }
 
-      // Auto-persist whenever the segments array changes
-      if (prop === "segments") {
-        try {
-          localStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify(value));
-        } catch (err) {
-          console.error("Failed to save playlist to localStorage:", err);
-        }
-      }
+  private notify(): void {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("player-track-changed"));
+    }
+  }
 
-      window.dispatchEvent(
-        new CustomEvent("player-track-changed", { detail: store }),
-      );
-      return true;
-    },
-  });
+  // ---------------------------------------------------------------------------
+  // Getters for Binder Expressions
+  // ---------------------------------------------------------------------------
 
-  // Store methods and getters
-  const store = {
-    state,
+  get currentTrack(): MediaSegment | undefined {
+    return this.state.segments.find((s) => s.id === this.state.activeId);
+  }
 
-    get active(): Segment {
-      return (
-        state.segments[state.currentIndex] || {
-          id: "",
-          title: "",
-          status: "private",
-        }
-      );
-    },
+  get currentTitle(): string | undefined {
+    return this.currentTrack?.title;
+  }
 
-    get currentTitle(): string {
-      return this.active.formattedTitle || this.active.title || "";
-    },
+  get currentIndex(): number {
+    return this.state.segments.findIndex((s) => s.id === this.state.activeId);
+  }
 
-    get currentArtistName(): string {
-      return this.active.formattedArtist || this.active.artistName || "";
-    },
+  get activeSegmentId(): string | null {
+    return this.state.activeId;
+  }
 
-    get currentArtistLink(): string {
-      return `${this.active.artistName || ""}`;
-    },
+  get isPlaying(): boolean {
+    return this.state.isPlaying;
+  }
 
-    get currentPoster(): string {
-      return this.active.cardImage ? `${this.active.cardImage}.jpg` : "";
-    },
+  get isAudioMode(): boolean {
+    return this.state.isAudioMode;
+  }
 
-    get isAudioMode(): boolean {
-      return !state.mode;
-    },
+  get totalSegments(): number {
+    return this.state.segments.length;
+  }
 
-    findSegmentById(segmentId: string): Segment | undefined {
-      if (!segmentId) return undefined;
-      return state.segments.find(
-        (segment) =>
-          segment.id === segmentId || (segment as any).slug === segmentId,
-      );
-    },
+  get currentArtistName(): string {
+    return this.currentTrack?.formattedArtist || "";
+  }
 
-    isSegmentActive(idx: number): boolean {
-      return state.currentIndex === idx;
-    },
+  get currentArtistLink(): string {
+    // Generates link slug from artist name or uses segment's explicit band link if present
+    const track = this.currentTrack;
+    if (!track) return "";
 
-    /**
-     * Explicitly starts playback when the user clicks the Play button.
-     */
-    playCurrent() {
-      const activeSegment = this.active;
-      if (!activeSegment?.id) return;
+    // Example slug conversion: "Aidan Ripley" -> "aidan_ripley"
+    return track.artistName;
+  }
 
-      if (typeof window.setupMediaPlayback === "function") {
-        window.setupMediaPlayback(activeSegment, state.mode, true);
-      }
-    },
+  public isSegmentActive(id: string): boolean {
+    return this.state.activeId === id;
+  }
 
-    /**
-     * Selects a segment track and loads the poster image without auto-playing.
-     */
-    async selectSegment(idx: number) {
-      if (idx < 0 || idx >= state.segments.length) return;
+  // ---------------------------------------------------------------------------
+  // Actions & Mutations
+  // ---------------------------------------------------------------------------
 
-      const videoEl = document.getElementById(
-        "r2-stream-player",
-      ) as HTMLVideoElement | null;
+  public selectSegment(id: string): void {
+    const exists = this.state.segments.some((s) => s.id === id);
+    if (!exists) return;
+
+    this.state.activeId = id;
+    this.syncMediaElementSource();
+    this.notify();
+  }
+
+  public toggleMode(): void {
+    this.state.isAudioMode = !this.state.isAudioMode;
+
+    const audioEl = document.getElementById(
+      "r2-audio-player",
+    ) as HTMLAudioElement | null;
+    const videoEl = document.getElementById(
+      "r2-video-player",
+    ) as HTMLVideoElement | null;
+
+    if (this.state.isAudioMode) {
+      videoEl?.pause();
+    } else {
+      audioEl?.pause();
+    }
+
+    this.syncMediaElementSource();
+    this.notify();
+  }
+
+  public setPlaying(isPlaying: boolean): void {
+    if (this.state.isPlaying !== isPlaying) {
+      this.state.isPlaying = isPlaying;
+      this.notify();
+    }
+  }
+
+  public updateTime(currentTime: number, duration: number): void {
+    this.state.currentTime = currentTime;
+    if (duration && !isNaN(duration)) {
+      this.state.duration = duration;
+    }
+  }
+
+  public syncMediaElementSource(): void {
+    if (typeof window === "undefined") return;
+
+    const track = this.currentTrack;
+    if (!track) return;
+
+    if (this.state.isAudioMode) {
       const audioEl = document.getElementById(
         "r2-audio-player",
       ) as HTMLAudioElement | null;
-
-      // 1. Immediately pause and reset active media elements
-      if (videoEl) {
-        videoEl.pause();
-        videoEl.currentTime = 0;
-      }
-      if (audioEl) {
-        audioEl.pause();
-        audioEl.currentTime = 0;
-      }
-
-      // 2. Update current index state
-      state.currentIndex = idx;
-
-      // 3. Ensure play overlay icon button is visible over the new poster
-      const overlayEl = document.getElementById("video-play-overlay");
-      if (overlayEl) {
-        overlayEl.style.display = "grid";
-      }
-
-      // 4. Update poster frame for newly selected segment
-      if (this.active.cardImage && videoEl) {
-        videoEl.poster = `${this.active.cardImage}.jpg`;
-      }
-
-      // 5. Update audio source if present
-      if (this.active.sourceMp3 && audioEl) {
-        if (audioEl.getAttribute("src") !== this.active.sourceMp3) {
-          audioEl.setAttribute("src", this.active.sourceMp3);
+      if (audioEl && track.sourceMp3) {
+        const isPlaying = !audioEl.paused;
+        if (audioEl.src !== track.sourceMp3) {
+          audioEl.src = track.sourceMp3;
           audioEl.load();
+          if (isPlaying && this.state.isPlaying) {
+            audioEl
+              .play()
+              .catch((err) =>
+                console.error("[PlayerStore] Audio play error:", err),
+              );
+          }
         }
       }
+    } else {
+      const videoEl = document.getElementById(
+        "r2-video-player",
+      ) as HTMLVideoElement | null;
+      if (videoEl) {
+        const quality: VideoQuality = getTargetQuality();
+        const videoSrc = getSegmentVideoSource(track, quality);
 
-      // 6. Prime setupMediaPlayback in STOPPED mode (shouldPlay = false)
-      if (typeof window.setupMediaPlayback === "function") {
-        try {
-          await window.setupMediaPlayback(this.active, state.mode, false);
-        } catch (err) {
-          console.error("⚠️ [PlayerStore] Error switching media segment:", err);
+        if (track.cardImage) {
+          videoEl.setAttribute("poster", `${track.cardImage}.jpg`);
+          videoEl.poster = `${track.cardImage}.jpg`;
+        }
+
+        if (videoSrc && videoEl.src !== videoSrc) {
+          const isPlaying = !videoEl.paused;
+          videoEl.src = videoSrc;
+          videoEl.load();
+
+          if (isPlaying && this.state.isPlaying) {
+            videoEl
+              .play()
+              .catch((err) =>
+                console.error("[PlayerStore] Video play error:", err),
+              );
+          }
         }
       }
-    },
-
-    /**
-     * Toggles between Video and Audio modes without auto-playing.
-     */
-    toggleMode() {
-      state.mode = !state.mode;
-      if (typeof window.setupMediaPlayback === "function") {
-        window.setupMediaPlayback(this.active, state.mode, false);
-      }
-    },
-
-    nextSegment() {
-      if (state.segments.length === 0) return;
-      const nextIdx =
-        state.currentIndex < state.segments.length - 1
-          ? state.currentIndex + 1
-          : 0;
-      this.selectSegment(nextIdx);
-    },
-
-    prevSegment() {
-      if (state.segments.length === 0) return;
-      const prevIdx =
-        state.currentIndex > 0
-          ? state.currentIndex - 1
-          : state.segments.length - 1;
-      this.selectSegment(prevIdx);
-    },
-  };
-
-  return store;
+    }
+  }
 }
 
-export type PlayerStore = ReturnType<typeof createPlayerStore>;
+declare global {
+  interface Window {
+    playerStore?: PlayerStore;
+  }
+}
+
+export function initPlayerStore(segments: MediaSegment[] = []): PlayerStore {
+  const store = new PlayerStore(segments);
+  if (typeof window !== "undefined") {
+    window.playerStore = store;
+  }
+  return store;
+}

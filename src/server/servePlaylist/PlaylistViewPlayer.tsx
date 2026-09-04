@@ -2,7 +2,7 @@ import { VideoPlayer } from "../../components/VideoPlayer";
 import { AudioToggle } from "../../components/AudioToggle";
 import { AudioPlayer } from "../../components/AudioPlayer";
 import { PlaylistPlayerControls } from "./PlaylistPlayerControls";
-import { Menu } from "../../components/Menu";
+import { TitleBar } from "../../components/TitleBar";
 
 export interface PlaylistViewPlayerProps {
   pageTitle: string;
@@ -18,19 +18,11 @@ export const PlaylistViewPlayer = ({
   firstMp3,
 }: PlaylistViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
-    <div class="meta-title-card">
-      <div>
-        <Menu />
-      </div>
-      <div class="meta-title-card-right">
-        <AudioToggle />
-      </div>
-    </div>
-
+    <TitleBar />
     <div class="performance-title-big">{pageTitle}</div>
     <div
       class="performance-title break-hyphens"
-      data-bind-text="player.currentTitle"
+      data-bind-text="player.currentTrack ? player.currentTrack.title : ''"
     >
       {firstTitle}
     </div>

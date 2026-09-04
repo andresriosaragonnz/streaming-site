@@ -6,7 +6,6 @@ export interface PlaylistCardProps {
   playlistLength: number | string;
   altImage: string;
   cardImage: string;
-  shareUrl?: string;
 }
 
 export const PlaylistCard = ({
@@ -14,14 +13,14 @@ export const PlaylistCard = ({
   playlistLength,
   altImage,
   cardImage,
-  shareUrl = "#",
 }: PlaylistCardProps) => (
-  <div class="card" data-bg={altImage}>
+  <div class="card" data-bg={altImage} data-playlist-name={playlistName}>
     {/* Image Link */}
     <a
-      href={shareUrl}
-      data-bind-href={`playlist.getShareUrl('${playlistName}')`}
-      style="text-decoration: none; color: inherit; display: block"
+      href="#"
+      data-card-link
+      data-bind-href={`portfolio.getShareUrl('${playlistName}')`}
+      style="text-decoration: none; color: inherit; display: block;"
     >
       <ItemThumbnail cardImage={cardImage} title={playlistName} />
     </a>
@@ -30,21 +29,26 @@ export const PlaylistCard = ({
     <div class="card-metadata">
       {/* Text Link */}
       <a
-        href={shareUrl}
-        data-bind-href={`playlist.getShareUrl('${playlistName}')`}
-        style="text-decoration: none; color: inherit; display: block"
+        href="#"
+        data-card-link
+        data-bind-href={`portfolio.getShareUrl('${playlistName}')`}
+        style="text-decoration: none; color: inherit; display: block;"
       >
         <h3 class="capitalize-words h3">{playlistName}</h3>
-        <p class="date">{playlistLength} songs</p>
+        <p class="date">{playlistLength} tracks</p>
       </a>
 
-      {/* Separate Share Action */}
-      <div
-        style="cursor: pointer;"
-        onclick={`window.playlistStore?.generateShareLink('${playlistName}')`}
+      {/* Share Action Trigger */}
+      <button
+        type="button"
+        class="share-btn"
+        data-action="copy-portfolio-share-link"
+        data-playlist-name={playlistName}
+        style="background: none; border: none; padding: 0; cursor: pointer; color: inherit;"
+        aria-label={`Share ${playlistName} playlist`}
       >
         <ShareIcon />
-      </div>
+      </button>
     </div>
   </div>
 );

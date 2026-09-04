@@ -1,303 +1,194 @@
-// public/js/stores/playlistStore.ts
-import { PlaylistsMap } from "../types.js";
-import {
-  generatePortfolioLink,
-  generateFollowLink,
-  PLAYLIST_STORAGE_KEY,
-  handleMyPlaylistsRedirect,
-  createShareUrl,
-} from "../utils/playlistUtils.js";
+// =============================================================================
+// Playlist Store Architecture
+// =============================================================================
+import { createShareUrl } from "../utils/playlistUtils";
 
-export function createPlaylistStore() {
-  // 1. Initial State (tries loading from LocalStorage first, defaults to empty arrays)
-  const loadInitialState = (): PlaylistsMap => {
-    try {
-      handleMyPlaylistsRedirect();
-      const saved = localStorage.getItem(PLAYLIST_STORAGE_KEY);
-      return saved ? JSON.parse(saved) : { favorites: [] };
-    } catch {
-      return { favorites: [], shared: [] };
-    }
-  };
-
-  const rawState = {
-    playlists: loadInitialState() as PlaylistsMap,
-  };
-
-  // 2. Reactive Proxy interceptor
-  const state = new Proxy(rawState, {
-    set(target, prop, value) {
-      (target as any)[prop] = value;
-      console.log("here", PLAYLIST_STORAGE_KEY, JSON.stringify(value));
-      // Auto-persist whenever the playlists map mutates
-      if (prop === "playlists") {
-        try {
-          localStorage.setItem(PLAYLIST_STORAGE_KEY, JSON.stringify(value));
-        } catch (err) {
-          console.error("Failed to save playlists to localStorage:", err);
-        }
-      }
-
-      // Automatically notify binder listeners
-      window.dispatchEvent(
-        new CustomEvent("playlists-changed", { detail: store }),
-      );
-      return true;
-    },
-  });
-
-  // 3. Store methods and getters
-  const store = {
-    state,
-
-    init() {
-      generatePortfolioLink();
-      generateFollowLink();
-    },
-
-    get playlistOptions(): string[] {
-      const current = state.playlists;
-      return [...Object.keys(current), "+ New Playlist..."];
-    },
-
-    get playlistsPortfolio(): Record<
-      string,
-      { amount: number; image: string }
-    > {
-      const values = Object.keys(state.playlists).reduce((acc, current) => {
-        const playlist = state.playlists[current];
-        if (!playlist || playlist.length === 0) {
-          return acc;
-        }
-        return {
-          ...acc,
-          [current]: {
-            amount: playlist.length,
-            image: `https://pub-fef6bcaae286450e98785a845f724ff1.r2.dev/images/${playlist[0]}_card`,
-          },
-        };
-      }, {});
-      return values;
-    },
-
-    saveToLocalStorage(): void {
-      try {
-        localStorage.setItem(
-          PLAYLIST_STORAGE_KEY,
-          JSON.stringify(state.playlists),
-        );
-      } catch (err) {
-        console.error("Failed to save playlists to localStorage:", err);
-      }
-    },
-
-    getShareUrl(playlistName: string): string {
-      const ids = state.playlists[playlistName];
-      if (!ids || ids.length === 0) return "#";
-
-      return createShareUrl(window.location.origin, ids, playlistName);
-    },
-
-    async generateShareLink(playlistName: string): Promise<void> {
-      const shareUrl = this.getShareUrl(playlistName);
-
-      if (shareUrl === "#") {
-        this.showNotification("Cannot share an empty playlist.", "info");
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        this.showNotification(
-          "📋 Playlist link copied to clipboard!",
-          "success",
-        );
-      } catch (err) {
-        console.error("Failed to copy to clipboard:", err);
-        this.showNotification("❌ Failed to copy link to clipboard.", "error");
-      }
-    },
-
-    addActiveToPlaylist(playlistName: string): void {
-      const player = window.playerStore;
-      const activeSegment = player?.active;
-      if (activeSegment && activeSegment.id) {
-        this.addToPlaylist(activeSegment.id, playlistName);
-        generatePortfolioLink();
-      }
-    },
-    // public/js/stores/playlistStore.ts
-    // public/js/stores/playlistStore.ts
-
-    // public/js/stores/playlistStore.ts
-
-    async shareCurrentPlaylist(playlistName?: string): Promise<void> {
-      const targetName =
-        playlistName ||
-        new URLSearchParams(window.location.search).get("name") ||
-        "favorites";
-
-      const shareUrl = this.getShareUrl(targetName);
-
-      if (!shareUrl || shareUrl === "#") {
-        this.showNotification(
-          `Cannot share empty playlist "${targetName}".`,
-          "info",
-        );
-        return;
-      }
-
-      // 1. Always persist to localStorage
-      try {
-        localStorage.setItem("last_copied_share_url", shareUrl);
-      } catch (err) {
-        console.error("Failed to save share URL to localStorage:", err);
-      }
-
-      // 2. Try Web Share API (Android Chrome native sheet)
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: `Playlist: ${targetName}`,
-            url: shareUrl,
-          });
-          return;
-        } catch (err: any) {
-          if (err.name === "AbortError") return; // User closed share sheet
-        }
-      }
-
-      // 3. Fallback: Modern Clipboard API
-      if (navigator.clipboard && window.isSecureContext) {
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          this.showNotification("Copied to clipboard!", "success");
-          return;
-        } catch (err) {
-          console.warn("Clipboard write failed, using textarea fallback", err);
-        }
-      }
-
-      // 4. Fallback for HTTP / non-secure contexts on Android
-      try {
-        const textArea = document.createElement("textarea");
-        textArea.value = shareUrl;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        textArea.style.top = "0";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        const successful = document.execCommand("copy");
-        document.body.removeChild(textArea);
-
-        if (successful) {
-          this.showNotification("Copied to clipboard!", "success");
-        } else {
-          throw new Error("execCommand copy returned false");
-        }
-      } catch (err) {
-        console.error("All copy mechanisms failed:", err);
-        this.showNotification("Failed to copy link", "error");
-      }
-    },
-    addToPlaylist(segmentId: string, playlistName: string): void {
-      // 1. Get current playlist array or default to empty
-      const currentList = state.playlists[playlistName] || [];
-
-      // Prevent duplicate track IDs in the same playlist
-      if (currentList.includes(segmentId)) {
-        this.showNotification(`Already in ${playlistName}!`, "info");
-        return;
-      }
-      // 2. CRITICAL: Re-assign state.playlists with a NEW object reference
-      // This triggers the Proxy set() trap, saves to localStorage, and fires 'playlists-changed'
-      state.playlists = {
-        ...state.playlists,
-        [playlistName]: [...currentList, segmentId],
-      };
-
-      this.showNotification(`Added to ${playlistName}!`, "success");
-    },
-
-    // Add inside playlistStore.ts store object
-
-    async deleteItemFromActivePlaylist(
-      index: string,
-      playlistName?: string,
-    ): Promise<void> {
-      console.log({ index });
-      // 1. Determine target playlist name from argument, URL search params, or default to "favorites"
-      const targetName =
-        playlistName ||
-        new URLSearchParams(window.location.search).get("name") ||
-        "favorites";
-
-      const currentList = state.playlists[targetName];
-      // const itemIndex = parseInt(index, 10);
-
-      // if (
-      //   !currentList ||
-      //   isNaN(itemIndex) ||
-      //   itemIndex < 0 ||
-      //   itemIndex >= currentList.length
-      // ) {
-      //   console.warn(
-      //     `[playlistStore] Invalid deletion target. Index: ${index}, Playlist: "${targetName}"`,
-      //   );
-      //   return;
-      // }
-
-      // 2. Resolve the track ID and fetch the segment title from playerStore
-      const trackId = index;
-      const player = (window as any).playerStore;
-      const segment = player?.findSegmentById?.(trackId);
-      const trackTitle = segment?.title ? `"${segment.title}"` : "this item";
-
-      // 3. Prompt native confirm dialog with the segment title
-      const confirmed = window.confirm(
-        `Are you sure you want to remove ${trackTitle} from "${targetName}"?`,
-      );
-      if (!confirmed) return;
-
-      // 4. Filter out item at specified index
-      const updatedList = currentList.filter((item) => item !== index);
-
-      // 5. Re-assign state.playlists reference to trigger Proxy set() trap
-      state.playlists = {
-        ...state.playlists,
-        [targetName]: updatedList,
-      };
-
-      generatePortfolioLink();
-      const url = createShareUrl(
-        window.location.origin,
-        updatedList,
-        targetName,
-      );
-      const cardId = `playlist-segment-card-${index}`;
-
-      document.getElementById(cardId)?.remove();
-      window.location.replace(url);
-    },
-
-    showNotification(
-      message: string,
-      type: "success" | "info" | "error",
-    ): void {
-      window.dispatchEvent(
-        new CustomEvent("app-toast-trigger", {
-          detail: { message, type },
-        }),
-      );
-    },
-  };
-
-  // Run initialization routines
-  store.init();
-
-  return store;
+export interface PlaylistTrack {
+  id: string;
+  title: string;
+  artist: string;
+  sourceMp3: string;
+  cardImage?: string;
+  isPublic: boolean;
+  duration?: number;
 }
 
-export type PlaylistStore = ReturnType<typeof createPlaylistStore>;
+export interface PlaylistState {
+  playlistName: string;
+  tracks: PlaylistTrack[];
+  currentIndex: number;
+  isShareModalOpen: boolean;
+  shareUrl: string;
+}
+
+export class PlaylistStore {
+  public state: PlaylistState = {
+    playlistName: "Favorites",
+    tracks: [],
+    currentIndex: 0,
+    isShareModalOpen: false,
+    shareUrl: "",
+  };
+
+  constructor(initialTracks: PlaylistTrack[] = [], playlistName = "Favorites") {
+    this.state.playlistName = playlistName;
+    this.state.tracks = [...initialTracks];
+    this.generateShareUrl();
+  }
+
+  /**
+   * Emits custom event to notify binder.ts of reactive state updates.
+   */
+  private notify(): void {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("playlist-state-changed"));
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Getters for Binder Expressions
+  // ---------------------------------------------------------------------------
+
+  get currentTrack(): PlaylistTrack | undefined {
+    return this.state.tracks[this.state.currentIndex];
+  }
+
+  get totalTracks(): number {
+    return this.state.tracks.length;
+  }
+
+  get shareUrl(): string {
+    return this.state.shareUrl;
+  }
+
+  get isShareModalOpen(): boolean {
+    return this.state.isShareModalOpen;
+  }
+
+  get hasTracks(): boolean {
+    return this.state.tracks.length > 0;
+  }
+
+  get activeTrackId(): string | undefined {
+    return this.currentTrack?.id;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Store Actions & Mutations
+  // ---------------------------------------------------------------------------
+
+  public selectTrack(index: number): void {
+    if (index < 0 || index >= this.state.tracks.length) return;
+    this.state.currentIndex = index;
+    this.notify();
+  }
+
+  public selectTrackById(id: string): void {
+    const index = this.state.tracks.findIndex((t) => t.id === id);
+    if (index !== -1) {
+      this.selectTrack(index);
+    }
+  }
+
+  public addTrack(track: PlaylistTrack): void {
+    const exists = this.state.tracks.some((t) => t.id === track.id);
+    if (!exists) {
+      this.state.tracks.push(track);
+      this.generateShareUrl();
+      this.notify();
+    }
+  }
+
+  public removeTrack(index: number): void {
+    if (index < 0 || index >= this.state.tracks.length) return;
+    this.state.tracks.splice(index, 1);
+
+    if (this.state.currentIndex >= this.state.tracks.length) {
+      this.state.currentIndex = Math.max(0, this.state.tracks.length - 1);
+    }
+
+    this.generateShareUrl();
+    this.notify();
+  }
+
+  public removeTrackById(id: string): void {
+    const index = this.state.tracks.findIndex((t) => t.id === id);
+    if (index !== -1) {
+      this.removeTrack(index);
+    }
+  }
+
+  public setPlaylistName(name: string): void {
+    this.state.playlistName = name;
+    this.generateShareUrl();
+    this.notify();
+  }
+
+  public reorderTracks(fromIndex: number, toIndex: number): void {
+    if (
+      fromIndex < 0 ||
+      fromIndex >= this.state.tracks.length ||
+      toIndex < 0 ||
+      toIndex >= this.state.tracks.length
+    ) {
+      return;
+    }
+
+    const [movedTrack] = this.state.tracks.splice(fromIndex, 1);
+    this.state.tracks.splice(toIndex, 0, movedTrack);
+
+    if (this.state.currentIndex === fromIndex) {
+      this.state.currentIndex = toIndex;
+    } else if (
+      this.state.currentIndex > fromIndex &&
+      this.state.currentIndex <= toIndex
+    ) {
+      this.state.currentIndex--;
+    } else if (
+      this.state.currentIndex < fromIndex &&
+      this.state.currentIndex >= toIndex
+    ) {
+      this.state.currentIndex++;
+    }
+
+    this.generateShareUrl();
+    this.notify();
+  }
+
+  public generateShareUrl(): string {
+    if (typeof window === "undefined") return "";
+
+    const origin = window.location.origin;
+    const segmentIds = this.state.tracks.map((track) => track.id);
+
+    this.state.shareUrl = createShareUrl(
+      origin,
+      segmentIds,
+      this.state.playlistName,
+    );
+    return this.state.shareUrl;
+  }
+
+  public toggleShareModal(isOpen?: boolean): void {
+    this.state.isShareModalOpen = isOpen ?? !this.state.isShareModalOpen;
+    this.notify();
+  }
+}
+
+// Global Singleton Interface
+declare global {
+  interface Window {
+    playlistStore?: PlaylistStore;
+  }
+}
+
+export function initPlaylistStore(
+  tracks: PlaylistTrack[] = [],
+  name?: string,
+): PlaylistStore {
+  const store = new PlaylistStore(tracks, name);
+  if (typeof window !== "undefined") {
+    window.playlistStore = store;
+  }
+  return store;
+}

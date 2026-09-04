@@ -1,34 +1,41 @@
 import { UI } from "./binder.js";
-import { createPlayerStore } from "./stores/playerStore.js";
-import { createPlaylistStore } from "./stores/playlistStore.js";
+import "./actions.js"; // Registers all data-action handlers
+import { initPlayerStore, PlayerStore } from "./stores/playerStore.js";
+import { initPlaylistStore, PlaylistStore } from "./stores/playlistStore.js";
+import { initToastStore, ToastStore } from "./stores/toastStore.js";
+import { initMediaController } from "./utils/mediaController.js";
 import { initCarouselScroll } from "./utils/carousel.js";
 import { PlaylistDragEngine } from "./utils/playlistDrag.js";
 import { initToastListener } from "./utils/toastUtils.js";
 
 declare global {
   interface Window {
-    playerStore: ReturnType<typeof createPlayerStore>;
-    playlistStore: ReturnType<typeof createPlaylistStore>;
+    playerStore?: PlayerStore;
+    playlistStore?: PlaylistStore;
+    toastStore?: ToastStore;
     playlistDragEngine: PlaylistDragEngine;
     setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
 }
 
-// Instantiate drag engine on window immediately
+// 1. Instantiate global drag engine immediately
 window.playlistDragEngine = new PlaylistDragEngine();
 
+// 2. Initialize UI layout helpers on DOM load
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => initCarouselScroll());
 } else {
   initCarouselScroll();
 }
 
+// 3. Load media engine script
 const mediaEngineScript = document.createElement("script");
 mediaEngineScript.src = "/js/mediaInit.js";
 
 mediaEngineScript.onload = () => {
   initToastListener();
 
+  // Parse server-rendered segment data
   const segmentsDataEl = document.getElementById("studio-segments-data");
   let initialSegments: any[] = [];
 
@@ -40,18 +47,24 @@ mediaEngineScript.onload = () => {
     }
   }
 
-  // Instantiate remaining active stores
-  window.playerStore = createPlayerStore(initialSegments);
-  window.playlistStore = createPlaylistStore();
+  // Instantiate active reactive stores
+  const playerStore = initPlayerStore(initialSegments);
+  initPlaylistStore(initialSegments);
+  initToastStore();
 
-  window.addEventListener("player-track-changed", () => UI.requestSync());
-  window.addEventListener("playlist-state-changed", () => UI.requestSync());
+  // Initialize native media element listeners (Audio, Video & Adaptive Quality)
+  initMediaController();
 
-  UI.requestSync();
-
-  if (window.playerStore?.active?.id) {
-    window.playerStore.selectSegment(0);
+  // Initial media sync if segments exist
+  if (playerStore.state.segments.length > 0) {
+    playerStore.selectSegment(playerStore.state.segments[0].id);
   }
+
+  // Trigger initial binder sync
+  UI.requestSync();
+  console.log(
+    "🚀 [App] App initialized with playerStore, playlistStore, toastStore & mediaController.",
+  );
 };
 
 mediaEngineScript.onerror = () => {

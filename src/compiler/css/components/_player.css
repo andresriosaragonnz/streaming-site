@@ -1,5 +1,54 @@
+/* =============================================================================
+   State Visibility Utilities
+   ============================================================================= */
+.is-hidden,
+.video-player-container.is-hidden,
+.audio-player-container.is-hidden,
+.video-play-overlay.is-hidden {
+  display: none !important;
+}
+
+/* =============================================================================
+   Player Layout & Canvas Setup (CLS Prevention)
+   ============================================================================= */
+.video-player-mock {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000000;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--bg-card);
+}
+
+.video-player-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.video-player-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.audio-player-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background-color: #000000;
+}
+
 .audio-player {
   width: 100%;
+  height: 100%;
   aspect-ratio: 16 / 9;
   position: relative;
   display: flex;
@@ -8,8 +57,25 @@
   align-items: center;
   background-color: #000000;
   overflow: hidden;
+  cursor: pointer;
 }
 
+/* Audio / Video Mode Display Toggles */
+.video-player-mock #r2-video-player {
+  display: block;
+}
+
+.video-player-mock.is-audio-mode #r2-video-player {
+  display: none;
+}
+
+.video-player-mock.is-audio-mode .audio-player-container {
+  display: flex !important;
+}
+
+/* =============================================================================
+   Typography & Titles
+   ============================================================================= */
 .performance-title {
   text-transform: capitalize;
   font-size: larger;
@@ -19,6 +85,24 @@
   text-transform: capitalize;
   font-size: x-large;
 }
+
+.break-hyphens {
+  /* Allow normal line wrapping */
+  white-space: normal;
+
+  /* Force wrap on overflow if a segment is too long */
+  overflow-wrap: break-word;
+
+  /* Ensures hyphens act as natural break points */
+  word-break: normal;
+
+  /* Prevent automatic dictionary hyphenation */
+  hyphens: manual;
+}
+
+/* =============================================================================
+   Player Overlays & Icons
+   ============================================================================= */
 .player-overlay {
   position: absolute;
   top: 0;
@@ -37,6 +121,7 @@
   top: 20%;
   left: 30%;
 }
+
 /* Base size for mobile */
 .play-icon {
   width: 80px;
@@ -59,21 +144,20 @@
     left: 35%;
   }
 }
-.break-hyphens {
-  /* Allow normal line wrapping */
-  white-space: normal;
 
-  /* Force wrap on overflow if a segment is too long */
-  overflow-wrap: break-word;
-
-  /* Ensures hyphens act as natural break points */
-  word-break: normal;
-
-  /* Prevent automatic dictionary hyphenation */
-  hyphens: manual;
+/* =============================================================================
+   Audio Background & Cassette Image
+   ============================================================================= */
+.audio-player-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+  filter: blur(2px);
+  position: absolute;
+  inset: 0;
 }
 
-/* Cassette Image (Cover + Film Negative Effect) */
 .audio-player-hero {
   position: absolute;
   inset: 0;
@@ -85,7 +169,7 @@
 
   /* Film Negative Inversion */
   filter: invert(1);
-  opacity: 0.85; /* Adjust brightness/opacity to your taste */
+  opacity: 0.85;
   pointer-events: none;
 }
 
@@ -96,4 +180,104 @@
   width: 100%;
   padding: 1rem;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+}
+
+/* =============================================================================
+   Audio / Video Player Mode Toggle
+   ============================================================================= */
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+
+/* Hide native checkbox visually while maintaining accessible focus */
+.toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Toggle Track Base (Video Mode Default) */
+.toggle label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 76px;
+  height: 36px;
+  padding: 0 6px;
+  background-color: var(--bg-card, #161b22);
+  border: 1px solid var(--border-color, #30363d);
+  border-radius: 20px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s ease;
+}
+
+/* Labels inside toggle track */
+.toggle label::before {
+  position: absolute;
+  right: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #8b949e);
+  transition: opacity 0.2s ease;
+}
+
+/* Sliding Knob */
+.toggle label::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  width: 26px;
+  height: 26px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.25s ease;
+}
+
+/* Hover & Focus States */
+.toggle label:hover {
+  border-color: #58a6ff;
+}
+
+.toggle input[type="checkbox"]:focus-visible + label {
+  outline: 2px solid #58a6ff;
+  outline-offset: 2px;
+}
+
+/* Active State: Audio Mode Checked */
+.toggle input[type="checkbox"]:checked + label {
+  background-color: rgba(19, 191, 17, 0.15);
+  border-color: #13bf11;
+}
+
+.toggle input[type="checkbox"]:checked + label::before {
+  left: 10px;
+  right: auto;
+  color: #13bf11;
+}
+
+.toggle input[type="checkbox"]:checked + label::after {
+  transform: translateX(40px);
+  background-color: #13bf11;
+}
+.meta-title-card {
+  background: var(--bg-deep);
+  border-radius: 8px;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  display: flex;
 }

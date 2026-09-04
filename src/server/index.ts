@@ -9,5 +9,5 @@ export { usePrivate } from "./usePrivate";
 export { serveClaim } from "./serveClaim";
 export { serveReset } from "./serveReset";
 export { serveOptions } from "./serveOptions";
-export { serveFeed } from "./serveFeed";
+export { servePlaylistPortfolioCards } from "./servePlaylistPortfolio/servePortfolioCards";
 export { servePlaylistPortfolio } from "./servePlaylistPortfolio";

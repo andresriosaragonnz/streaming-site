@@ -27,7 +27,7 @@
 @media (min-width: 640px) {
   .performance-grid {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    padding: 2rem 4rem 4rem 4rem;
+    padding: 2rem 3rem 4rem 3rem;
   }
 }
 

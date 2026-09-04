@@ -14,11 +14,10 @@ export const PlaylistViewSidebar = ({
 }: PlaylistViewSidebarProps) => (
   <aside class="playlist-sidebar">
     <div id="sidebar-artist" class="sidebar-artist-container">
-      {/* Declarative text & attribute bindings */}
       <a
         class="sidebar-artist-button"
-        href={`/${artistLink}`}
-        data-bind-href="player.currentArtistLink"
+        href={artistLink ? `/${artistLink}` : "#"}
+        data-bind-href="player.currentArtistLink ? '/' + player.currentArtistLink : '#'"
         data-bind-text="player.currentArtistName"
       >
         {artistName}

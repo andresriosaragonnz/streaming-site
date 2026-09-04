@@ -20,7 +20,7 @@ export const servePlaylist = async (c: any) => {
   const nameParam = escapeHtml(rawNameParam.trim().slice(0, 50));
 
   if (!shareParam || typeof shareParam !== "string") {
-    return c.text("Missing share parameter", 400);
+    return c.redirect("/myplaylists", 302);
   }
 
   // 2. Bound total length of base64 payload to prevent DoS
@@ -72,25 +72,13 @@ export const servePlaylist = async (c: any) => {
         venueName: escapeHtml(segment.venueName),
       }),
     );
-    // 8. Render HTML page
-    // const html = renderPlaylistPage(
-    //   {
-    //     segments: sanitizedSegments,
-    //   },
-    //   nameParam,
-    // );
-
     // 9. Set defensive headers (Cache-Control & Content Security Policy)
     c.header("Cache-Control", "private, no-store, max-age=0");
-    // c.header(
-    //   "Content-Security-Policy",
-    //   "default-src 'self'; media-src 'self' https://*.r2.dev http://localhost:* http://192.168.1.*; img-src 'self' data: https://*.r2.dev; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';",
-    // );
+
     return c.html(
       "<!doctype html>\n" +
       <PlaylistPageLayout pageTitle={nameParam} segments={sanitizedSegments} />,
     );
-    // return c.html(html);
   } catch (err) {
     console.error("Failed to parse playlist share parameter:", err);
     return c.text("Invalid share payload", 400);

@@ -1,72 +1,174 @@
 /* =============================================================================
-   Graph Drawer Modal & Overlay Stack
+   1. Container & Stacking Context
    ============================================================================= */
 
-/* Graph Drawer Modal Container */
 #graph-drawer-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1000;
-  display: none; /* Controlled by JS / binder */
-  justify-content: flex-end;
-  pointer-events: none; /* Let clicks pass through to page when overlay is closed */
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  visibility: hidden;
+  transition: visibility 0.3s ease;
 }
 
-/* Explicit layout state when opened */
 #graph-drawer-container.is-open {
-  display: flex !important;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 /* Backdrop Overlay */
 .graph-drawer-overlay {
   position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+#graph-drawer-container.is-open .graph-drawer-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* =============================================================================
+   2. Left-Sliding Panel Layout
+   ============================================================================= */
+
+.graph-drawer-panel {
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.graph-drawer-overlay.is-open {
-  opacity: 1;
-  pointer-events: auto; /* Capture backdrop clicks to close drawer */
-}
-
-/* Slide-out Drawer Panel */
-.graph-drawer-panel {
-  position: relative;
-  z-index: 1001;
-  width: 100%;
-  max-width: 600px;
-  height: 100vh; /* Mandatory so flex: 1 on #graph gets non-zero height */
+  width: min(850px, 90vw);
+  height: 100vh;
   background: #040714;
   display: flex;
   flex-direction: column;
   padding: 1rem;
   box-sizing: border-box;
-  pointer-events: auto; /* Re-enable pointer events for controls and canvas */
-  transform: translateX(100%);
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  z-index: 10001;
+  pointer-events: none;
 }
 
+#graph-drawer-container.is-open .graph-drawer-panel,
 .graph-drawer-panel.is-open {
   transform: translateX(0);
+  pointer-events: auto;
 }
 
-/* Canvas Container */
-#graph {
-  width: 100%;
-  flex: 1;
-  min-height: 400px; /* Fallback guarantee for canvas dimensions */
+/* Header & Footer Controls Layout */
+#reset-btn-container {
   position: relative;
+  z-index: 10002;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+#see-videos-wrapper {
+  position: relative;
+  z-index: 10002;
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-shrink: 0;
+  pointer-events: auto;
+}
+
+.graph-action-link {
+  text-decoration: none;
+  padding: 14px 0;
+  font-weight: bold;
+  width: 80%;
+  text-align: center;
+  display: block;
+}
+
+/* Canvas Viewport Wrapper */
+#graph-viewport-wrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 400px;
   background: #040714;
   border-radius: 8px;
   overflow: hidden;
+  display: flex;
+}
+
+#graph {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* =============================================================================
+   3. Button Styling (.reset-btn)
+   ============================================================================= */
+
+.reset-btn {
+  background: linear-gradient(135deg, #0072d2 0%, #0056a3 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  backdrop-filter: blur(8px);
+  box-shadow:
+    0 4px 14px rgba(0, 114, 210, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reset-btn:hover {
+  background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 20px rgba(0, 136, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.reset-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(0, 114, 210, 0.4);
+}
+
+.reset-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.5);
+}
+
+/* =============================================================================
+   4. Graph Node Overlay Text
+   ============================================================================= */
+
+#graph text,
+#graph .orb-node-label,
+#graph span {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }

@@ -1,24 +1,22 @@
 export interface DeleteButtonProps {
-  itemKey?: string;
-  actionPath?: string;
+  id?: string;
+  action?: string;
   classNames?: string;
   label?: string;
-  onclick: any;
 }
 
 export const DeleteButton = ({
-  itemKey = "",
-  actionPath = "playlist.deletePlaylist",
+  id = "",
+  action,
   classNames = "btn-delete-icon",
   label,
-  onclick,
 }: DeleteButtonProps) => {
   return (
     <button
       type="button"
       class={classNames}
-      onclick={onclick}
-      data-bind-action={`${actionPath}_${itemKey}`}
+      data-action={action}
+      data-id={id}
       title="Delete Item"
       aria-label="Delete"
       style="background: #18181b; border: 1px solid #ffffff; color: #ffffff; padding: 6px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: monospace; font-size: 12px; font-weight: 600; border-radius: 0;"

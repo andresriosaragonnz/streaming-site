@@ -10,8 +10,8 @@ import {
   serveClaim,
   serveReset,
   serveOptions,
-  serveFeed,
   servePlaylistPortfolio,
+  servePlaylistPortfolioCards,
 } from "./server";
 
 type Bindings = {
@@ -35,10 +35,10 @@ app.get("/playlist", servePlaylist);
 app.get("/reset", serveReset);
 app.get("/admin/generate-token", serveGenerateToken);
 app.get("/auth/claim", serveClaim);
-app.get("/feed", serveFeed);
 
 // Explicit POST routes
 app.post("/api/commit-status", commitStatus);
+app.get("/api/playlists/portfolio-components", servePlaylistPortfolioCards);
 
 // API GET routes
 app.get("/api/search-options", serveOptions);

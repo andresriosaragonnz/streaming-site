@@ -1,39 +1,7 @@
 import { Menu } from "../../components/Menu";
-import { PlaylistHero } from "./PlaylistHero";
-import { PlaylistCard } from "./PlaylistCard";
-import { getCardImage } from "../../compiler/formatSegments/getCardImage";
-import { getHeroImage } from "../../compiler/formatSegments/getHeroImage";
-import { getRandomIndex } from "../../compiler/utils/getRandomIndex";
+import { Toast } from "../../components/ToastContainer";
 
-export interface PlaylistPortfolioLayoutProps {
-  ids: string[];
-  names: string[];
-  ls: string[];
-}
-
-export const PlaylistPortfolioLayout = ({
-  ids,
-  names,
-  ls,
-}: PlaylistPortfolioLayoutProps) => {
-  let count = 0;
-
-  const portfolioImages = [] as string[];
-  const cards = ids.map((id, index) => {
-    const image = getCardImage(id);
-    count += parseInt(ls[index]);
-    const heroImage = getHeroImage(ids[index]);
-    portfolioImages.push(heroImage);
-    return (
-      <PlaylistCard
-        playlistName={names[index]}
-        playlistLength={ls[index]}
-        altImage={image}
-        cardImage={image}
-      />
-    );
-  });
-
+export const PlaylistPortfolioLayout = () => {
   return (
     <html lang="en">
       <head>
@@ -57,20 +25,31 @@ export const PlaylistPortfolioLayout = ({
         <link rel="stylesheet" href="/css/main.css" />
       </head>
       <body>
+        <Toast />
         <div class="menu-container">
           <Menu />
         </div>
-        <PlaylistHero
-          heroImage={portfolioImages[getRandomIndex(portfolioImages)]}
-          count={ids.length}
-        />
-        <main class="performance-grid" id="performance-grid">
-          {cards}
+
+        {/* Hero Banner Container */}
+        <div
+          id="portfolio-hero-container"
+          data-bind-class="portfolio.isLoading ? 'hero-container is-loading' : 'hero-container'"
+        >
+          {/* Skeleton or dynamic inner HTML will be swapped here */}
+          <div class="hero-placeholder">Loading your playlists...</div>
+        </div>
+
+        {/* Performance Cards Grid Container */}
+        <main
+          class="performance-grid"
+          id="performance-grid"
+          data-bind-class="portfolio.isLoading ? 'performance-grid is-loading' : 'performance-grid'"
+        >
+          {/* Rendered cards will be injected here */}
         </main>
+
+        <script type="module" src="/js/playlistPortfolioApp.js"></script>
       </body>
-      <script type="module" src="/js/playlistPortfolioInit.js"></script>
-      <script type="module" src="/js/portfolioApp.js"></script>
-      <script type="module" src="/js/imageFade.js"></script>
     </html>
   );
 };

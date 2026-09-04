@@ -2,7 +2,7 @@ import { PlaylistViewPlayer } from "./PlaylistViewPlayer";
 import { PlaylistViewSidebar } from "./PlaylistViewSidebar";
 import { PlaylistSegmentCard } from "./PlaylistSegmentCard";
 import type { Segment } from "../../ts/types";
-import { ToastContainer } from "../../components/ToastContainer";
+import { Toast } from "../../components/ToastContainer";
 
 export interface PlaylistPageLayoutProps {
   segments: Segment[];
@@ -57,7 +57,7 @@ export const PlaylistPageLayout = ({
         <link rel="stylesheet" href="/css/review-studio.css" />
       </head>
       <body>
-        <ToastContainer />
+        <Toast />
         <div class="studio-container">
           <PlaylistViewPlayer
             pageTitle={pageTitle}

@@ -9,6 +9,7 @@ export const AudioToggle = () => (
       data-bind-class="player.isAudioMode ? 'is-active' : ''"
       aria-label="Toggle Audio Mode"
       aria-checked="false"
+      class=""
     >
       <span class="toggle-slider"></span>
     </button>

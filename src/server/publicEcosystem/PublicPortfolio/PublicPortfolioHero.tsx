@@ -20,8 +20,7 @@ export const PublicPortfolioHero = ({
       <button
         type="button"
         class="btn-back"
-        data-action="toggle-drawer"
-        data-drawer-id="graph-drawer-container"
+        data-action="open-graph-modal"
         style="cursor: pointer;"
       >
         See network

@@ -11,7 +11,6 @@
 
 /* 4. Independent Public Interface Components */
 @import "./components/_hero.css";
-@import "./components/_network.css";
 @import "./components/_menu.css";
 @import "./components/_toast.css";
 @import "./components/_graph.css";

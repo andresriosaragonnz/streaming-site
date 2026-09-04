@@ -1,33 +1,57 @@
-// src/components/VideoPlayer.tsx
 export interface VideoPlayerProps {
-  posterImage: string;
+  posterImage?: string;
+  firstVideo?: string;
 }
 
-export function VideoPlayer({ posterImage }: VideoPlayerProps) {
+export const VideoPlayer = ({
+  posterImage = "",
+  firstVideo = "",
+}: VideoPlayerProps) => {
   return (
     <div
-      id="video-player-container"
-      data-bind-show="!player.isAudioMode"
-      style="width: 100%; height: 100%; position: relative;"
+      class="video-player-container"
+      data-bind-class="player.isAudioMode ? 'video-player-container is-hidden' : 'video-player-container'"
+      style="position: relative; width: 100%; height: 100%;"
     >
-      <div style="width: 100%; height: 100%; position: relative">
-        <video
-          id="r2-stream-player"
-          controls
-          playsinline
-          preload="none"
-          poster={`${posterImage}.jpg`}
-          data-bind-poster="player.currentPoster"
-          style="width: 100%; height: 100%; object-fit: contain; display: block; background: #000;"
-        ></video>
+      <video
+        id="r2-video-player"
+        controls
+        playsinline
+        preload="metadata"
+        src={firstVideo}
+        poster={posterImage ? `${posterImage}.jpg` : ""}
+        data-bind-src="player.currentTrack ? (player.currentTrack.sourceVideo1080p || player.currentTrack.sourceVideo480p || player.currentTrack.source ) : ''"
+        data-bind-poster="player.currentTrack && player.currentTrack.cardImage ? player.currentTrack.cardImage : ''"
+        style="width: 100%; height: 100%; object-fit: cover; display: block;"
+      />
 
-        {/* Centered Play Overlay */}
-        <div
-          id="video-play-overlay"
-          onclick="this.style.display='none'; window.playerStore.playCurrent();"
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: grid; place-items: center; background: rgba(0, 0, 0, 0.35); cursor: pointer; z-index: 10; touch-action: manipulation;"
-        ></div>
-      </div>
+      <button
+        type="button"
+        class="video-play-overlay"
+        aria-label="Play Video"
+        data-action="toggle-media-play"
+        data-bind-class="player.isPlaying || player.isAudioMode ? 'video-play-overlay is-hidden' : 'video-play-overlay'"
+        style="position: absolute; inset: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.35); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5; transition: opacity 0.2s ease;"
+      >
+        <span
+          class="play-icon-wrapper"
+          style="width: 64px; height: 64px; border-radius: 50%; background: rgba(24, 24, 27, 0.55); border: 1px solid #ffffff; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);"
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="#ffffff"
+            stroke="#ffffff"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="margin-left: 3px;"
+          >
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+        </span>
+      </button>
     </div>
   );
-}
+};

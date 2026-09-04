@@ -16,6 +16,7 @@ export interface PublicPortfolioLayoutProps {
 const PORTFOLIO_SHELL_RAW = (
   <html lang="en">
     <head>
+      <script src="/js/orb.js"></script>
       <script type="application/json" id="page-images">
         {"<!-- SLOT -->"}
       </script>
@@ -37,7 +38,6 @@ const PORTFOLIO_SHELL_RAW = (
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Performance</title>
       <link rel="stylesheet" href="/css/main.css" />
-      <script src="/js/orb.js"></script>
     </head>
     <body>
       <div class="menu-container">

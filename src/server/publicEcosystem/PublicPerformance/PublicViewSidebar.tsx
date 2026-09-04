@@ -17,8 +17,6 @@ export const PublicViewSidebar = ({
         class="sidebar-artist-button"
         id="sidebar-artist-button"
         href={`/${artistLink}`}
-        data-bind-href="player.currentArtistLink"
-        data-bind-text="player.currentArtistName"
       >
         {artistName}
       </a>

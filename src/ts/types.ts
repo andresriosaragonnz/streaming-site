@@ -11,6 +11,7 @@ export interface Segment {
   heroImage: string;
   artistName: string;
   formattedPerformance: string;
+  formatedDuration: string;
   [key: string]: unknown;
 }
 

@@ -2,16 +2,13 @@ export interface PublicPlayerControlsProps {}
 
 export const PublicPlayerControls = () => (
   <div class="meta-workspace-card" id="public-player-controls">
-    <div
-      class="studio-controls-group"
-      style="display: flex; align-items: center; gap: 8px; min-height: 40px"
-    >
-      {/* Playlist Selector */}
-      <div class="input-field-group" style="min-width: 160px">
+    <div class="studio-controls-group">
+      {/* Playlist Selector Dropdown */}
+      <div class="input-field-group playlist-select-group">
         <select
           id="playlist-select"
-          style="width: 100%"
-          onchange="window.playlistUtils?.handlePlaylistSelectChange(this)"
+          class="select-public"
+          data-action="playlist-select-change"
         >
           <option value="favorites" selected>
             favorites
@@ -20,27 +17,25 @@ export const PublicPlayerControls = () => (
         </select>
       </div>
 
-      {/* Free Text Input */}
+      {/* Dynamic Custom Playlist Name Input */}
       <div
         id="custom-playlist-group"
-        class="input-field-group"
-        style="display: none; min-width: 180px"
+        class="input-field-group custom-playlist-group"
+        data-bind-show="Boolean(player.isCustomPlaylistInput)"
       >
         <input
           type="text"
           id="custom-playlist-name"
           placeholder="Enter playlist name..."
           class="input-public"
-          style="width: 100%"
         />
       </div>
 
-      {/* Add Button */}
+      {/* Save Segment Action Button */}
       <button
         type="button"
-        class="btn-public"
-        style="white-space: nowrap"
-        onclick="window.playlistUtils?.handleAddToPlaylistSubmit(event)"
+        class="btn-public btn-save-segment"
+        data-action="add-current-segment-to-playlist"
       >
         <span>Add to playlist</span>
       </button>

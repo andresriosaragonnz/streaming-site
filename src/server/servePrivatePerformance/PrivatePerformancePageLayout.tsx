@@ -2,7 +2,7 @@ import { PrivateViewPlayer } from "./PrivateViewPlayer";
 import { PrivateViewSidebar } from "./PrivateViewSidebar";
 import { formatSegments } from "../../compiler/formatSegments/index";
 import { PrivateSegmentCard } from "./PrivateSegmentCard";
-import { ToastContainer } from "../../components/ToastContainer";
+import { Toast } from "../../components/ToastContainer";
 
 export interface SegmentDataItem {
   title: string;
@@ -39,7 +39,7 @@ export const PrivatePerformancePageLayout = ({
         <link rel="stylesheet" href="/css/review-studio.css" />
       </head>
       <body>
-        <ToastContainer />
+        <Toast />
         <div class="studio-container">
           <PrivateViewPlayer
             studioTitle={`${formattedArtist}-${venueName}-${formattedDate}`}

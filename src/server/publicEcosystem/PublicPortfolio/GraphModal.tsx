@@ -1,21 +1,18 @@
 export interface GraphModalProps {}
 
 export const GraphModal = () => (
-  <div id="graph-drawer-container">
+  <div
+    id="graph-drawer-container"
+    data-bind-class-toggle="is-open:graph.isDrawerOpen"
+    aria-hidden="true"
+  >
     {/* Overlay Backdrop */}
-    <div
-      class="graph-drawer-overlay"
-      data-action="close-modal"
-      data-modal-id="graph-drawer-container"
-    ></div>
+    <div class="graph-drawer-overlay" data-action="close-graph-modal"></div>
 
     {/* Left-Sliding Panel */}
     <aside class="graph-drawer-panel">
       {/* Header Controls */}
-      <div
-        id="reset-btn-container"
-        style="margin-bottom: 16px; display: flex; gap: 8px; justify-content: flex-end; align-items: center;"
-      >
+      <header id="reset-btn-container">
         <button
           id="reset-btn"
           class="reset-btn"
@@ -25,38 +22,30 @@ export const GraphModal = () => (
           Show Full Network
         </button>
 
-        <button
-          type="button"
-          class="reset-btn"
-          data-action="close-modal"
-          data-modal-id="graph-drawer-container"
-        >
+        <button type="button" class="reset-btn" data-action="close-graph-modal">
           Close
         </button>
-      </div>
+      </header>
 
       {/* Graph Canvas Container */}
-      <div
-        id="graph"
-        style="width: 100%; flex: 1; position: relative; background: #040714; border-radius: 8px; overflow: hidden;"
-      ></div>
+      <main id="graph-viewport-wrapper">
+        <div id="graph"></div>
+      </main>
 
-      {/* Bottom Centered Action Bar */}
-      <div
+      {/* Bottom Action Bar */}
+      <footer
         id="see-videos-wrapper"
-        data-bind-show="Boolean(review.activeNodeLink)"
-        style="margin-top: 16px; justify-content: center; align-items: center; width: 100%;"
+        data-bind-show="Boolean(graph.activeNodeLink)"
       >
         <a
           id="see-videos-btn"
-          class="reset-btn"
-          href=""
-          data-bind-href="review.activeNodeLink || ''"
-          style="text-decoration: none; padding: 14px 0; font-weight: bold; width: 80%; text-align: center; display: block;"
+          class="reset-btn graph-action-link"
+          href="#"
+          data-bind-href="graph.activeNodeHref"
         >
           See videos
         </a>
-      </div>
+      </footer>
     </aside>
   </div>
 );
