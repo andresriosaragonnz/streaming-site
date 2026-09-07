@@ -1,12 +1,12 @@
 import { Menu } from "./Menu";
 
 export interface TitleBarProps {
-  /** Optional custom class name for extending styles */
+  /** Optional flag to render player controls on the right */
   player?: boolean;
 }
 
 export const TitleBar = ({ player }: TitleBarProps) => (
-  <div class={`meta-title-card `}>
+  <div class="meta-title-card">
     <div class="meta-title-card-left">
       <Menu />
     </div>

@@ -21,7 +21,6 @@ export const VideoPlayer = ({
         src={firstVideo}
         poster={posterImage ? `${posterImage}.jpg` : ""}
         data-bind-src="player.currentTrack ? (player.currentTrack.sourceVideo1080p || player.currentTrack.sourceVideo480p || player.currentTrack.source ) : ''"
-        data-bind-poster="player.currentTrack && player.currentTrack.cardImage ? player.currentTrack.cardImage : ''"
         style="width: 100%; height: 100%; object-fit: cover; display: block;"
       />
 

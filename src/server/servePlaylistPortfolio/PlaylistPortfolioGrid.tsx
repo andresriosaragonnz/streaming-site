@@ -1,8 +1,8 @@
 import { PlaylistCard } from "./PlaylistCard";
 import { PlaylistHero } from "./PlaylistHero";
-import { getCardImage } from "../../compiler/formatSegments/getCardImage";
-import { getHeroImage } from "../../compiler/formatSegments/getHeroImage";
-import { getRandomIndex } from "../../compiler/utils/getRandomIndex";
+import { getCardImage } from "../../formatSegments/getCardImage";
+import { getHeroImage } from "../../formatSegments/getHeroImage";
+import { getRandomIndex } from "../../formatSegments/utils/getRandomIndex";
 
 export interface PlaylistPortfolioGridProps {
   ids: string[];
@@ -23,7 +23,7 @@ export const renderPortfolioGrid = ({
 }: PlaylistPortfolioGridProps): PortfolioRenderResult => {
   if (!ids || ids.length === 0) {
     const emptyHero = (
-      <PlaylistHero heroImage="/images/default-hero.jpg" count={0} />
+      <PlaylistHero heroImage={getHeroImage("playlists")} count={0} />
     );
 
     const emptyCards = (

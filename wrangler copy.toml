@@ -1,0 +1,28 @@
+name = "dev-backend"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Serve static files from the ./public directory at the Cloudflare Edge
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "test"
+database_id = "20d92b02-8f65-4e87-83d4-2fb8b57d5a1f" # Created via: npx wrangler d1 create studio-db
+
+[[kv_namespaces]]
+binding = "PAGE_CACHE"
+id = "62705a56a0f745e985b2d712e8653903" # Put a placeholder or real KV ID here
+
+
+[[r2_buckets]]
+binding = "STATIC_BUCKET"
+bucket_name = "pages"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "media"
+

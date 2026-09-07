@@ -1,5 +1,5 @@
-import { getRandomIndex } from "../utils/getRandomIndex.js";
-import { formatTime } from "../formatSegments/formatTime.js";
+import { getRandomIndex } from "./getRandomIndex.js";
+import { formatTime } from "../formatTime.js";
 
 const getPerformancesFromSegmentsStatus = (segments: any) => {
   const performancesIndex = {} as any;

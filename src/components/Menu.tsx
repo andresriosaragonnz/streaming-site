@@ -82,32 +82,10 @@ export const Menu = () => (
 
     {/* Drawer Panel */}
     <aside class="drawer-panel">
-      <div class="drawer-header">
-        <h2>Studio Navigation</h2>
-        <label for="drawer-toggle" class="drawer-close" aria-label="Close menu">
-          &times;
-        </label>
-      </div>
-
       <ul id="drawer-target" class="drawer-links">
-        <li>
-          <a href="/feed" class="drawer-link" id="my-follows">
-            My Feed
-          </a>
-        </li>
         <li>
           <a href="/myplaylists" class="drawer-link" id="my-playlists">
             My playlists
-          </a>
-        </li>
-        <li>
-          <a href="/roadmap" class="drawer-link">
-            Roadmap
-          </a>
-        </li>
-        <li>
-          <a href="/budget" class="drawer-link">
-            Budget
           </a>
         </li>
 

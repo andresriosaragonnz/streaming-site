@@ -3,7 +3,8 @@ node_modules
 devAssets
 .wrangler
 public/images
-
+seed_test.sql
+seed.sql
 # output
 out
 dist

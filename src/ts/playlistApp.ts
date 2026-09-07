@@ -48,9 +48,18 @@ mediaEngineScript.onload = () => {
   }
 
   // Instantiate active reactive stores
+  const urlParams =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : null;
+  const initialPlaylistName = urlParams?.get("name") || "Favorites";
+
+  // Instantiate active reactive stores
+
   const playerStore = initPlayerStore(initialSegments);
-  initPlaylistStore(initialSegments);
+  playerStore.populatePlaylistDropdown();
   initToastStore();
+  initPlaylistStore(initialSegments, initialPlaylistName);
 
   // Initialize native media element listeners (Audio, Video & Adaptive Quality)
   initMediaController();

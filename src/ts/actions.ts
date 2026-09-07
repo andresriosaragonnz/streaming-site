@@ -1,7 +1,6 @@
 import { UI } from "./binder";
 import { stopPlayback } from "./utils/mediaController.js";
 
-// Global handle type definitions
 declare global {
   interface Window {
     scheduleGraphRender?: (data?: any) => void;
@@ -9,39 +8,28 @@ declare global {
 }
 
 // =============================================================================
-// Modal & Drawer Specific Lifecycle Hooks
+// Modal & Drawer Lifecycle Hooks
 // =============================================================================
 
 const openModalHooks: Record<string, () => void> = {
-  "commit-modal-container": () => {
-    if (window.reviewStore?.state) {
-      window.reviewStore.state.isCommitModalOpen = true;
-      window.dispatchEvent(new CustomEvent("review-state-changed"));
-    }
-  },
+  "commit-modal-dialog": () => window.reviewStore?.toggleCommitModal(true),
   "graph-drawer-container": () => {
     if (window.graphStore) {
       window.graphStore.openDrawer();
-    } else if (window.reviewStore?.state) {
-      window.reviewStore.state.isGraphDrawerOpen = true;
+    } else {
+      window.reviewStore?.toggleGraphDrawer(true);
     }
     window.dispatchEvent(new CustomEvent("modal-ready"));
   },
 };
 
 const closeModalHooks: Record<string, () => void> = {
-  "commit-modal-container": () => {
-    if (window.reviewStore?.state) {
-      window.reviewStore.state.isCommitModalOpen = false;
-      window.dispatchEvent(new CustomEvent("review-state-changed"));
-    }
-  },
+  "commit-modal-dialog": () => window.reviewStore?.toggleCommitModal(false),
   "graph-drawer-container": () => {
     if (window.graphStore) {
       window.graphStore.closeDrawer();
-    } else if (window.reviewStore?.state) {
-      window.reviewStore.state.isGraphDrawerOpen = false;
-      window.dispatchEvent(new CustomEvent("review-state-changed"));
+    } else {
+      window.reviewStore?.toggleGraphDrawer(false);
     }
   },
 };
@@ -55,6 +43,7 @@ export function initAppActions(): void {
   // 1. Audio & Video Player Actions
   // ---------------------------------------------------------------------------
   UI.registerAction("toggle-audio-mode", () => {
+    console.log("toggle-audio-mode");
     window.playerStore?.toggleMode?.();
   });
 
@@ -76,118 +65,90 @@ export function initAppActions(): void {
   UI.registerAction("select-segment", (trigger: HTMLElement) => {
     const card = trigger.closest("[data-id]") as HTMLElement | null;
     const id = card?.dataset.id ?? trigger.dataset.id;
-    if (id) {
+    console.log("select segment", id);
+    if (id && window.playerStore) {
       stopPlayback();
-      window.playerStore?.selectSegment(id);
+      window.playerStore.selectSegment(id);
     }
   });
 
   // ---------------------------------------------------------------------------
   // 2. Public Performance Playlist Actions
   // ---------------------------------------------------------------------------
-
   UI.registerAction("add-current-segment-to-playlist", () => {
     const selectEl = document.getElementById(
       "playlist-select",
     ) as HTMLSelectElement | null;
-    const customInputEl = document.getElementById(
+    const customGroup = document.getElementById("custom-playlist-group");
+    const customInput = document.getElementById(
       "custom-playlist-name",
     ) as HTMLInputElement | null;
+    const toggleBtn = document.getElementById("btn-toggle-new-playlist");
 
     if (!selectEl) return;
 
-    let targetPlaylist = selectEl.value;
+    const isCustomVisible =
+      customGroup && !customGroup.classList.contains("hidden");
+    const customValue = customInput?.value.trim();
 
-    if (targetPlaylist === "+ New Playlist...") {
-      targetPlaylist = customInputEl?.value.trim() || "";
-      if (!targetPlaylist) {
-        window.toastStore?.trigger?.("Please enter a playlist name", "error");
-        return;
-      }
-    }
+    let targetPlaylistName = selectEl.value;
 
-    const currentSegment =
-      window.playerStore?.state?.currentSegment ||
-      window.playerStore?.state?.segments?.find(
-        (s: any) => s.id === window.playerStore?.state?.activeId,
+    // 1. If custom input is visible and filled, use it as target playlist
+    if (isCustomVisible && customValue) {
+      targetPlaylistName = customValue;
+
+      // Dynamically insert new option if it doesn't exist yet
+      let opt = Array.from(selectEl.options).find(
+        (o) => o.value === customValue,
       );
+      if (!opt) {
+        opt = document.createElement("option");
+        opt.value = customValue;
+        opt.textContent = customValue;
+        selectEl.appendChild(opt);
+      }
+      selectEl.value = customValue;
 
-    if (!currentSegment) {
-      window.toastStore?.trigger?.("No active segment to add", "error");
-      return;
+      // Reset custom input state
+      customInput.value = "";
+      customGroup.classList.add("hidden");
+      toggleBtn?.classList.remove("active");
     }
 
-    const STORAGE_KEY = "user_playlists";
-    let userPlaylists: Record<string, any[]> = {};
+    if (!targetPlaylistName) return;
 
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) userPlaylists = JSON.parse(raw);
-    } catch (err) {
-      console.error("Failed to parse local user_playlists:", err);
-    }
-
-    if (!Array.isArray(userPlaylists[targetPlaylist])) {
-      userPlaylists[targetPlaylist] = [];
-    }
-
-    const exists = userPlaylists[targetPlaylist].some(
-      (item) => item.id === currentSegment.id,
-    );
-
-    if (exists) {
-      window.toastStore?.trigger?.(`Already in "${targetPlaylist}"`, "info");
-      return;
-    }
-
-    userPlaylists[targetPlaylist].push(currentSegment.id);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userPlaylists));
-
-    if (customInputEl) customInputEl.value = "";
-
-    window.toastStore?.trigger?.(`Added to "${targetPlaylist}"`, "success");
+    // 2. Persist active segment ID to target playlist
+    window.playlistStore?.addCurrentSegmentToPlaylist(targetPlaylistName);
   });
 
   UI.registerAction("playlist-select-change", (trigger: HTMLElement) => {
-    const select = trigger as HTMLSelectElement;
-    const customGroup = document.getElementById("custom-playlist-group");
+    const selectEl = trigger as HTMLSelectElement;
+    const isNew = selectEl.value === "+ New Playlist...";
 
-    if (customGroup) {
-      customGroup.style.display =
-        select.value === "+ New Playlist..." ? "block" : "none";
+    window.playerStore?.setCustomPlaylistInput(isNew);
+  });
+
+  // ---------------------------------------------------------------------------
+  // 3. Dialog & Drawer Lifecycle Actions
+  // ---------------------------------------------------------------------------
+  UI.registerAction("open-commit-dialog", () => {
+    const dialogEl = document.getElementById(
+      "commit-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.showModal === "function") {
+      openModalHooks["commit-modal-dialog"]?.();
+      dialogEl.showModal();
     }
   });
 
-  // ---------------------------------------------------------------------------
-  // 3. Generic Modal & Drawer Actions (Class-based display)
-  // ---------------------------------------------------------------------------
-
-  UI.registerAction("open-modal", (trigger: HTMLElement) => {
-    const modalId = trigger.dataset.modalId;
-    if (!modalId) return;
-
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-
-    modal.classList.add("is-open");
-    modal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("modal-open");
-
-    openModalHooks[modalId]?.();
-  });
-
-  UI.registerAction("close-modal", (trigger: HTMLElement) => {
-    const modalId = trigger.dataset.modalId;
-    if (!modalId) return;
-
-    const modal = document.getElementById(modalId);
-    if (!modal) return;
-
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("modal-open");
-
-    closeModalHooks[modalId]?.();
+  UI.registerAction("close-commit-dialog", () => {
+    const dialogEl = document.getElementById(
+      "commit-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.close === "function") {
+      closeModalHooks["commit-modal-dialog"]?.();
+      dialogEl.close();
+    }
   });
 
   UI.registerAction("toggle-drawer", (trigger: HTMLElement) => {
@@ -209,154 +170,116 @@ export function initAppActions(): void {
   });
 
   // ---------------------------------------------------------------------------
-  // 4. Network Graph Actions (Native UI.registerAction bindings)
+  // 4. Network Graph Actions
   // ---------------------------------------------------------------------------
-
-  UI.registerAction("open-graph-modal", () => {
-    if (window.graphStore) {
-      console.log("open-graph-modal");
-      window.graphStore.openDrawer();
-    }
-  });
-
-  UI.registerAction("close-graph-modal", () => {
-    if (window.graphStore) {
-      console.log("closing");
-      window.graphStore.closeDrawer();
-    }
-  });
-
-  UI.registerAction("toggle-graph-modal", () => {
-    if (window.graphStore) {
-      window.graphStore.toggleDrawer();
-    }
-  });
+  UI.registerAction("open-graph-modal", () => window.graphStore?.openDrawer());
+  UI.registerAction("close-graph-modal", () =>
+    window.graphStore?.closeDrawer(),
+  );
+  UI.registerAction("toggle-graph-modal", () =>
+    window.graphStore?.toggleDrawer(),
+  );
 
   UI.registerAction("reset-graph", () => {
-    if (window.graphStore) {
-      window.graphStore.setActiveNode("");
-    }
+    window.graphStore?.setActiveNode("");
     if (typeof window.scheduleGraphRender === "function") {
       window.scheduleGraphRender();
     }
   });
 
   // ---------------------------------------------------------------------------
-  // 5. Review Store Actions
+  // 5. Review Store & Commit Actions
   // ---------------------------------------------------------------------------
+  UI.registerAction("toggle-segment-status", () => {
+    window.reviewStore?.toggleStatus();
+  });
 
-  UI.registerAction("toggle-track-status", (trigger: HTMLElement) => {
-    const triggerId =
-      trigger.dataset.id ??
-      trigger.closest("[data-id]")?.getAttribute("data-id");
+  UI.registerAction("sync-segment-title", (trigger: HTMLElement) => {
+    const inputEl = trigger as HTMLInputElement;
+    console.log("clidk");
+    window.reviewStore?.syncTitle(inputEl.value);
+  });
 
-    const activeId =
-      triggerId ||
-      window.playerStore?.activeSegmentId ||
-      window.playerStore?.state?.activeId;
+  UI.registerAction("toggle-license-check", (trigger: HTMLElement) => {
+    const checkbox = trigger as HTMLInputElement;
+    const dialog = checkbox.closest("dialog");
+    const confirmBtn = dialog?.querySelector(
+      ".btn-modal-confirm",
+    ) as HTMLButtonElement | null;
 
-    if (activeId) {
-      window.reviewStore?.toggleStatus?.(activeId);
+    if (confirmBtn) {
+      confirmBtn.disabled = !checkbox.checked;
     }
   });
 
-  UI.registerAction("submit-commit", async (trigger: HTMLElement) => {
+  UI.registerAction("submit-review-commit", async (trigger: HTMLElement) => {
     const confirmBtn = trigger as HTMLButtonElement;
     if (confirmBtn.disabled) return;
-    await window.reviewStore?.submitCommit?.();
+    await window.reviewStore?.submitCommit();
+
+    // Auto-close dialog after successful commit
+    const dialogEl = document.getElementById(
+      "commit-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.close === "function") {
+      dialogEl.close();
+    }
   });
 
   UI.registerAction("copy-share-url", async (trigger: HTMLElement) => {
     const store = window.playlistStore;
     const shareUrl =
       store?.shareUrl || store?.generateShareUrl() || window.location.href;
-
+    console.log({ shareUrl });
     try {
       await navigator.clipboard.writeText(shareUrl);
-
       const labelSpan = trigger.querySelector("span");
       const originalText = labelSpan?.textContent || "Share playlist";
 
       if (labelSpan) {
         labelSpan.textContent = "Copied!";
         trigger.classList.add("is-success");
-
         setTimeout(() => {
           labelSpan.textContent = originalText;
           trigger.classList.remove("is-success");
         }, 2000);
       }
-
-      window.toastStore?.trigger?.("Copied to clipboard!", "success", 2500);
     } catch (err) {
-      console.error("Failed to copy share URL to clipboard:", err);
-      window.toastStore?.trigger?.("Failed to copy URL", "error", 3000);
+      console.error("Failed to copy share URL:", err);
     }
   });
 
   UI.registerAction("copy-portfolio-share-link", (trigger: HTMLElement) => {
     const playlistName = trigger.dataset.playlistName;
-    if (!playlistName) return;
+    if (!playlistName || !window.portfolioStore) return;
 
-    const portfolioStore = window.portfolioStore;
-    if (!portfolioStore) return;
+    const shareUrl = window.portfolioStore.getShareUrl(playlistName);
+    if (!shareUrl || shareUrl === "#") return;
 
-    const shareUrl = portfolioStore.getShareUrl(playlistName);
-
-    if (!shareUrl || shareUrl === "#") {
-      window.toastStore?.trigger?.(
-        `Playlist "${playlistName}" is empty.`,
-        "info",
-      );
-      return;
-    }
-
-    navigator.clipboard
-      .writeText(shareUrl)
-      .then(() => {
-        window.toastStore?.trigger?.(
-          `Copied link for "${playlistName}"!`,
-          "success",
-        );
-      })
-      .catch(() => {
-        window.toastStore?.trigger?.(
-          "Failed to copy link to clipboard.",
-          "error",
-        );
-      });
-  });
-
-  UI.registerAction("dismiss-toast", () => {
-    window.toastStore?.dismiss();
+    navigator.clipboard.writeText(shareUrl).catch((err) => {
+      console.error("Failed to copy portfolio link:", err);
+    });
   });
 
   UI.registerAction(
     "delete-playlist-item",
     (trigger: HTMLElement, event: MouseEvent) => {
       event.stopPropagation();
-
       const trackId =
         trigger.dataset.id ??
         trigger.closest("[data-id]")?.getAttribute("data-id");
 
-      if (!trackId) return;
+      if (!trackId || !window.playlistStore) return;
 
-      const store = window.playlistStore;
-      if (store) {
-        store.removeTrackById(trackId);
+      window.playlistStore.removeTrackById(trackId);
 
-        if (
-          window.playerStore &&
-          window.playerStore.state.activeId === trackId
-        ) {
-          const remainingTracks = store.state.tracks;
-          if (remainingTracks.length > 0) {
-            window.playerStore.selectSegment(remainingTracks[0].id);
-          } else {
-            window.playerStore.state.activeId = null;
-            window.playerStore.syncMediaElementSource();
-          }
+      if (window.playerStore && window.playerStore.state.activeId === trackId) {
+        const remainingTracks = window.playlistStore.state.tracks;
+        if (remainingTracks.length > 0) {
+          window.playerStore.selectSegment(remainingTracks[0].id);
+        } else {
+          window.playerStore.state.activeId = null;
+          window.playerStore.syncMediaElementSource();
         }
       }
 
@@ -364,14 +287,14 @@ export function initAppActions(): void {
         ".sidebar-item-card",
       ) as HTMLElement | null;
       if (cardElement) {
-        cardElement.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+        cardElement.style.transition = "opacity 0.3s ease, transform 0.3s ease";
         cardElement.style.opacity = "0";
         cardElement.style.transform = "scale(0.95)";
 
         setTimeout(() => {
           cardElement.remove();
           UI.requestSync();
-        }, 500);
+        }, 300);
       }
     },
   );

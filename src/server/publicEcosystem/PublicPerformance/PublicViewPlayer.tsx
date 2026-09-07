@@ -1,7 +1,7 @@
 import { TitleBar } from "../../../components/TitleBar";
 import { VideoPlayer } from "../../../components/VideoPlayer";
 import { AudioPlayer } from "../../../components/AudioPlayer";
-import { PublicPlayerControls } from "./PublicPlayerControls";
+import { AddToPlaylist } from "../../../components/AddToPlaylist";
 
 export interface PublicViewPlayerProps {
   studioTitle: string;
@@ -19,6 +19,7 @@ export const PublicViewPlayer = ({
   <section class="player-column" id="publicPlayerColumn">
     {/* Navigation & Mode Toggle Header */}
     <TitleBar player />
+
     {/* Metadata Information Section */}
     <header class="player-metadata">
       <span class="performance-title-big">Performance</span>
@@ -30,10 +31,11 @@ export const PublicViewPlayer = ({
         {firstTitle}
       </h3>
     </header>
-    {/* Player Canvas Wrapper (Controlled via player.isAudioMode class) */}
+
+    {/* Player Canvas Wrapper (Updated to data-bind-class for UI.ts compatibility) */}
     <div
       class="video-player-mock"
-      data-bind-class-toggle="is-audio-mode:player.isAudioMode"
+      data-bind-class="player.isAudioMode ? 'video-player-mock is-audio-mode' : 'video-player-mock'"
     >
       {/* Video View Context */}
       <VideoPlayer posterImage={posterImage} />
@@ -41,7 +43,8 @@ export const PublicViewPlayer = ({
       {/* Audio View Context */}
       <AudioPlayer firstMp3={firstMp3} />
     </div>
+
     {/* Control Action Bar */}
-    <PublicPlayerControls />
+    <AddToPlaylist />
   </section>
 );

@@ -1,7 +1,8 @@
 import { buildPublicNetworkGraph } from "./calculateNetwork";
 import { renderPublicEcosystem } from "./publicEcosystem/renderPublicEcosystem";
+import { purgeStalePages } from "./purgeStale";
 import { savePagesToTarget } from "./savePagesToTarget";
-import { formatSegment } from "../compiler/formatSegments";
+import { formatSegment } from "../formatSegments";
 
 export interface RebuildPagesResult {
   pagesCount: number;
@@ -10,11 +11,12 @@ export interface RebuildPagesResult {
 
 export const rebuildPages = async (env: any): Promise<RebuildPagesResult> => {
   const totalStart = performance.now();
+  const performanceCache = {} as any;
   console.log("🚀 [Rebuild] Starting full page rebuild...");
 
   // 1. Fetch all segments
   const fetchStart = performance.now();
-  const sql = `SELECT * FROM segments`;
+  const sql = `SELECT * FROM segments `;
   const { results: allSegments } = await env.DB.prepare(sql).all();
   console.log(
     `📦 [Rebuild] Fetched ${allSegments.length} segments in ${(performance.now() - fetchStart).toFixed(2)}ms`,
@@ -29,8 +31,9 @@ export const rebuildPages = async (env: any): Promise<RebuildPagesResult> => {
 
   for (let i = 0; i < len; i++) {
     const seg = allSegments[i];
-    const formatted = formatSegment(seg);
+    const formatted = formatSegment(seg, performanceCache);
     formattedSegments[i] = formatted;
+    performanceCache[formatted.performance] = formatted;
 
     const artistName = seg.artistName;
     if (artistName) {
@@ -68,10 +71,11 @@ export const rebuildPages = async (env: any): Promise<RebuildPagesResult> => {
   console.log(
     `🎨 [Rebuild] Rendered ${pages.length} pages across ${Object.keys(groupedByArtist).length} artists in ${(performance.now() - renderStart).toFixed(2)}ms`,
   );
-
+  const pagesKeys = pages.map((page) => page.key);
   // 5. Save generated HTML pages
   const saveStart = performance.now();
   await savePagesToTarget(env, pages);
+  await purgeStalePages(pagesKeys, env.PAGE_CACHE, env.STATIC_BUCKET);
   console.log(
     `💾 [Rebuild] Saved ${pages.length} pages in ${(performance.now() - saveStart).toFixed(2)}ms`,
   );

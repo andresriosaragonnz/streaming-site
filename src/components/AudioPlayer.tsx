@@ -21,7 +21,7 @@ export function AudioPlayer({ firstMp3 }: AudioPlayerProps) {
           src=""
           alt="Track Background"
           class="audio-player-bg"
-          data-bind-src="player.currentTrack ? player.currentTrack.cardImage : ''"
+          data-bind-src="player.currentCardImage"
           style="width: 100%; height: 100%; object-fit: cover; opacity: 0.45; filter: blur(2px); position: absolute; inset: 0;"
         />
 

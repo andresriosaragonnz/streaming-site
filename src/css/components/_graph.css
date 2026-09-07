@@ -42,6 +42,7 @@
   left: 0;
   width: min(850px, 90vw);
   height: 100vh;
+  max-height: 100vh; /* Strictly bounds panel to viewport height */
   background: #040714;
   display: flex;
   flex-direction: column;
@@ -52,6 +53,7 @@
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
   z-index: 10001;
   pointer-events: none;
+  overflow: hidden; /* Contains flex children within drawer boundaries */
 }
 
 #graph-drawer-container.is-open .graph-drawer-panel,
@@ -69,7 +71,7 @@
   gap: 8px;
   justify-content: flex-end;
   align-items: center;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevents header from collapsing */
   pointer-events: auto;
 }
 
@@ -81,8 +83,15 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Guarantees footer never gets squeezed or pushed off-screen */
   pointer-events: auto;
+  background: #040714;
+}
+
+/* Respect UI Binder hidden class toggles */
+#see-videos-wrapper.is-hidden,
+#see-videos-wrapper[style*="display: none"] {
+  display: none !important;
 }
 
 .graph-action-link {
@@ -97,9 +106,9 @@
 /* Canvas Viewport Wrapper */
 #graph-viewport-wrapper {
   position: relative;
-  flex: 1;
+  flex: 1 1 auto; /* Allows dynamic growing and shrinking */
   width: 100%;
-  min-height: 400px;
+  min-height: 0; /* CRITICAL: Override standard flex min-height to allow canvas to resize */
   background: #040714;
   border-radius: 8px;
   overflow: hidden;

@@ -1,65 +1,64 @@
-// import { UI } from "./binder.js";
-// import { createPlayerStore } from "./stores/playerStore.js";
-// import { createPlaylistStore } from "./stores/playlistStore.js";
-// import { createReviewStore } from "./stores/privateReviewStore.js";
-// import { initCarouselScroll } from "./utils/carousel.js";
-// import * as playlistUtils from "./utils/playlistUtils.js";
-// import { initToastListener } from "./utils/toastUtils.js";
+import { UI } from "./binder.js";
+import "./actions.js"; // Registers all data-action handlers
+import { initPlayerStore, PlayerStore } from "./stores/playerStore.js";
+import { initReviewStore, ReviewStore } from "./stores/reviewStore.js";
+import { initMediaController } from "./utils/mediaController.js";
+import { initCarouselScroll } from "./utils/carousel.js";
 
-// (window as any).playlistUtils = playlistUtils;
+declare global {
+  interface Window {
+    playerStore?: PlayerStore;
+    reviewStore?: ReviewStore;
 
-// declare global {
-//   interface Window {
-//     playerStore: ReturnType<typeof createPlayerStore>;
-//     playlistStore: ReturnType<typeof createPlaylistStore>;
-//     reviewStore: ReturnType<typeof createReviewStore>;
-//     setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
-//   }
-// }
+    setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
+  }
+}
 
-// if (document.readyState === "loading") {
-//   document.addEventListener("DOMContentLoaded", () => initCarouselScroll());
-// } else {
-//   initCarouselScroll();
-// }
+// 1. Initialize UI layout helpers on DOM load
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => initCarouselScroll());
+} else {
+  initCarouselScroll();
+}
 
-// const mediaEngineScript = document.createElement("script");
-// mediaEngineScript.src = "/js/mediaInit.js";
+// 2. Load media engine script
+const mediaEngineScript = document.createElement("script");
+mediaEngineScript.src = "/js/mediaInit.js";
 
-// mediaEngineScript.onload = () => {
-//   initToastListener();
+mediaEngineScript.onload = () => {
+  // Read server-rendered segment data payload
+  const segmentsDataEl = document.getElementById("studio-segments-data");
+  let initialSegments: any[] = [];
 
-//   // 1. Read directly from #studio-segments-data
-//   const segmentsDataEl = document.getElementById("studio-segments-data");
-//   let initialSegments: any[] = [];
+  if (segmentsDataEl && segmentsDataEl.textContent) {
+    try {
+      initialSegments = JSON.parse(segmentsDataEl.textContent);
+    } catch (err) {
+      console.error("Failed to parse #studio-segments-data JSON:", err);
+    }
+  }
 
-//   try {
-//     if (segmentsDataEl?.textContent) {
-//       initialSegments = JSON.parse(segmentsDataEl.textContent);
-//     }
-//   } catch (e) {
-//     console.error("Failed to parse #studio-segments-data payload:", e);
-//   }
+  // Instantiate active reactive stores
+  const playerStore = initPlayerStore(initialSegments);
+  initReviewStore(initialSegments);
 
-//   // 2. Map payload properties accurately (status === "public")
-//   const initialReviewTracks = initialSegments.map((s: any) => ({
-//     title: s.title || "",
-//     isPublic: s.status === "public",
-//     id: s.id,
-//   }));
+  // Initialize native media element listeners (Audio, Video & Adaptive Quality)
+  initMediaController();
 
-//   // 3. Instantiate stores with hydrated segments
-//   window.playerStore = createPlayerStore(initialSegments);
-//   window.playlistStore = createPlaylistStore();
-//   window.reviewStore = createReviewStore(initialReviewTracks);
+  // Initial media sync if segments exist
+  if (playerStore.state.segments.length > 0) {
+    playerStore.selectSegment(playerStore.state.segments[0].id);
+  }
 
-//   // 4. Initialize global click delegates & render
-//   UI.init();
-//   window.reviewStore.render();
-// };
+  // Trigger initial binder sync
+  UI.requestSync();
+  console.log(
+    "🚀 [PrivateApp] Initialized with playerStore, reviewStore & mediaController.",
+  );
+};
 
-// mediaEngineScript.onerror = () => {
-//   console.error("Failed to load /js/mediaInit.js engine script.");
-// };
+mediaEngineScript.onerror = () => {
+  console.error("Failed to load /js/mediaInit.js engine script.");
+};
 
-// document.head.appendChild(mediaEngineScript);
+document.head.appendChild(mediaEngineScript);

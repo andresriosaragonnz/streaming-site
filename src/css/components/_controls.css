@@ -12,11 +12,17 @@
 
 /* Playlist Dropdown */
 .playlist-select-group {
-  min-width: 160px;
-  max-width: 400px;
-  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 4rem;
+  width: 100%;
 }
 
+@media (min-width: 1536px) {
+  .playlist-select-group {
+    width: 48%;
+  }
+}
 .select-public {
   width: 100%;
   padding: 8px 12px;
@@ -36,12 +42,13 @@
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--accent-blue-subtle);
 }
-
+.hidden {
+  display: none !important;
+}
 /* Dynamic Custom Input */
 .custom-playlist-group {
   min-width: 180px;
   flex: 1;
-  display: none; /* Toggled via action or binder */
 }
 
 .input-public {

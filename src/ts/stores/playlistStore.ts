@@ -21,6 +21,8 @@ export interface PlaylistState {
   shareUrl: string;
 }
 
+const STORAGE_KEY = "user_playlists";
+
 export class PlaylistStore {
   public state: PlaylistState = {
     playlistName: "Favorites",
@@ -34,6 +36,41 @@ export class PlaylistStore {
     this.state.playlistName = playlistName;
     this.state.tracks = [...initialTracks];
     this.generateShareUrl();
+  }
+
+  /**
+   * Syncs the current state.tracks array back to localStorage under playlistName.
+   */
+  private syncUserPlaylistsToStorage(): void {
+    if (typeof window === "undefined" || !this.state.playlistName) return;
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      let userPlaylists: Record<string, string[]> = {};
+
+      if (raw) {
+        userPlaylists = JSON.parse(raw);
+      }
+      if (this.state.tracks.length > 0) {
+        userPlaylists[this.state.playlistName] = this.state.tracks.map(
+          (t) => t.id,
+        );
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userPlaylists));
+      } else {
+        delete userPlaylists[this.state.playlistName];
+        console.log({ userPlaylists });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(userPlaylists));
+        if (Object.keys(userPlaylists).length === 0) {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+        if (typeof window !== "undefined") {
+          // Redirect to "My Playlist" (or "Favorites" default view)
+          window.location.href = "myplaylists";
+        }
+      }
+    } catch (err) {
+      console.error("Failed to sync playlist changes to localStorage:", err);
+    }
   }
 
   /**
@@ -94,9 +131,45 @@ export class PlaylistStore {
     const exists = this.state.tracks.some((t) => t.id === track.id);
     if (!exists) {
       this.state.tracks.push(track);
+      this.syncUserPlaylistsToStorage();
       this.generateShareUrl();
       this.notify();
     }
+  }
+
+  /**
+   * Saves active segment ID into local user_playlists storage under specified playlist key.
+   */
+  public addCurrentSegmentToPlaylist(targetPlaylistName: string): void {
+    if (!targetPlaylistName) return;
+
+    const activeId = window.playerStore?.activeSegmentId;
+    if (!activeId) return;
+
+    let userPlaylists: Record<string, string[]> = {};
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) userPlaylists = JSON.parse(raw);
+    } catch (err) {
+      console.error("Failed to parse local user_playlists:", err);
+    }
+
+    if (!Array.isArray(userPlaylists[targetPlaylistName])) {
+      userPlaylists[targetPlaylistName] = [];
+    }
+
+    if (userPlaylists[targetPlaylistName].includes(activeId)) {
+      window.toastStore?.trigger(`Already in "${targetPlaylistName}"`, "info");
+      return;
+    }
+
+    userPlaylists[targetPlaylistName].push(activeId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userPlaylists));
+
+    window.toastStore?.trigger(`Saved to "${targetPlaylistName}"`, "success");
+
+    this.notify();
   }
 
   public removeTrack(index: number): void {
@@ -106,7 +179,7 @@ export class PlaylistStore {
     if (this.state.currentIndex >= this.state.tracks.length) {
       this.state.currentIndex = Math.max(0, this.state.tracks.length - 1);
     }
-
+    this.syncUserPlaylistsToStorage();
     this.generateShareUrl();
     this.notify();
   }
@@ -151,6 +224,7 @@ export class PlaylistStore {
       this.state.currentIndex++;
     }
 
+    this.syncUserPlaylistsToStorage();
     this.generateShareUrl();
     this.notify();
   }

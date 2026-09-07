@@ -1,21 +1,32 @@
 import { dateFromString } from "./formatDates.js";
-import { getCardImage } from "./getCardImage.js";
-import { getVideoSource } from "./getVideoSource.js";
-import { getCardVideoSource } from "./getCardVideoSource.js";
-import { getAudioSource } from "./getAudioSource.js";
-import { getHeroImage } from "./getHeroImage.js";
+import { getMediaSource } from "./getMediaSource";
 import { formatTime } from "./formatTime.js";
 
-export const formatSegment = (segment: any) => {
+export const formatSegment = (segment: any, performanceCache: any) => {
+  const media = getMediaSource(segment.id);
+  const fromCache = performanceCache[segment.performance];
+  if (performanceCache[segment.performance]) {
+    const result = {
+      ...fromCache,
+      ...media,
+      formattedTitle: segment.title ? segment.title.replaceAll("_", " ") : "",
+      formatedDuration: formatTime(segment.duration),
+      status: segment.status,
+      id: segment.id,
+      title: segment.title,
+      duration: segment.duration,
+    };
+    return result;
+  }
+
   const formattedDate = dateFromString(segment.eventDate).formated;
   const formattedArtist = segment.artistName.replaceAll("_", " ");
   const formattedVenue = segment.venueName.replaceAll("_", " ");
   const formattedPerformance = `${formattedArtist}-${formattedVenue}-${formattedDate}`;
   const result = {
+    ...media,
     artistName: segment.artistName,
     artistId: segment.artistId,
-    cardImage: getCardImage(segment.id),
-    heroImage: getHeroImage(segment.id),
     duration: segment.duration,
     eventDate: segment.eventDate,
     formatedDuration: formatTime(segment.duration),
@@ -26,9 +37,6 @@ export const formatSegment = (segment: any) => {
     id: segment.id,
     performance: segment.performance,
     formattedPerformance,
-    sourceVideo1080p: getVideoSource(segment.id),
-    sourceVideo480p: getCardVideoSource(segment.id),
-    sourceMp3: getAudioSource(segment.id),
     title: segment.title,
     venueName: segment.venueName,
     status: segment.status,
@@ -44,7 +52,7 @@ const formatSegments = (rawSegments: any[]) => {
   for (let i = 0; i < len; i++) {
     const segment = rawSegments[i];
     totalDuration += parseInt(segment.duration);
-    formattedSegments[i] = formatSegment(segment);
+    formattedSegments[i] = formatSegment(segment, {});
   }
   return { totalDuration: formatTime(totalDuration), formattedSegments };
 };

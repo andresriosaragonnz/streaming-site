@@ -18,7 +18,7 @@ export const PlaylistViewPlayer = ({
   firstMp3,
 }: PlaylistViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
-    <TitleBar />
+    <TitleBar player />
     <div class="performance-title-big">{pageTitle}</div>
     <div
       class="performance-title break-hyphens"
@@ -29,9 +29,12 @@ export const PlaylistViewPlayer = ({
 
     <div
       class="video-player-mock"
-      style="width: 100%; aspect-ratio: 16 / 9; background-color: #000; position: relative; overflow: hidden; border-radius: 12px;"
+      data-bind-class-toggle="is-audio-mode:player.isAudioMode"
     >
+      {/* Video View Context */}
       <VideoPlayer posterImage={posterImage} />
+
+      {/* Audio View Context */}
       <AudioPlayer firstMp3={firstMp3} />
     </div>
 

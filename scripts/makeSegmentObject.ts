@@ -1,5 +1,5 @@
 import fs from "fs";
-import { generateDeterministicId } from "../src/utils/makeId";
+import { hashNameToId } from "../src/utils/makeId";
 
 const INPUT_FOLDER = "/mnt/big_archive/screenshots";
 
@@ -11,9 +11,7 @@ const makeSegmentObject = () => {
       .split("-");
 
     const [eventDate, index] = eventDateRaw.split("_");
-    const id = generateDeterministicId(
-      `${artistName}-${venueName}-${eventDate}_${index}`,
-    );
+    const id = hashNameToId(`${artistName}-${venueName}-${eventDate}_${index}`);
 
     return {
       id: id,

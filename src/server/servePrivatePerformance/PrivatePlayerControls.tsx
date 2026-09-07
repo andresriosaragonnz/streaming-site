@@ -10,55 +10,47 @@ export const PrivatePlayerControls = ({
   <>
     <div class="meta-workspace-card">
       <div class="studio-controls-group">
-        <div class="input-field-group">
-          <input
-            type="text"
-            data-action="sync-track-title"
-            data-bind-value="review.active?.title || ''"
-          />
-        </div>
+        {/* Editable Title Input for Active Segment */}
+        <input
+          type="text"
+          class="input-public"
+          data-action="sync-segment-title"
+          data-bind-value="review.activeTrack?.title || ''"
+          placeholder="Segment Title..."
+        />
 
+        {/* Current Segment Public/Private Toggle */}
         <button
           type="button"
           class="btn-status"
-          data-action="toggle-track-status"
-          data-bind-class="review.isCurrentPublic ? 'btn-public-green' : 'btn-private-red'"
+          data-action="toggle-segment-status"
+          data-bind-class="{ 'btn-public-green': review.isCurrentPublic, 'btn-private-red': !review.isCurrentPublic }"
         >
           <span data-bind-text="review.isCurrentPublic ? 'Public' : 'Private'">
             Public
           </span>
         </button>
 
+        {/* Status Counter Displays */}
         <div class="studio-controls-status-count-container">
-          <span
-            class="studio-controls-status-count"
-            data-bind-text="`public:${review.publicCount}`"
-          >
-            public:0
-          </span>
-          <span
-            class="studio-controls-status-count"
-            data-bind-text="`private:${review.privateCount}`"
-          >
-            private:0
-          </span>
+          <h3 data-bind-text="`public:${review.publicCount}`">public:0</h3>
+          <h3 data-bind-text="`private:${review.privateCount}`">private:0</h3>
         </div>
 
-        <div class="status-action-wrapper">
-          <button
-            type="button"
-            class="btn-status btn-public-green"
-            data-action="open-modal"
-            data-modal-id="commit-modal-container"
-            data-bind-show="review.hasUncommittedChanges"
-          >
-            <span>Commit</span>
-          </button>
-        </div>
+        {/* Commit Button (Class-toggled to stay hidden until uncommitted changes exist) */}
+
+        <button
+          data-bind-class="{ 'is-hidden': !review.hasUncommittedChanges }"
+          type="button"
+          class="btn-status btn-public-green"
+          data-action="open-commit-dialog"
+        >
+          <span>Commit</span>
+        </button>
       </div>
     </div>
 
-    {/* Placed at root level to leverage position: fixed .modal-backdrop */}
+    {/* Native HTML Dialog Modal */}
     <CommitModal segments={segments} />
   </>
 );

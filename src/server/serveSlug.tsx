@@ -1,4 +1,5 @@
 import { devMemoryCache } from "./savePagesToTarget";
+import { NotFoundPageLayout } from "./publicEcosystem/Missing";
 
 export const serveSlug = async (c: any) => {
   const slug = c.req.param("slug");
@@ -73,7 +74,7 @@ export const serveSlug = async (c: any) => {
       return rewriter.transform(response);
     }
 
-    return c.html("<h1>404 - Page Not Found (Dev KV/Memory)</h1>", 404);
+    return c.html("<!doctype html>\n" + <NotFoundPageLayout />);
   }
 
   // -------------------------------------------------------------
@@ -89,7 +90,7 @@ export const serveSlug = async (c: any) => {
   const object = await c.env.STATIC_BUCKET.get(slug);
 
   if (!object) {
-    return c.html("<h1>404 - Page Not Found</h1>", 404);
+    return c.html("<!doctype html>\n" + <NotFoundPageLayout />);
   }
 
   object.writeHttpMetadata(headers);

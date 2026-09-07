@@ -1,24 +1,29 @@
 // =============================================================================
-// Lightweight, Generic UI Binder Engine (No 'with' statement)
+// Lightweight, Generic UI Binder Engine
 // =============================================================================
 
-export type ActionHandler = (trigger: HTMLElement, event: MouseEvent) => void;
+export type ActionHandler = (trigger: HTMLElement, event: Event) => void;
 
+/**
+ * High-performance, zero-dependency DOM binder and event delegation engine.
+ * Handles single-pass state synchronization and global action routing.
+ */
 export class UI {
   private static handlers = new Map<string, ActionHandler>();
   private static registeredEvents = new Set<string>();
   private static stores = new Map<string, string>(); // storeName -> windowKey
+  private static evalCache = new Map<string, Function>();
   private static isScheduled = false;
 
   /**
-   * Register custom action handlers modularly.
+   * Registers a callback handler for a specific `data-action` key.
    */
   static registerAction(actionName: string, handler: ActionHandler): void {
     UI.handlers.set(actionName, handler);
   }
 
   /**
-   * Register state update events dynamically without modifying the binder core.
+   * Registers custom window events to trigger reactive DOM re-syncs.
    */
   static listenToEvents(...events: string[]): void {
     for (const event of events) {
@@ -30,20 +35,27 @@ export class UI {
   }
 
   /**
-   * Register global store namespaces dynamically for binder evaluation.
+   * Registers global store namespaces mapped to `window` object keys.
    */
   static registerStore(name: string, windowKey: string): void {
     UI.stores.set(name, windowKey);
   }
 
   /**
-   * Evaluates expressions against registered store contexts strictly without 'with'.
+   * Evaluates expressions against registered store contexts using cached Function instances.
    */
   private static evalExpr(expr: string, context: Record<string, any>): any {
     try {
       const keys = Object.keys(context);
+      const cacheKey = `${keys.join(",")}:${expr}`;
+      let fn = UI.evalCache.get(cacheKey);
+
+      if (!fn) {
+        fn = new Function(...keys, `return ${expr};`);
+        UI.evalCache.set(cacheKey, fn);
+      }
+
       const values = Object.values(context);
-      const fn = new Function(...keys, `return ${expr};`);
       return fn(...values);
     } catch {
       return undefined;
@@ -63,7 +75,7 @@ export class UI {
   }
 
   /**
-   * Pure reactive sync pass: Updates DOM text, inputs, attributes, and CSS classes.
+   * Pure reactive sync pass: Updates DOM text, inputs, attributes, visibility, and CSS classes.
    */
   static sync(): void {
     const ctx: Record<string, any> = {};
@@ -71,9 +83,19 @@ export class UI {
       ctx[storeName] = (window as any)[windowKey] ?? {};
     });
 
-    const elements = document.querySelectorAll<HTMLElement>(
-      "[data-bind-text], [data-bind-value], [data-bind-class], [data-bind-href], [data-bind-aria-checked], [data-bind-src], [data-bind-poster]",
-    );
+    const selector = [
+      "[data-bind-text]",
+      "[data-bind-value]",
+      "[data-bind-checked]",
+      "[data-bind-class]",
+      "[data-bind-show]",
+      "[data-bind-href]",
+      "[data-bind-aria-checked]",
+      "[data-bind-src]",
+      "[data-bind-poster]",
+    ].join(", ");
+
+    const elements = document.querySelectorAll<HTMLElement>(selector);
 
     elements.forEach((el) => {
       const ds = el.dataset;
@@ -86,7 +108,7 @@ export class UI {
         }
       }
 
-      // 2. Form Inputs (Skip active inputs to preserve typing focus)
+      // 2. Form Inputs (Preserves typing focus & cursor position)
       if (ds.bindValue && document.activeElement !== el) {
         const val = UI.evalExpr(ds.bindValue, ctx);
         if (
@@ -97,11 +119,23 @@ export class UI {
         }
       }
 
-      // 3. Conditional CSS Classes
+      // 3. Checkbox / Radio Checked State (Guarded against uninitialized stores)
+      if (ds.bindChecked) {
+        const val = UI.evalExpr(ds.bindChecked, ctx);
+        if (val !== undefined) {
+          const isChecked = Boolean(val);
+          const inputEl = el as HTMLInputElement;
+          if (inputEl.checked !== isChecked) {
+            inputEl.checked = isChecked;
+          }
+        }
+      }
+
+      // 4. Conditional CSS Classes (Supports Object Map & String)
       if (ds.bindClass) {
         const clsMap = UI.evalExpr(ds.bindClass, ctx);
         if (typeof clsMap === "string") {
-          el.className = clsMap;
+          if (el.className !== clsMap) el.className = clsMap;
         } else if (typeof clsMap === "object" && clsMap !== null) {
           Object.entries(clsMap).forEach(([className, active]) => {
             el.classList.toggle(className, Boolean(active));
@@ -109,7 +143,15 @@ export class UI {
         }
       }
 
-      // 4. Anchor Href Attribute
+      // 5. Conditional Visibility Toggle
+      if (ds.bindShow) {
+        const val = UI.evalExpr(ds.bindShow, ctx);
+        if (val !== undefined) {
+          el.classList.toggle("is-hidden", !Boolean(val));
+        }
+      }
+
+      // 6. Anchor Href Attribute
       if (ds.bindHref) {
         const val = UI.evalExpr(ds.bindHref, ctx);
         if (val !== undefined) {
@@ -120,16 +162,18 @@ export class UI {
         }
       }
 
-      // 5. ARIA Switch & Checkbox State
+      // 7. ARIA Switch & Checkbox State
       if (ds.bindAriaChecked) {
-        const isChecked = Boolean(UI.evalExpr(ds.bindAriaChecked, ctx));
-        const targetVal = String(isChecked);
-        if (el.getAttribute("aria-checked") !== targetVal) {
-          el.setAttribute("aria-checked", targetVal);
+        const val = UI.evalExpr(ds.bindAriaChecked, ctx);
+        if (val !== undefined) {
+          const targetVal = String(Boolean(val));
+          if (el.getAttribute("aria-checked") !== targetVal) {
+            el.setAttribute("aria-checked", targetVal);
+          }
         }
       }
 
-      // 6. Media & Image Source Binding
+      // 8. Media & Image Source Binding
       if (ds.bindSrc) {
         const val = UI.evalExpr(ds.bindSrc, ctx);
         if (val !== undefined) {
@@ -144,9 +188,9 @@ export class UI {
         }
       }
 
-      // 7. Video Poster Image Binding
-      if (ds.bindposter) {
-        const val = UI.evalExpr(ds.bindposter, ctx);
+      // 9. Video Poster Image Binding
+      if (ds.bindPoster) {
+        const val = UI.evalExpr(ds.bindPoster, ctx);
         if (val !== undefined) {
           const targetPoster = String(val || "");
           const videoEl = el as HTMLVideoElement;
@@ -160,9 +204,9 @@ export class UI {
   }
 
   /**
-   * Delegated Global Click Listener -> Routes to Registered Action Handlers
+   * Dispatches delegated events directly to registered action handlers.
    */
-  private static handleGlobalClick(event: MouseEvent): void {
+  private static dispatchAction(event: Event): void {
     const targetElement = event.target as Element | null;
     if (!targetElement) return;
 
@@ -179,8 +223,15 @@ export class UI {
   }
 
   static init(): void {
-    document.removeEventListener("click", UI.handleGlobalClick);
-    document.addEventListener("click", UI.handleGlobalClick);
+    // Register global event delegation listeners
+    document.removeEventListener("click", UI.dispatchAction);
+    document.addEventListener("click", UI.dispatchAction);
+
+    document.removeEventListener("change", UI.dispatchAction);
+    document.addEventListener("change", UI.dispatchAction);
+
+    document.removeEventListener("input", UI.dispatchAction);
+    document.addEventListener("input", UI.dispatchAction);
 
     // Register base stores
     UI.registerStore("player", "playerStore");

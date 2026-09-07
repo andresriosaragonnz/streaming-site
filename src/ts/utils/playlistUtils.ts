@@ -1,5 +1,5 @@
 // public/js/utils/playlistUtils.ts
-import { getRandomIndex } from "../../compiler/utils/getRandomIndex.js";
+import { getRandomIndex } from "../../formatSegments/utils/getRandomIndex.js";
 
 export const PLAYLIST_STORAGE_KEY = "user_playlists";
 export const FOLLOW_STORAGE_KEY = "user_subscriptions";
@@ -27,11 +27,11 @@ export function createShareUrl(
 
 export const getPlaylistItems = () => {
   const saved = localStorage.getItem(PLAYLIST_STORAGE_KEY);
-  const finalList = saved ? JSON.parse(saved) : { favorites: [] };
+  const finalList = saved ? JSON.parse(saved) : { Favorites: [] };
   const listNames: string[] = [];
   const ids: string[] = [];
   const l: number[] = [];
-
+  console.log({ listNames });
   for (const key of Object.keys(finalList)) {
     listNames.push(key);
     const localIds = finalList[key] || [];

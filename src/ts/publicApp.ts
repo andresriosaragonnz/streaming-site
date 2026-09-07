@@ -2,6 +2,7 @@ import { UI } from "./binder.js";
 import "./actions.js"; // Registers all data-action handlers
 import { initPlayerStore, PlayerStore } from "./stores/playerStore.js";
 import { initToastStore, ToastStore } from "./stores/toastStore.js";
+import { initPlaylistStore, PlaylistStore } from "./stores/playlistStore.js";
 import { initMediaController } from "./utils/mediaController.js";
 import { initCarouselScroll } from "./utils/carousel.js";
 import { initToastListener } from "./utils/toastUtils.js";
@@ -10,6 +11,7 @@ declare global {
   interface Window {
     playerStore?: PlayerStore;
     toastStore?: ToastStore;
+    playlistStore?: PlaylistStore;
     setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
 }
@@ -42,7 +44,9 @@ mediaEngineScript.onload = () => {
 
   // Instantiate active reactive stores
   const playerStore = initPlayerStore(initialSegments);
+  playerStore.populatePlaylistDropdown();
   initToastStore();
+  initPlaylistStore(initialSegments, "Favorites");
 
   // Initialize native media element listeners (Audio, Video & Adaptive Quality)
   initMediaController();
@@ -55,7 +59,7 @@ mediaEngineScript.onload = () => {
   // Trigger initial binder sync
   UI.requestSync();
   console.log(
-    "🚀 [PublicApp] App initialized with playerStore, toastStore & mediaController.",
+    "🚀 [PublicApp] App initialized with playerStore, toastStore, playlistStore & mediaController.",
   );
 };
 

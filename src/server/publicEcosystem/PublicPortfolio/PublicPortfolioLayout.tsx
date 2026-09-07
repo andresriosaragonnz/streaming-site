@@ -3,8 +3,8 @@ import { PublicPortfolioHero } from "./PublicPortfolioHero";
 import { PublicPerformanceCard } from "./PublicPerformanceCard";
 import { GraphModal } from "./GraphModal";
 import type { Segment, PerformanceData } from "../../../ts/types";
-import { getRandomIndex } from "../../../compiler/utils/getRandomIndex";
-import { getRandomElements } from "../../../compiler/utils/getRandomElement";
+import { getRandomIndex } from "../../../formatSegments/utils/getRandomIndex";
+import { getRandomElements } from "../../../formatSegments/utils/getRandomElement";
 
 export interface PublicPortfolioLayoutProps {
   performances: PerformanceData[];

@@ -30,7 +30,7 @@ try {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(rows, null, 2), "utf-8");
 
   console.log(`✅ Downloaded ${rows.length} segments to ${OUTPUT_FILE}`);
-} catch (error) {
+} catch (error: any) {
   console.error("❌ Failed to fetch data from remote D1:", error.message);
   process.exit(1);
 }

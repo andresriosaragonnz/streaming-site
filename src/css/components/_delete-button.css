@@ -1,5 +1,8 @@
 /* Delete Button Base */
 .btn-delete-icon {
+  border: 1px solid #ffffff;
+  color: #ffffff;
+  cursor: pointer;
   background-color: #18181b;
   color: #ffffff;
   border: 1px solid #ffffff;
@@ -9,6 +12,8 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
+  height: fit-content;
+  align-self: center;
   transition:
     background-color 0.12s ease-out,
     color 0.12s ease-out;

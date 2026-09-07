@@ -107,7 +107,7 @@ export class PlaylistDragEngine {
 
     // 6. Sync reordered IDs to playlistsStore (e.g. active/current playlist)
     const activePlaylistName =
-      listContainer?.getAttribute("data-playlist-name") || "favorites";
+      listContainer?.getAttribute("data-playlist-name");
     const playlistsStore = window.playlistStore;
 
     if (playlistsStore?.state?.playlists) {

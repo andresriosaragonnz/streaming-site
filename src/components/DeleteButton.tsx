@@ -1,25 +1,19 @@
 export interface DeleteButtonProps {
   id?: string;
   action?: string;
-  classNames?: string;
   label?: string;
 }
 
-export const DeleteButton = ({
-  id = "",
-  action,
-  classNames = "btn-delete-icon",
-  label,
-}: DeleteButtonProps) => {
+export const DeleteButton = ({ id = "", action }: DeleteButtonProps) => {
   return (
     <button
       type="button"
-      class={classNames}
+      class="btn-delete-icon"
       data-action={action}
       data-id={id}
       title="Delete Item"
       aria-label="Delete"
-      style="background: #18181b; border: 1px solid #ffffff; color: #ffffff; padding: 6px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: monospace; font-size: 12px; font-weight: 600; border-radius: 0;"
+      style="display: inline-flex; align-items: center; gap: 6px; font-family: monospace; font-size: 12px; font-weight: 600; border-radius: 0; height:auto;"
     >
       {/* Crisp 16x16 Trash Icon SVG */}
       <svg
@@ -38,7 +32,6 @@ export const DeleteButton = ({
         <line x1="10" y1="11" x2="10" y2="17" />
         <line x1="14" y1="11" x2="14" y2="17" />
       </svg>
-      {label && <span>{label}</span>}
     </button>
   );
 };

@@ -10,8 +10,8 @@ export const PublicPlayerControls = () => (
           class="select-public"
           data-action="playlist-select-change"
         >
-          <option value="favorites" selected>
-            favorites
+          <option value="Favorites" selected>
+            Favorites
           </option>
           <option value="+ New Playlist...">+ New Playlist...</option>
         </select>

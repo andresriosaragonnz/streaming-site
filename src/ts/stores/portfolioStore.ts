@@ -43,9 +43,6 @@ export class PortfolioStore {
     return this.state.count;
   }
 
-  /**
-   * Evaluated by binder expressions or card links (e.g., data-bind-href="portfolio.getShareUrl('Favorites')")
-   */
   public getShareUrl(playlistName: string): string {
     return this.state.shareUrls[playlistName] || "#";
   }
@@ -135,6 +132,7 @@ export class PortfolioStore {
     if (typeof window === "undefined") return {};
 
     const saved = localStorage.getItem(PLAYLIST_STORAGE_KEY);
+    console.log({ saved });
     const playlistsMap: Record<string, string[]> = saved
       ? JSON.parse(saved)
       : {};

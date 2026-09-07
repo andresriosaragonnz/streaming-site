@@ -1,4 +1,4 @@
-import { ItemThumbnail } from "../../components/ItemThumbnail";
+import { CardThumbnail } from "../../components/CardThumbnail";
 import { DeleteButton } from "../../components/DeleteButton";
 
 export interface PlaylistSegmentCardProps {
@@ -21,9 +21,10 @@ export const PlaylistSegmentCard = ({
   return (
     <div
       id={cardId}
-      data-id={cardId}
+      data-id={id}
       class="sidebar-item-card"
       draggable="true"
+      data-action="select-segment"
       data-bind-class={`player.state.activeId === '${id}' ? 'sidebar-item-card is-active' : 'sidebar-item-card'`}
       ondragstart={`window.playlistDragEngine?.handleDragStart(${index}, event)`}
       /* CRITICAL: event.preventDefault() MUST run on dragover */
@@ -31,16 +32,14 @@ export const PlaylistSegmentCard = ({
       ondrop={`window.playlistDragEngine?.handleDrop(${index}, event)`}
       ondragend="window.playlistDragEngine?.handleDragEnd()"
     >
-      <div class="item-meta" data-action="select-segment" data-id={id}>
-        <ItemThumbnail cardImage={cardImage} title={title} />
+      <div class="item-meta">
+        <CardThumbnail cardImage={cardImage} altText={title} />
       </div>
-      <div class="title-text">
-        <span>{title}</span>
-      </div>
-      <div class="title-text justified-line">
-        <span data-action="select-segment" data-id={id}>
-          {formattedArtist}
-        </span>
+      <div class="item-meta">
+        <div class="title-text">
+          <span class="segment-duration">{title}</span>
+          <span class="segment-duration">{formattedArtist}</span>
+        </div>
         <DeleteButton action="delete-playlist-item" id={id} />
       </div>
     </div>

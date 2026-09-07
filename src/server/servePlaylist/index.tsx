@@ -1,4 +1,4 @@
-import { formatSegments } from "../../compiler/formatSegments/index";
+import { formatSegments } from "../../formatSegments/index";
 import { PlaylistPageLayout } from "./PlaylistPageLayout";
 
 // Helper to escape HTML characters

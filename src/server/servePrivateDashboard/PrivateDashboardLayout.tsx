@@ -1,7 +1,7 @@
-import { formatSegments } from "../../compiler/formatSegments";
-import { getPerformancesFromSegments } from "../../compiler/utils/getPerformancesFromSegments";
-import { getRandomElements } from "../../compiler/utils/getRandomElement";
-import { getRandomIndex } from "../../compiler/utils/getRandomIndex";
+import { formatSegments } from "../../formatSegments";
+import { getPerformancesFromSegments } from "../../formatSegments/utils/getPerformancesFromSegments";
+import { getRandomElements } from "../../formatSegments/utils/getRandomElement";
+import { getRandomIndex } from "../../formatSegments/utils/getRandomIndex";
 import { Menu } from "../../components/Menu";
 import { PrivateDashboardHero } from "./PrivateDashboardHero";
 import { PrivatePerformanceCard } from "./PrivatePerformanceCard";

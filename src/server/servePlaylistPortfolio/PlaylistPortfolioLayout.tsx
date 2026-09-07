@@ -36,7 +36,7 @@ export const PlaylistPortfolioLayout = () => {
           data-bind-class="portfolio.isLoading ? 'hero-container is-loading' : 'hero-container'"
         >
           {/* Skeleton or dynamic inner HTML will be swapped here */}
-          <div class="hero-placeholder">Loading your playlists...</div>
+          <div class="hero-placeholder"></div>
         </div>
 
         {/* Performance Cards Grid Container */}

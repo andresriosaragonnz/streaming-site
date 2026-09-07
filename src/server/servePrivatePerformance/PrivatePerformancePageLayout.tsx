@@ -1,6 +1,6 @@
 import { PrivateViewPlayer } from "./PrivateViewPlayer";
 import { PrivateViewSidebar } from "./PrivateViewSidebar";
-import { formatSegments } from "../../compiler/formatSegments/index";
+import { formatSegments } from "../../formatSegments/index";
 import { PrivateSegmentCard } from "./PrivateSegmentCard";
 import { Toast } from "../../components/ToastContainer";
 
@@ -24,6 +24,7 @@ export const PrivatePerformancePageLayout = ({
   const cards = formattedSegments.map((segment, index) => (
     <PrivateSegmentCard
       index={index}
+      id={segment.id}
       title={segment.title}
       status={segment.status}
       formatedDuration={segment.formatedDuration}
