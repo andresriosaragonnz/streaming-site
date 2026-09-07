@@ -12,7 +12,7 @@ database_id = "c04dda39-26b4-4948-8dfc-ac33aa283ff4"
 # Production KV Namespace
 [[kv_namespaces]]
 binding = "PAGE_CACHE"
-id = "PAGE_CACHE"
+id = "62705a56a0f745e985b2d712e8653903"
 
 # -----------------------------------------------------------------------------
 # Staging Environment Overrides (`bunx wrangler deploy -e staging`)
