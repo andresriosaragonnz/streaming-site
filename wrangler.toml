@@ -14,6 +14,11 @@ database_id = "c04dda39-26b4-4948-8dfc-ac33aa283ff4"
 binding = "PAGE_CACHE"
 id = "62705a56a0f745e985b2d712e8653903"
 
+[[env.staging.r2_buckets]]
+binding = "STATIC_BUCKET"
+bucket_name = "pages"
+
+
 # -----------------------------------------------------------------------------
 # Staging Environment Overrides (`bunx wrangler deploy -e staging`)
 # -----------------------------------------------------------------------------
@@ -30,3 +35,7 @@ database_id = "20d92b02-8f65-4e87-83d4-2fb8b57d5a1f"
 [[env.staging.kv_namespaces]]
 binding = "PAGE_CACHE"
 id = "62705a56a0f745e985b2d712e8653903"
+
+[[env.staging.r2_buckets]]
+binding = "STATIC_BUCKET"
+bucket_name = "pages"
