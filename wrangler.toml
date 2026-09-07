@@ -29,4 +29,4 @@ database_id = "20d92b02-8f65-4e87-83d4-2fb8b57d5a1f"
 # Staging KV Namespace
 [[env.staging.kv_namespaces]]
 binding = "PAGE_CACHE"
-id = "PAGE_CACHE"
+id = "62705a56a0f745e985b2d712e8653903"
