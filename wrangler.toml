@@ -1,12 +1,18 @@
 # Top-Level / Default (Production)
 name = "my-app-testing"
 main = "src/index.ts"
-compatibility_date = "2026-09-01"
+compatibility_date = "2026-07-29"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
 
 # Production D1 Database
 [[d1_databases]]
 binding = "DB"
-database_name = "prod"
+database_name = "db"
 database_id = "c04dda39-26b4-4948-8dfc-ac33aa283ff4"
 
 # Production KV Namespace
@@ -17,6 +23,10 @@ id = "62705a56a0f745e985b2d712e8653903"
 [[r2_buckets]]
 binding = "STATIC_BUCKET"
 bucket_name = "pages"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "testsync"
 
 
 # -----------------------------------------------------------------------------
@@ -39,3 +49,7 @@ id = "62705a56a0f745e985b2d712e8653903"
 [[env.staging.r2_buckets]]
 binding = "STATIC_BUCKET"
 bucket_name = "pages"
+
+[[env.staging.r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "testsync2"
