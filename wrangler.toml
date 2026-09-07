@@ -14,7 +14,7 @@ database_id = "c04dda39-26b4-4948-8dfc-ac33aa283ff4"
 binding = "PAGE_CACHE"
 id = "62705a56a0f745e985b2d712e8653903"
 
-[[env.staging.r2_buckets]]
+[[r2_buckets]]
 binding = "STATIC_BUCKET"
 bucket_name = "pages"
 
