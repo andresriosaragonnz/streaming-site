@@ -1,6 +1,6 @@
 import { VideoPlayer } from "../../components/VideoPlayer";
 import { AudioPlayer } from "../../components/AudioPlayer";
-import { PlaylistPlayerControls } from "./PlaylistPlayerControls";
+import { AddToPlaylist } from "../../components/AddToPlaylist";
 import { TitleBar } from "../../components/TitleBar";
 import { ShareIcon } from "../../components/ShareIcon";
 
@@ -20,7 +20,7 @@ export const PlaylistViewPlayer = ({
   <section class="player-column" id="publicPlayerColumn">
     <TitleBar player />
     <div class="performance-title-big">{pageTitle}</div>
-    <div class="studio-controls-group">
+    <div style="display:flex;flex-direction:row;gap:8px">
       <div
         class="performance-title break-hyphens"
         data-bind-text="player.currentTrack ? player.currentTrack.title : ''"
@@ -48,7 +48,6 @@ export const PlaylistViewPlayer = ({
       {/* Audio View Context */}
       <AudioPlayer firstMp3={firstMp3} />
     </div>
-
-    <PlaylistPlayerControls />
+    <AddToPlaylist />
   </section>
 );
