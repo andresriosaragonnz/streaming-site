@@ -172,7 +172,34 @@ export function initAppActions(): void {
   // ---------------------------------------------------------------------------
   // 4. Network Graph Actions
   // ---------------------------------------------------------------------------
-  UI.registerAction("open-graph-modal", () => window.graphStore?.openDrawer());
+  // UI.registerAction("open-graph-modal", () => window.graphStore?.openDrawer());
+
+  UI.registerAction("open-graph-modal", (trigger: HTMLElement) => {
+    const wrapper = document.getElementById("graph-viewport-wrapper");
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+    // Read pre-set attributes or derive from window bounds on mobile
+    const staticWidth = wrapper?.dataset.viewportWidth
+      ? parseInt(wrapper.dataset.viewportWidth, 10)
+      : isMobile
+        ? window.innerWidth
+        : undefined;
+
+    const staticHeight = wrapper?.dataset.viewportHeight
+      ? parseInt(wrapper.dataset.viewportHeight, 10)
+      : isMobile
+        ? window.innerHeight
+        : undefined;
+
+    // Initialize or update graph engine
+    window.graphStore?.open({
+      dimensions:
+        staticWidth && staticHeight
+          ? { width: staticWidth, height: staticHeight }
+          : undefined,
+    });
+  });
+
   UI.registerAction("close-graph-modal", () =>
     window.graphStore?.closeDrawer(),
   );

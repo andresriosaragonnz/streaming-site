@@ -1,17 +1,6 @@
-export interface GraphModalProps {
-  /**
-   * Optional initial bounding box dimensions.
-   * If provided (or passed on mobile), the graph engine uses static dimensions
-   * to bypass getBoundingClientRect() reflows on node clicks.
-   */
-  initialWidth?: number;
-  initialHeight?: number;
-}
+export interface GraphModalProps {}
 
-export const GraphModal = ({
-  initialWidth,
-  initialHeight,
-}: GraphModalProps = {}) => (
+export const GraphModal = () => (
   <div
     id="graph-drawer-container"
     data-bind-class="{ 'is-open': graph.isDrawerOpen }"
@@ -69,12 +58,8 @@ export const GraphModal = ({
         </button>
       </header>
 
-      {/* Graph Canvas Container with Optional Pre-calculated Bounding Attributes */}
-      <main
-        id="graph-viewport-wrapper"
-        data-viewport-width={initialWidth ? String(initialWidth) : undefined}
-        data-viewport-height={initialHeight ? String(initialHeight) : undefined}
-      >
+      {/* Graph Canvas Container */}
+      <main id="graph-viewport-wrapper">
         <div id="graph"></div>
       </main>
     </aside>

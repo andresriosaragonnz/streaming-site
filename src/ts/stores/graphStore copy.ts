@@ -2,26 +2,15 @@
 // Graph Store Architecture
 // =============================================================================
 
-export interface Dimensions {
-  width: number;
-  height: number;
-}
-
-export interface GraphOpenOptions {
-  dimensions?: Dimensions;
-}
-
 export interface GraphState {
   isGraphDrawerOpen: boolean;
   activeNodeLink: string;
-  dimensions: Dimensions | null;
 }
 
 export class GraphStore {
   public state: GraphState = {
     isGraphDrawerOpen: false,
     activeNodeLink: "",
-    dimensions: null,
   };
 
   /**
@@ -49,29 +38,11 @@ export class GraphStore {
     return this.state.activeNodeLink ? `/${this.state.activeNodeLink}` : "#";
   }
 
-  get dimensions(): Dimensions | null {
-    return this.state.dimensions;
-  }
-
   // ---------------------------------------------------------------------------
   // Store Actions
   // ---------------------------------------------------------------------------
 
-  /**
-   * Opens the graph drawer and optionally locks initial viewport dimensions
-   * to eliminate layout reflows (getBoundingClientRect) during mobile node clicks.
-   */
-  public open(options?: GraphOpenOptions): void {
-    if (options?.dimensions) {
-      this.state.dimensions = options.dimensions;
-    }
-    this.openDrawer();
-  }
-
-  public openDrawer(options?: GraphOpenOptions): void {
-    if (options?.dimensions) {
-      this.state.dimensions = options.dimensions;
-    }
+  public openDrawer(): void {
     this.state.isGraphDrawerOpen = true;
     this.notify();
   }
@@ -88,11 +59,6 @@ export class GraphStore {
 
   public setActiveNode(link: string): void {
     this.state.activeNodeLink = link;
-    this.notify();
-  }
-
-  public setDimensions(dimensions: Dimensions | null): void {
-    this.state.dimensions = dimensions;
     this.notify();
   }
 }

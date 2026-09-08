@@ -28,7 +28,6 @@ function resolveGraphPayload(customData) {
 
   const currentArtist = decodeURIComponent(rawArtist).toLowerCase().trim();
 
-  // ⚡ Load pre-computed cluster if an active artist is explicitly selected
   if (currentArtist && rawData.artistClusters) {
     const key = currentArtist;
     const cluster =
@@ -44,7 +43,6 @@ function resolveGraphPayload(customData) {
     }
   }
 
-  // 🌐 Fall back to full un-focused network graph
   return {
     nodes: rawData.nodes || [],
     edges: rawData.edges || [],
@@ -52,9 +50,6 @@ function resolveGraphPayload(customData) {
   };
 }
 
-/**
- * Safely updates the "See videos" button href attribute in the DOM.
- */
 function syncSeeVideosLink(targetArtist) {
   const seeVideosBtn = document.getElementById("see-videos-btn");
   if (!seeVideosBtn) return;
@@ -72,8 +67,24 @@ export function renderGraph(customData) {
   const container = document.getElementById("graph");
   if (!container) return;
 
-  const rect = container.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0) return;
+  const wrapper = document.getElementById("graph-viewport-wrapper");
+  const cachedDims = window.graphStore?.dimensions;
+
+  const width =
+    cachedDims?.width ||
+    (wrapper?.dataset.viewportWidth
+      ? parseInt(wrapper.dataset.viewportWidth, 10)
+      : 0);
+  const height =
+    cachedDims?.height ||
+    (wrapper?.dataset.viewportHeight
+      ? parseInt(wrapper.dataset.viewportHeight, 10)
+      : 0);
+
+  if (!width || !height) {
+    const rect = container.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+  }
 
   const payload = resolveGraphPayload(customData);
   if (!payload || !payload.nodes || !payload.nodes.length) {
@@ -81,55 +92,17 @@ export function renderGraph(customData) {
     return;
   }
 
-  // Sync "See videos" button target artist
   if (payload.targetNode) {
     const activeName = payload.targetNode.rawArtist || payload.targetNode.name;
     syncSeeVideosLink(activeName);
   }
 
-  // Clean up existing instance
-  if (orbInstance) {
-    try {
-      if (typeof orbInstance.destroy === "function") {
-        orbInstance.destroy();
-      } else if (typeof orbInstance.view?.unload === "function") {
-        orbInstance.view.unload();
-      }
-    } catch (e) {}
-    orbInstance = null;
-  }
+  const currentFocusId = payload.targetNode
+    ? String(payload.targetNode.id)
+    : null;
 
-  container.innerHTML = "";
-
-  try {
-    const OrbConstructor =
-      (window.Orb && typeof window.Orb.Orb === "function" && window.Orb.Orb) ||
-      (window.Orb &&
-        typeof window.Orb.default === "function" &&
-        window.Orb.default) ||
-      (typeof window.Orb === "function" && window.Orb);
-
-    if (!OrbConstructor) return;
-
-    orbInstance = new OrbConstructor(container, {
-      simulator: {
-        workerUrl: null,
-      },
-      simulation: {
-        isPhysicsEnabled: false,
-      },
-      transition: {
-        duration: 0,
-      },
-    });
-
-    if (!orbInstance || !orbInstance.data) return;
-
-    const currentFocusId = payload.targetNode
-      ? String(payload.targetNode.id)
-      : null;
-
-    // Apply default styles (Uniform size & colors when no target is focused)
+  // ⚡ FAST PATH: Reuse existing Orb instance if already initialized
+  if (orbInstance && orbInstance.data) {
     orbInstance.data.setDefaultStyle({
       getNodeStyle(node) {
         const isTarget = currentFocusId
@@ -164,13 +137,93 @@ export function renderGraph(customData) {
       },
     });
 
-    // Load nodes and edges
+    // Update dataset in-place without destroying DOM canvas
     orbInstance.data.setup({
       nodes: payload.nodes,
       edges: payload.edges,
     });
 
-    // Node click delegation
+    if (orbInstance.view && typeof orbInstance.view.render === "function") {
+      orbInstance.view.render(() => {
+        if (typeof orbInstance.view.recenter === "function") {
+          orbInstance.view.recenter();
+        }
+      });
+    } else if (typeof orbInstance.render === "function") {
+      orbInstance.render();
+      if (typeof orbInstance.recenter === "function") {
+        orbInstance.recenter();
+      }
+    }
+    return;
+  }
+
+  // Initial Full Render (only executed once when instance is null)
+  container.innerHTML = "";
+
+  try {
+    const OrbConstructor =
+      (window.Orb && typeof window.Orb.Orb === "function" && window.Orb.Orb) ||
+      (window.Orb &&
+        typeof window.Orb.default === "function" &&
+        window.Orb.default) ||
+      (typeof window.Orb === "function" && window.Orb);
+
+    if (!OrbConstructor) return;
+
+    orbInstance = new OrbConstructor(container, {
+      simulator: {
+        workerUrl: null,
+      },
+      simulation: {
+        isPhysicsEnabled: false,
+      },
+      transition: {
+        duration: 0,
+      },
+    });
+
+    if (!orbInstance || !orbInstance.data) return;
+
+    orbInstance.data.setDefaultStyle({
+      getNodeStyle(node) {
+        const isTarget = currentFocusId
+          ? String(node.id) === currentFocusId
+          : false;
+        const nodeData = node.data || node;
+        return {
+          size: currentFocusId ? (isTarget ? 16 : 9) : 7,
+          color: currentFocusId
+            ? isTarget
+              ? "#ff3e3e"
+              : "#00d2ff"
+            : "#0072d2",
+          label: nodeData.name || nodeData.label || "",
+          fontSize: currentFocusId ? (isTarget ? 7 : 4) : 3.5,
+          fontColor: "#ffffff",
+          x: nodeData.x ?? node.x,
+          y: nodeData.y ?? node.y,
+        };
+      },
+      getEdgeStyle(edge) {
+        const weight = edge.data?.weight ?? edge.weight ?? 1;
+        return {
+          color: currentFocusId
+            ? "#ff3e3e"
+            : weight > 1
+              ? "#3b82f6"
+              : "#ffffff",
+          width: Math.min(weight * (currentFocusId ? 1.5 : 0.6), 4),
+          opacity: currentFocusId ? 0.8 : 0.5,
+        };
+      },
+    });
+
+    orbInstance.data.setup({
+      nodes: payload.nodes,
+      edges: payload.edges,
+    });
+
     if (orbInstance.events && typeof orbInstance.events.on === "function") {
       orbInstance.events.on("node-click", (event) => {
         const node = event ? event.node : null;
@@ -194,7 +247,6 @@ export function renderGraph(customData) {
       });
     }
 
-    // Render pass & camera auto-center
     if (orbInstance.view && typeof orbInstance.view.render === "function") {
       orbInstance.view.render(() => {
         if (typeof orbInstance.view.recenter === "function") {
@@ -220,7 +272,6 @@ if (typeof window !== "undefined") {
 
   const handleGraphStateChange = () => {
     const drawerEl = document.getElementById("graph-drawer-container");
-
     const isOpen = Boolean(window.graphStore?.isDrawerOpen);
 
     if (drawerEl) {
@@ -233,20 +284,17 @@ if (typeof window !== "undefined") {
     }
   };
 
-  // 🔄 Click handler for 'Show Full Network' button action
   document.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-action='reset-graph']");
     if (!trigger) return;
 
     event.preventDefault();
 
-    // Clear performance DOM context attribute temporarily
     const perfLinkEl = document.getElementById("performance-link");
     if (perfLinkEl) {
       perfLinkEl.removeAttribute("data-artist");
     }
 
-    // Reset active node in graphStore
     if (
       window.graphStore &&
       typeof window.graphStore.setActiveNode === "function"
@@ -267,6 +315,7 @@ if (typeof window !== "undefined") {
 
   window.addEventListener("graph-state-changed", handleGraphStateChange);
 
+  // ⚡ Update graph data when node selection changes
   window.addEventListener("node-selected", (e) => {
     if (e.detail?.artist) {
       syncSeeVideosLink(e.detail.artist);

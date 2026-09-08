@@ -28,6 +28,7 @@ function resolveGraphPayload(customData) {
 
   const currentArtist = decodeURIComponent(rawArtist).toLowerCase().trim();
 
+  // ⚡ Load pre-computed cluster if an active artist is explicitly selected
   if (currentArtist && rawData.artistClusters) {
     const key = currentArtist;
     const cluster =
@@ -43,6 +44,7 @@ function resolveGraphPayload(customData) {
     }
   }
 
+  // 🌐 Fall back to full un-focused network graph
   return {
     nodes: rawData.nodes || [],
     edges: rawData.edges || [],
@@ -127,7 +129,7 @@ export function renderGraph(customData) {
       ? String(payload.targetNode.id)
       : null;
 
-    // Apply the working setDefaultStyle configuration for white text
+    // Apply default styles (Uniform size & colors when no target is focused)
     orbInstance.data.setDefaultStyle({
       getNodeStyle(node) {
         const isTarget = currentFocusId
@@ -135,10 +137,14 @@ export function renderGraph(customData) {
           : false;
         const nodeData = node.data || node;
         return {
-          size: isTarget ? 16 : 9,
-          color: isTarget ? "#ff3e3e" : "#00d2ff",
+          size: currentFocusId ? (isTarget ? 16 : 9) : 7,
+          color: currentFocusId
+            ? isTarget
+              ? "#ff3e3e"
+              : "#00d2ff"
+            : "#0072d2",
           label: nodeData.name || nodeData.label || "",
-          fontSize: isTarget ? 7 : 4,
+          fontSize: currentFocusId ? (isTarget ? 7 : 4) : 3.5,
           fontColor: "#ffffff",
           x: nodeData.x ?? node.x,
           y: nodeData.y ?? node.y,
@@ -152,13 +158,13 @@ export function renderGraph(customData) {
             : weight > 1
               ? "#3b82f6"
               : "#ffffff",
-          width: Math.min(weight * 1.5, 4),
+          width: Math.min(weight * (currentFocusId ? 1.5 : 0.6), 4),
           opacity: currentFocusId ? 0.8 : 0.5,
         };
       },
     });
 
-    // Load pre-computed nodes and edges
+    // Load nodes and edges
     orbInstance.data.setup({
       nodes: payload.nodes,
       edges: payload.edges,
@@ -202,7 +208,7 @@ export function renderGraph(customData) {
       }
     }
 
-    console.log("🕸️ [Network] Graph rendered with crisp white fontColor.");
+    console.log("🕸️ [Network] Graph rendered successfully.");
   } catch (err) {
     console.error("❌ [Network] Failed to render Orb graph:", err);
   }
@@ -215,7 +221,6 @@ if (typeof window !== "undefined") {
   const handleGraphStateChange = () => {
     const drawerEl = document.getElementById("graph-drawer-container");
 
-    // Rely strictly on store state to avoid stale DOM class reading
     const isOpen = Boolean(window.graphStore?.isDrawerOpen);
 
     if (drawerEl) {
@@ -227,6 +232,32 @@ if (typeof window !== "undefined") {
       scheduleGraphRender();
     }
   };
+
+  // 🔄 Click handler for 'Show Full Network' button action
+  document.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-action='reset-graph']");
+    if (!trigger) return;
+
+    event.preventDefault();
+
+    // Clear performance DOM context attribute temporarily
+    const perfLinkEl = document.getElementById("performance-link");
+    if (perfLinkEl) {
+      perfLinkEl.removeAttribute("data-artist");
+    }
+
+    // Reset active node in graphStore
+    if (
+      window.graphStore &&
+      typeof window.graphStore.setActiveNode === "function"
+    ) {
+      window.graphStore.setActiveNode("");
+    } else if (window.graphStore) {
+      window.graphStore.activeNodeLink = "";
+    }
+
+    scheduleGraphRender();
+  });
 
   window.addEventListener("modal-ready", () => {
     if (window.graphStore?.isDrawerOpen) {
