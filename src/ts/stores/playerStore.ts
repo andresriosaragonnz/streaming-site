@@ -230,7 +230,6 @@ export class PlayerStore {
 
     const track = this.currentTrack;
     if (!track) return;
-    console.log("now");
     if (this.state.isAudioMode) {
       const audioEl = document.getElementById(
         "r2-audio-player",
@@ -266,7 +265,6 @@ export class PlayerStore {
           const isPlaying = !videoEl.paused;
           videoEl.src = videoSrc;
           videoEl.load();
-
           if (isPlaying && this.state.isPlaying) {
             videoEl
               .play()

@@ -41,7 +41,6 @@ export function getTargetQuality(): VideoQuality {
     (document as any).webkitFullscreenElement ||
     (document as any).msFullscreenElement,
   );
-
   if (isMobileViewport && !isFullscreen) {
     return "480p";
   }

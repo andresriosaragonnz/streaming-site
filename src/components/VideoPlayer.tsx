@@ -20,7 +20,6 @@ export const VideoPlayer = ({
         preload="none"
         poster={posterImage ? `${posterImage}.jpg` : ""}
         data-action="video-element"
-        data-bind-src="player.currentTrack ? (window.matchMedia('(min-width: 769px)').matches ? (player.currentTrack.sourceVideo1080p || player.currentTrack.source) : (player.currentTrack.sourceVideo480p || player.currentTrack.source)) : ''"
         style="width: 100%; height: 100%; object-fit: cover; display: block;"
       />
 
