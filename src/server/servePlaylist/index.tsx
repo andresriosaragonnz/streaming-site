@@ -41,7 +41,6 @@ export const servePlaylist = async (c: any) => {
       .split(",")
       .map((id) => id.trim())
       .filter((id) => /^[a-zA-Z0-9_-]{1,32}$/.test(id));
-
     // Limit maximum allowed segments per query to prevent D1 parameter overflow
     if (ids.length === 0 || ids.length > 50) {
       return c.text("Invalid playlist IDs or count exceeds limit", 400);
