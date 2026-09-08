@@ -18,6 +18,7 @@ export const PublicPerformanceCard = ({
   <a
     href={`/${link}`}
     class="card"
+    rel="prefetch"
     data-bg={altImage}
     style="text-decoration: none; color: inherit"
   >

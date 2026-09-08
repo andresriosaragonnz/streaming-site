@@ -125,14 +125,10 @@ export class PortfolioStore {
     }
   }
 
-  /**
-   * Scans user_playlists in localStorage and constructs share URLs for each key.
-   */
   public generateAllShareUrls(): Record<string, string> {
     if (typeof window === "undefined") return {};
 
     const saved = localStorage.getItem(PLAYLIST_STORAGE_KEY);
-    console.log({ saved });
     const playlistsMap: Record<string, string[]> = saved
       ? JSON.parse(saved)
       : {};
@@ -148,9 +144,30 @@ export class PortfolioStore {
     }
 
     this.state.shareUrls = generatedUrls;
+
+    // ⚡ Client-Side Dynamic Prefetching
+    this.prefetchGeneratedUrls(generatedUrls);
+
     return generatedUrls;
   }
 
+  private prefetchGeneratedUrls(urlsMap: Record<string, string>): void {
+    // Cap top 6 valid share URLs to keep initial network activity lean
+    const validUrls = Object.values(urlsMap)
+      .filter((url) => url && url !== "#")
+      .slice(0, 6);
+
+    validUrls.forEach((url) => {
+      // Prevent duplicate prefetch links
+      if (!document.querySelector(`link[rel="prefetch"][href="${url}"]`)) {
+        const link = document.createElement("link");
+        link.rel = "prefetch";
+        link.href = url;
+        link.as = "document";
+        document.head.appendChild(link);
+      }
+    });
+  }
   /**
    * Directly updates href attributes on rendered cards based on data-playlist-name.
    */

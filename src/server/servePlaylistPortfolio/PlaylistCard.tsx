@@ -31,6 +31,7 @@ export const PlaylistCard = ({
       <a
         href="#"
         data-card-link
+        rel="prefetch"
         data-bind-href={`portfolio.getShareUrl('${playlistName}')`}
         style="text-decoration: none; color: inherit; display: block;"
       >

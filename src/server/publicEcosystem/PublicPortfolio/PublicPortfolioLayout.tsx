@@ -12,10 +12,11 @@ export interface PublicPortfolioLayoutProps {
   graphDataJS?: string;
 }
 
-// 1. Raw static HTML shell
+// 1. Raw static HTML shell with dedicated PREFETCH_SLOT in <head>
 const PORTFOLIO_SHELL_RAW = (
   <html lang="en">
     <head>
+      {"<!-- PREFETCH_SLOT -->"}
       <script src="/js/orb.js"></script>
       <script type="application/json" id="page-images">
         {"<!-- SLOT -->"}
@@ -58,14 +59,19 @@ const PORTFOLIO_SHELL_RAW = (
   </html>
 ).toString();
 
-// 2. Pre-split shell into static string fragments ONCE on module import
+// Pre-split head slot ONCE on import
+const [PORTFOLIO_HEAD_PREFIX, SHELL_BODY_RAW] = PORTFOLIO_SHELL_RAW.split(
+  "<!-- PREFETCH_SLOT -->",
+);
+
+// 2. Pre-split remaining shell slots ONCE on module import
 const [
-  PORTFOLIO_HEAD,
+  PORTFOLIO_HEAD_SUFFIX,
   PORTFOLIO_AFTER_IMAGES,
   PORTFOLIO_AFTER_HERO,
   PORTFOLIO_AFTER_CARDS,
   PORTFOLIO_TAIL,
-] = PORTFOLIO_SHELL_RAW.split("<!-- SLOT -->");
+] = SHELL_BODY_RAW.split("<!-- SLOT -->");
 
 export const PublicPortfolioLayout = ({
   performances = [],
@@ -73,9 +79,10 @@ export const PublicPortfolioLayout = ({
   graphDataJS = "[]",
 }: PublicPortfolioLayoutProps) => {
   const portfolioImages: string[][] = [];
+  const prefetchUrls: string[] = [];
   const { formattedArtist } = segments[0] ?? {};
 
-  // Render dynamic cards
+  // Render dynamic cards & accumulate prefetch links
   const cardsHtml = performances
     .map((performance) => {
       const {
@@ -86,6 +93,12 @@ export const PublicPortfolioLayout = ({
         formattedVenueName,
         formattedDate,
       } = performance;
+
+      // Extract unique target link for prefetching
+      if (link && !prefetchUrls.includes(link)) {
+        prefetchUrls.push(link);
+      }
+
       const random = getRandomElements(images, 8);
       portfolioImages.push(random);
       return (
@@ -98,6 +111,15 @@ export const PublicPortfolioLayout = ({
         />
       ).toString();
     })
+    .join("");
+
+  // Cap top 6 links to protect mobile bandwidth on load
+  const prefetchTagsHtml = prefetchUrls
+    .slice(0, 6)
+    .map(
+      (url) =>
+        `<link rel="prefetch" href="${url.startsWith("/") ? url : `/${url}`}" as="document">`,
+    )
     .join("");
 
   const flattedImages = portfolioImages.flat();
@@ -118,7 +140,9 @@ export const PublicPortfolioLayout = ({
 
   // 3. Fast Zero-Copy Assembly via Array.join()
   return [
-    PORTFOLIO_HEAD,
+    PORTFOLIO_HEAD_PREFIX,
+    prefetchTagsHtml,
+    PORTFOLIO_HEAD_SUFFIX,
     JSON.stringify(flattedImages),
     PORTFOLIO_AFTER_IMAGES,
     heroHtml,
