@@ -13,6 +13,7 @@
     "pages:deploy": "aws s3 sync ./dist/pages s3://pages --endpoint-url https://8a48bde066e009089f9f8e944792d619.r2.cloudflarestorage.com --content-type \"text/html; charset=utf-8\" --profile r2",
     "seed-remote": "bunx wrangler d1 execute db --remote --file=./seed.sql",
     "init-db": "bunx wrangler d1 execute DB --local --file=./schema.sql",
+    "init-db-remote": "bunx wrangler d1 execute DB  --file=./schema.sql --remote",
     "seed-local": "bunx wrangler d1 execute DB --local --file=seed.sql",
     "kv:reset": "rm -rf .wrangler/state/v3/kv",
     "db:reset": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --local --file=./schema.sql && bunx wrangler d1 execute DB --local --file=./seed.sql",

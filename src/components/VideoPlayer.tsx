@@ -9,18 +9,18 @@ export const VideoPlayer = ({
 }: VideoPlayerProps) => {
   return (
     <div
-      class="video-player-container"
+      class="video-player-container relative w-full h-full"
+      data-action="player-wrapper"
       data-bind-class="player.isAudioMode ? 'video-player-container is-hidden' : 'video-player-container'"
-      style="position: relative; width: 100%; height: 100%;"
     >
       <video
         id="r2-video-player"
         controls
         playsinline
-        preload="metadata"
-        src={firstVideo}
+        preload="none"
         poster={posterImage ? `${posterImage}.jpg` : ""}
-        data-bind-src="player.currentTrack ? (player.currentTrack.sourceVideo1080p || player.currentTrack.sourceVideo480p || player.currentTrack.source ) : ''"
+        data-action="video-element"
+        data-bind-src="player.currentTrack ? (window.matchMedia('(min-width: 769px)').matches ? (player.currentTrack.sourceVideo1080p || player.currentTrack.source) : (player.currentTrack.sourceVideo480p || player.currentTrack.source)) : ''"
         style="width: 100%; height: 100%; object-fit: cover; display: block;"
       />
 

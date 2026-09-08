@@ -230,20 +230,9 @@ export function initAppActions(): void {
     const store = window.playlistStore;
     const shareUrl =
       store?.shareUrl || store?.generateShareUrl() || window.location.href;
-    console.log({ shareUrl });
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      const labelSpan = trigger.querySelector("span");
-      const originalText = labelSpan?.textContent || "Share playlist";
-
-      if (labelSpan) {
-        labelSpan.textContent = "Copied!";
-        trigger.classList.add("is-success");
-        setTimeout(() => {
-          labelSpan.textContent = originalText;
-          trigger.classList.remove("is-success");
-        }, 2000);
-      }
+      // await navigator.clipboard.writeText(shareUrl);
+      window.toastStore?.trigger("Copied to clipboard", "success");
     } catch (err) {
       console.error("Failed to copy share URL:", err);
     }
@@ -255,6 +244,7 @@ export function initAppActions(): void {
 
     const shareUrl = window.portfolioStore.getShareUrl(playlistName);
     if (!shareUrl || shareUrl === "#") return;
+    window.toastStore?.trigger("Copied to clipboard", "success");
 
     navigator.clipboard.writeText(shareUrl).catch((err) => {
       console.error("Failed to copy portfolio link:", err);

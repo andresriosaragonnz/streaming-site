@@ -44,7 +44,7 @@ export class PortfolioStore {
   }
 
   public getShareUrl(playlistName: string): string {
-    return this.state.shareUrls[playlistName] || "#";
+    return this.state.shareUrls[playlistName].toLowerCase() || "#";
   }
 
   // ---------------------------------------------------------------------------
