@@ -50,6 +50,9 @@ function resolveGraphPayload(customData) {
   };
 }
 
+/**
+ * Safely updates the "See videos" button href and prefetches the target page in the background.
+ */
 function syncSeeVideosLink(targetArtist) {
   const seeVideosBtn = document.getElementById("see-videos-btn");
   if (!seeVideosBtn) return;
@@ -60,9 +63,22 @@ function syncSeeVideosLink(targetArtist) {
     );
     const href = `/${formattedArtist}`;
     seeVideosBtn.setAttribute("href", href);
+
+    // ⚡ PREFETCH OPTIMIZATION
+    // Avoid duplicate prefetch links in the document head
+    let prefetchLink = document.querySelector(
+      `link[rel="prefetch"][href="${href}"]`,
+    );
+
+    if (!prefetchLink) {
+      prefetchLink = document.createElement("link");
+      prefetchLink.rel = "prefetch";
+      prefetchLink.href = href;
+      prefetchLink.as = "document";
+      document.head.appendChild(prefetchLink);
+    }
   }
 }
-
 export function renderGraph(customData) {
   const container = document.getElementById("graph");
   if (!container) return;
