@@ -1,14 +1,14 @@
 # Top-Level / Default (Production)
-name = "my-app-testing"
+name = "streaming-site" # 👈 Fixed to match Dashboard project name
 main = "src/index.ts"
 compatibility_date = "2026-07-29"
 compatibility_flags = ["nodejs_compat"]
-workers_dev = false # ⚡ Disable public *.workers.dev route
+workers_dev = false
 
-# Production Route
+# Production Routes (Clean hostnames without /*)
 routes = [
-  { pattern = "iknowthatband.org/*", custom_domain = true },
-  { pattern = "www.iknowthatband.org/*", custom_domain = true }
+  { pattern = "iknowthatband.org", custom_domain = true },     # 👈 Removed /*
+  { pattern = "www.iknowthatband.org", custom_domain = true }  # 👈 Removed /*
 ]
 
 [assets]
@@ -36,15 +36,15 @@ bucket_name = "testsync"
 
 
 # -----------------------------------------------------------------------------
-# Staging Environment Overrides (`bunx wrangler deploy -e staging`)
+# Staging Environment Overrides
 # -----------------------------------------------------------------------------
 [env.staging]
-name = "my-app-staging"
-workers_dev = false # ⚡ Disable public *.workers.dev route
+name = "streaming-site-staging" # 👈 Matching naming convention
+workers_dev = false
 
-# Staging Route
+# Staging Route (Clean hostname without /*)
 routes = [
-  { pattern = "test.mydomain.org/*", custom_domain = true }
+  { pattern = "test.iknowthatband.org", custom_domain = true } # 👈 Removed /*
 ]
 
 # Staging D1 Database
