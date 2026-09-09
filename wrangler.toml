@@ -34,22 +34,12 @@ bucket_name = "pages"
 binding = "MEDIA_BUCKET"
 bucket_name = "testsync"
 
-[observability.logs]
-enabled = true
-head_sampling_rate = 1
-invocation_logs = true
-persist = true
-
-[observability.traces]
-enabled = false
-head_sampling_rate = 1
-persist = true
 
 # -----------------------------------------------------------------------------
 # Staging Environment Overrides
 # -----------------------------------------------------------------------------
 [env.staging]
-name = "streaming-site-staging" # 👈 Matching naming conventionss
+name = "streaming-site-staging" # 👈 Matching naming convention
 workers_dev = false
 
 # Staging Route (Clean hostname without /*)
