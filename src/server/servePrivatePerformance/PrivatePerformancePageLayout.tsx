@@ -19,7 +19,7 @@ export const PrivatePerformancePageLayout = ({
   segments = [],
 }: PrivatePerformancePageLayoutProps) => {
   const { formattedSegments } = formatSegments(segments);
-  const { cardImage, formattedArtist, venueName, formattedDate } =
+  const { cardImage, formattedArtist, venueName, formattedDate, artistName } =
     formattedSegments[0];
   const cards = formattedSegments.map((segment, index) => (
     <PrivateSegmentCard
@@ -44,6 +44,7 @@ export const PrivatePerformancePageLayout = ({
         <div class="studio-container">
           <PrivateViewPlayer
             studioTitle={`${formattedArtist}-${venueName}-${formattedDate}`}
+            artistName={artistName}
             posterImage={cardImage}
             segments={formattedSegments}
           />

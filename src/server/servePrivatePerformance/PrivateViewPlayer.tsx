@@ -6,12 +6,14 @@ export interface PrivateViewPlayerProps {
   studioTitle: string;
   posterImage: string;
   segments: any;
+  artistName: string;
 }
 
 export const PrivateViewPlayer = ({
   studioTitle,
   posterImage,
   segments,
+  artistName,
 }: PrivateViewPlayerProps) => (
   <section class="player-column">
     <div class="meta-title-card">
@@ -21,6 +23,7 @@ export const PrivateViewPlayer = ({
       <div class="meta-title-card-right"></div>
     </div>
     <div class="performance-title">{studioTitle}</div>
+    <a href={`/private/${artistName}`}>{studioTitle}</a>
 
     <div class="video-player-mock">
       <div
