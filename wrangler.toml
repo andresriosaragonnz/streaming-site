@@ -39,7 +39,7 @@ bucket_name = "testsync"
 # Staging Environment Overrides
 # -----------------------------------------------------------------------------
 [env.staging]
-name = "streaming-site-staging" # 👈 Matching naming conventions
+name = "streaming-site-staging" # 👈 Matching naming conventionss
 workers_dev = false
 
 # Staging Route (Clean hostname without /*)
