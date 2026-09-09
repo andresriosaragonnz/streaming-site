@@ -16,6 +16,8 @@
     "init-db-remote": "bunx wrangler d1 execute DB  --file=./schema.sql --remote",
     "seed-local": "bunx wrangler d1 execute DB --local --file=seed.sql",
     "kv:reset": "rm -rf .wrangler/state/v3/kv",
+    "disable-remote": "npx wrangler d1 execute db --remote --command=\"UPDATE segments SET status = 'private';\"",
+    "enable-remote": "npx wrangler d1 execute db --remote --command=\"UPDATE segments SET status = 'public';\"",
     "db:reset": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --local --file=./schema.sql && bunx wrangler d1 execute DB --local --file=./seed.sql",
     "compile-js": "bun run scripts/build.ts"
   },
