@@ -22,7 +22,7 @@ export const NotFoundPageLayout = () => {
         <link rel="manifest" href="/site.webmanifest" />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Not Found</title>
+        <title>Coming soon</title>
         <link rel="stylesheet" href="/css/main.css" />
       </head>
       <body>
@@ -38,8 +38,8 @@ export const NotFoundPageLayout = () => {
             <HeroImage heroImage={getHeroImage("playlists")} />
 
             <div class="hero-overlay">
-              <h1 class="capitalize-words">Not Found</h1>
-              <h3>Use the search to find an artist</h3>
+              <h1 class="capitalize-words">Soon but not yet ...</h1>
+              <h3>Use the search to find an artist </h3>
             </div>
           </div>
         </div>

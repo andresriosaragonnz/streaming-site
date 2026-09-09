@@ -59,7 +59,7 @@ export const Menu = () => (
         <input
           type="text"
           id="search-input"
-          placeholder="Search"
+          placeholder="I know that band..."
           autocomplete="off"
         />
         <label
