@@ -7,8 +7,8 @@ workers_dev = false # ⚡ Disable public *.workers.dev route
 
 # Production Route
 routes = [
-  { pattern = "mydomain.org/*", custom_domain = true },
-  { pattern = "www.mydomain.org/*", custom_domain = true }
+  { pattern = "iknowthatband.org/*", custom_domain = true },
+  { pattern = "www.iknowthatband.org/*", custom_domain = true }
 ]
 
 [assets]
