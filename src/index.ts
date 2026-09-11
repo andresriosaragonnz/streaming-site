@@ -13,6 +13,7 @@ import {
   servePlaylistPortfolio,
   servePlaylistPortfolioCards,
   serveDisable,
+  serveEnable,
 } from "./server";
 
 type Bindings = {
@@ -22,7 +23,7 @@ type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>();
 
 // ---------------------------------------------------------
-// 1. Root Endpoint
+// 1. Root Endpointa
 // ---------------------------------------------------------
 app.get("/", (c) => {
   return c.html("<h1>Archive Engine Server Running</h1>");
@@ -34,7 +35,8 @@ app.get("/", (c) => {
 app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
 app.get("/reset", serveReset);
-app.get("/diable", serveDisable);
+app.get("/disable", serveDisable);
+app.get("/enable", serveEnable);
 app.get("/admin/generate-token", serveGenerateToken);
 app.get("/auth/claim", serveClaim);
 
