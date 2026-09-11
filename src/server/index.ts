@@ -11,3 +11,4 @@ export { serveReset } from "./serveReset";
 export { serveOptions } from "./serveOptions";
 export { servePlaylistPortfolioCards } from "./servePlaylistPortfolio/servePortfolioCards";
 export { servePlaylistPortfolio } from "./servePlaylistPortfolio";
+export { serveDisable } from "./serveDisabled";

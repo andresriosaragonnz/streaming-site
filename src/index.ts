@@ -12,6 +12,7 @@ import {
   serveOptions,
   servePlaylistPortfolio,
   servePlaylistPortfolioCards,
+  serveDisable,
 } from "./server";
 
 type Bindings = {
@@ -33,6 +34,7 @@ app.get("/", (c) => {
 app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
 app.get("/reset", serveReset);
+app.get("/diable", serveDisable);
 app.get("/admin/generate-token", serveGenerateToken);
 app.get("/auth/claim", serveClaim);
 
