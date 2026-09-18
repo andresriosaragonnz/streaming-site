@@ -5,6 +5,10 @@ compatibility_date = "2026-07-29"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 
+# Top-Level / Production Environment Variables
+[vars]
+APP_URL = "https://iknowthatband.org"
+
 # Production Routes (Clean hostnames without /*)
 routes = [
   { pattern = "iknowthatband.org", custom_domain = true },     # 👈 Removed /*
@@ -53,6 +57,10 @@ bucket_name = "testsync"
 [env.staging]
 name = "streaming-site-staging" # 👈 Matching naming convention
 workers_dev = false
+
+# Staging Environment Variables
+[env.staging.vars]
+APP_URL = "https://test.iknowthatband.org"
 
 # Staging Route (Clean hostname without /*)
 routes = [

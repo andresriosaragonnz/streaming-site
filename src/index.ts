@@ -4,16 +4,16 @@ import {
   servePrivateDashboard,
   servePlaylist,
   commitStatus,
-  serveSlug,
   usePrivate,
   serveGenerateToken,
   serveClaim,
-  serveReset,
   serveOptions,
   servePlaylistPortfolio,
   servePlaylistPortfolioCards,
   serveDisable,
   serveEnable,
+  servePublicPortfolio,
+  servePublicPerformance,
 } from "./server";
 
 type Bindings = {
@@ -34,7 +34,6 @@ app.get("/", (c) => {
 // ---------------------------------------------------------
 app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
-app.get("/reset", serveReset);
 app.get("/disable", serveDisable);
 app.get("/enable", serveEnable);
 app.get("/admin/generate-token", serveGenerateToken);
@@ -61,10 +60,14 @@ app.get("/private/:slug", servePrivateDashboard);
 // ---------------------------------------------------------
 app.get("/private/performance/:slug", servePrivatePerformance);
 app.get("/private/:slug", servePrivateDashboard);
-
+// Explicit extension guard for missing static assets
+app.get("/:file{.+\\.(?:png|ico|jpg|jpeg|svg|css|js)$}", (c) =>
+  c.text("Asset Not Found", 404),
+);
 // ---------------------------------------------------------
 // 5. Catch-All Parametric Route (MUST BE ABSOLUTE LAST)
 // ---------------------------------------------------------
-app.get("/:slug", serveSlug);
+app.get("/:slug/:performance", servePublicPerformance);
+app.get("/:slug", servePublicPortfolio);
 
 export default app;

@@ -49,7 +49,6 @@ function renderPrivateBands() {
     }
     const currentArtist = peformanceLink.getAttribute("data-artist");
     if (bands.includes(currentArtist)) {
-      console.log({ currentArtist }, "allowed");
       const a = document.createElement("a");
       a.href = `/private/${currentArtist}`;
       a.textContent = "See Private dashboard";

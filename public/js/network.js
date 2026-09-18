@@ -19,13 +19,13 @@ function resolveGraphPayload(customData) {
   if (!rawData) return null;
 
   const activeLink = window.graphStore?.activeNodeLink;
-  const perfLinkEl = document.getElementById("performance-link");
+  const perfLinkEl = document.getElementById("artist-name");
 
   const rawArtist =
     (activeLink ? activeLink.replace(/^artist\//, "") : "") ||
     perfLinkEl?.getAttribute("data-artist") ||
     "";
-
+  console.log(rawArtist);
   const currentArtist = decodeURIComponent(rawArtist).toLowerCase().trim();
 
   if (currentArtist && rawData.artistClusters) {

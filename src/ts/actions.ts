@@ -13,6 +13,9 @@ declare global {
 
 const openModalHooks: Record<string, () => void> = {
   "commit-modal-dialog": () => window.reviewStore?.toggleCommitModal(true),
+  "favorites-modal-dialog": () => {
+    // Optional hook when opening the favorites dialog
+  },
   "graph-drawer-container": () => {
     if (window.graphStore) {
       window.graphStore.openDrawer();
@@ -25,6 +28,9 @@ const openModalHooks: Record<string, () => void> = {
 
 const closeModalHooks: Record<string, () => void> = {
   "commit-modal-dialog": () => window.reviewStore?.toggleCommitModal(false),
+  "favorites-modal-dialog": () => {
+    // Optional hook when closing the favorites dialog
+  },
   "graph-drawer-container": () => {
     if (window.graphStore) {
       window.graphStore.closeDrawer();
@@ -73,7 +79,7 @@ export function initAppActions(): void {
   });
 
   // ---------------------------------------------------------------------------
-  // 2. Public Performance Playlist Actions
+  // 2. Public Performance Playlist & Favorites Actions
   // ---------------------------------------------------------------------------
   UI.registerAction("add-current-segment-to-playlist", () => {
     const selectEl = document.getElementById(
@@ -119,6 +125,13 @@ export function initAppActions(): void {
 
     // 2. Persist active segment ID to target playlist
     window.playlistStore?.addCurrentSegmentToPlaylist(targetPlaylistName);
+    const dialogEl = document.getElementById(
+      "favorites-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.close === "function") {
+      closeModalHooks["favorites-modal-dialog"]?.();
+      dialogEl.close();
+    }
   });
 
   UI.registerAction("playlist-select-change", (trigger: HTMLElement) => {
@@ -126,6 +139,26 @@ export function initAppActions(): void {
     const isNew = selectEl.value === "+ New Playlist...";
 
     window.playerStore?.setCustomPlaylistInput(isNew);
+  });
+
+  UI.registerAction("toggle-favorite-track", (trigger: HTMLElement) => {
+    const checkbox = trigger as HTMLInputElement;
+    if (window.playerStore) {
+      window.playerStore.toggleFavorite?.(checkbox.checked);
+    }
+  });
+
+  UI.registerAction("save-favorites", () => {
+    window.playlistStore?.addCurrentSegmentToPlaylist("Favorites");
+    window.toastStore?.trigger("Saved to Favorites", "success");
+
+    const dialogEl = document.getElementById(
+      "favorites-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.close === "function") {
+      closeModalHooks["favorites-modal-dialog"]?.();
+      dialogEl.close("save");
+    }
   });
 
   // ---------------------------------------------------------------------------
@@ -151,6 +184,26 @@ export function initAppActions(): void {
     }
   });
 
+  UI.registerAction("open-favorites-dialog", () => {
+    const dialogEl = document.getElementById(
+      "favorites-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.showModal === "function") {
+      openModalHooks["favorites-modal-dialog"]?.();
+      dialogEl.showModal();
+    }
+  });
+
+  UI.registerAction("close-favorites-dialog", () => {
+    const dialogEl = document.getElementById(
+      "favorites-modal-dialog",
+    ) as HTMLDialogElement | null;
+    if (dialogEl && typeof dialogEl.close === "function") {
+      closeModalHooks["favorites-modal-dialog"]?.();
+      dialogEl.close();
+    }
+  });
+
   UI.registerAction("toggle-drawer", (trigger: HTMLElement) => {
     const drawerId = trigger.dataset.drawerId || trigger.dataset.modalId;
     if (!drawerId) return;
@@ -172,32 +225,9 @@ export function initAppActions(): void {
   // ---------------------------------------------------------------------------
   // 4. Network Graph Actions
   // ---------------------------------------------------------------------------
-  // UI.registerAction("open-graph-modal", () => window.graphStore?.openDrawer());
-
   UI.registerAction("open-graph-modal", (trigger: HTMLElement) => {
-    const wrapper = document.getElementById("graph-viewport-wrapper");
-    const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-    // Read pre-set attributes or derive from window bounds on mobile
-    const staticWidth = wrapper?.dataset.viewportWidth
-      ? parseInt(wrapper.dataset.viewportWidth, 10)
-      : isMobile
-        ? window.innerWidth
-        : undefined;
-
-    const staticHeight = wrapper?.dataset.viewportHeight
-      ? parseInt(wrapper.dataset.viewportHeight, 10)
-      : isMobile
-        ? window.innerHeight
-        : undefined;
-
     // Initialize or update graph engine
-    window.graphStore?.open({
-      dimensions:
-        staticWidth && staticHeight
-          ? { width: staticWidth, height: staticHeight }
-          : undefined,
-    });
+    window.graphStore?.openDrawer();
   });
 
   UI.registerAction("close-graph-modal", () =>
@@ -258,7 +288,6 @@ export function initAppActions(): void {
     const shareUrl =
       store?.shareUrl || store?.generateShareUrl() || window.location.href;
     try {
-      // await navigator.clipboard.writeText(shareUrl);
       window.toastStore?.trigger("Copied to clipboard", "success");
     } catch (err) {
       console.error("Failed to copy share URL:", err);

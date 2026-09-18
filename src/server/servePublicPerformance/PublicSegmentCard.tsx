@@ -1,4 +1,4 @@
-import { CardThumbnail } from "../../../components/CardThumbnail";
+import { CardThumbnail } from "../../components/CardThumbnail";
 
 export interface PublicSegmentCardProps {
   id: string;

@@ -57,21 +57,7 @@ export class GraphStore {
   // Store Actions
   // ---------------------------------------------------------------------------
 
-  /**
-   * Opens the graph drawer and optionally locks initial viewport dimensions
-   * to eliminate layout reflows (getBoundingClientRect) during mobile node clicks.
-   */
-  public open(options?: GraphOpenOptions): void {
-    if (options?.dimensions) {
-      this.state.dimensions = options.dimensions;
-    }
-    this.openDrawer();
-  }
-
-  public openDrawer(options?: GraphOpenOptions): void {
-    if (options?.dimensions) {
-      this.state.dimensions = options.dimensions;
-    }
+  public openDrawer(): void {
     this.state.isGraphDrawerOpen = true;
     this.notify();
   }

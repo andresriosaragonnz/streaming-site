@@ -1,4 +1,4 @@
-import { HeroImage } from "../../../components/HeroImage";
+import { HeroImage } from "../../components/HeroImage";
 
 export interface PublicPortfolioHeroProps {
   heroImage: string;
@@ -27,6 +27,7 @@ export const PublicPortfolioHero = ({
       </button>
       <p class="performance-count">{count} Documented</p>
       <div id="performance-link" data-artist={link}></div>
+      <div id="artist-name" data-artist={link}></div>
     </div>
   </div>
 );

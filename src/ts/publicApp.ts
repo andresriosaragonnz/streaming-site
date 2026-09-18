@@ -3,6 +3,7 @@ import "./actions.js"; // Registers all data-action handlers
 import { initPlayerStore, PlayerStore } from "./stores/playerStore.js";
 import { initToastStore, ToastStore } from "./stores/toastStore.js";
 import { initPlaylistStore, PlaylistStore } from "./stores/playlistStore.js";
+import { initGraphStore, GraphStore } from "./stores/graphStore.js";
 import { initMediaController } from "./utils/mediaController.js";
 import { initCarouselScroll } from "./utils/carousel.js";
 import { initToastListener } from "./utils/toastUtils.js";
@@ -12,6 +13,7 @@ declare global {
     playerStore?: PlayerStore;
     toastStore?: ToastStore;
     playlistStore?: PlaylistStore;
+    graphStore?: GraphStore;
     setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
 }
@@ -23,7 +25,12 @@ if (document.readyState === "loading") {
   initCarouselScroll();
 }
 
-// 2. Load media engine script
+// 2. Instantiate Graph Store & register with UI Binder
+initGraphStore();
+UI.registerStore("graph", "graphStore");
+UI.listenToEvents("graph-state-changed");
+
+// 3. Load media engine script
 const mediaEngineScript = document.createElement("script");
 mediaEngineScript.src = "/js/mediaInit.js";
 
@@ -48,6 +55,16 @@ mediaEngineScript.onload = () => {
   initToastStore();
   initPlaylistStore(initialSegments, "Favorites");
 
+  // Register stores with UI Binder
+  UI.registerStore("player", "playerStore");
+  UI.registerStore("toast", "toastStore");
+  UI.registerStore("playlist", "playlistStore");
+  UI.listenToEvents(
+    "player-track-changed",
+    "toast-state-changed",
+    "playlist-state-changed",
+  );
+
   // Initialize native media element listeners (Audio, Video & Adaptive Quality)
   initMediaController();
 
@@ -59,7 +76,7 @@ mediaEngineScript.onload = () => {
   // Trigger initial binder sync
   UI.requestSync();
   console.log(
-    "🚀 [PublicApp] App initialized with playerStore, toastStore, playlistStore & mediaController.",
+    "🚀 [PublicApp] App initialized with playerStore, toastStore, playlistStore, graphStore & mediaController.",
   );
 };
 

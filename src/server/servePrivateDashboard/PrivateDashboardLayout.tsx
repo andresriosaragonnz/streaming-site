@@ -8,7 +8,7 @@ import { PrivatePerformanceCard } from "./PrivatePerformanceCard";
 
 export const PrivateDashboardLayout = ({ segments = [] }) => {
   const { formattedSegments, totalDuration } = formatSegments(segments);
-  const { formattedArtist, artistName, artistLink } = formattedSegments[0];
+  const { formattedArtist, artistName } = formattedSegments[0];
   const performances = getPerformancesFromSegments(formattedSegments);
   const portfolioImages = [] as string[][];
 

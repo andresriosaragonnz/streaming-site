@@ -1,22 +1,26 @@
-import { ItemThumbnail } from "../../../components/ItemThumbnail";
+import { ItemThumbnail } from "../../components/ItemThumbnail";
 
 export interface PublicPerformanceCardProps {
-  link: string;
   altImage: string;
+  artistName: string;
   cardImage: string;
-  formattedVenueName: string;
+  eventDate: string;
   formattedDate: string;
+  formattedVenueName: string;
+  venueName: string;
 }
 
 export const PublicPerformanceCard = ({
-  link,
   altImage,
+  artistName,
   cardImage,
-  formattedVenueName,
+  eventDate,
   formattedDate,
+  formattedVenueName,
+  venueName,
 }: PublicPerformanceCardProps) => (
   <a
-    href={`/${link}`}
+    href={`${artistName}/${venueName}-${eventDate}`}
     class="card"
     rel="prefetch"
     data-bg={altImage}

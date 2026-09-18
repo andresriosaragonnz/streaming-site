@@ -1,13 +1,15 @@
-import { TitleBar } from "../../../components/TitleBar";
-import { VideoPlayer } from "../../../components/VideoPlayer";
-import { AudioPlayer } from "../../../components/AudioPlayer";
-import { AddToPlaylist } from "../../../components/AddToPlaylist";
+import { TitleBar } from "../../components/TitleBar";
+import { VideoPlayer } from "../../components/VideoPlayer";
+import { AudioPlayer } from "../../components/AudioPlayer";
+import { ConstellationBtn } from "../../components/ConstellationBtn";
 
 export interface PublicViewPlayerProps {
   studioTitle: string;
   firstTitle: string;
   posterImage: string;
   firstMp3: string;
+  artistLink: string;
+  artistName: string;
 }
 
 export const PublicViewPlayer = ({
@@ -15,6 +17,8 @@ export const PublicViewPlayer = ({
   firstTitle,
   posterImage,
   firstMp3,
+  artistLink,
+  artistName,
 }: PublicViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
     {/* Navigation & Mode Toggle Header */}
@@ -22,7 +26,27 @@ export const PublicViewPlayer = ({
 
     {/* Metadata Information Section */}
     <header class="player-metadata">
-      <span class="performance-title-big">Performance</span>
+      <div class="artist-title">
+        <a
+          class="sidebar-artist-button"
+          href={`/${artistLink}`}
+          id="artist-name"
+          data-artist={artistLink}
+        >
+          {artistName}
+        </a>
+        <button
+          id="reset-btn"
+          class="search-trigger"
+          type="button"
+          title="Show Network"
+          aria-label="Show Network"
+          data-action="open-graph-modal"
+          style="cursor: pointer;"
+        >
+          <ConstellationBtn />
+        </button>
+      </div>
       <h2 class="performance-title break-hyphens">{studioTitle}</h2>
       <h3
         class="performance-subtitle break-hyphens"
@@ -43,8 +67,5 @@ export const PublicViewPlayer = ({
       {/* Audio View Context */}
       <AudioPlayer firstMp3={firstMp3} />
     </div>
-
-    {/* Control Action Bar */}
-    <AddToPlaylist />
   </section>
 );

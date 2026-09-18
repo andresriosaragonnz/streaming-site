@@ -3,6 +3,7 @@ import { PrivateViewSidebar } from "./PrivateViewSidebar";
 import { formatSegments } from "../../formatSegments/index";
 import { PrivateSegmentCard } from "./PrivateSegmentCard";
 import { Toast } from "../../components/ToastContainer";
+import { Favicon } from "../../components/Favicon";
 
 export interface SegmentDataItem {
   title: string;
@@ -34,6 +35,7 @@ export const PrivatePerformancePageLayout = ({
   return (
     <html lang="en">
       <head>
+        <Favicon />
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Performance</title>

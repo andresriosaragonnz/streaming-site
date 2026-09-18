@@ -2,23 +2,8 @@ import { dateFromString } from "./formatDates.js";
 import { getMediaSource } from "./getMediaSource";
 import { formatTime } from "./formatTime.js";
 
-export const formatSegment = (segment: any, performanceCache: any) => {
+export const formatSegment = (segment: any) => {
   const media = getMediaSource(segment.id);
-  const fromCache = performanceCache[segment.performance];
-  if (performanceCache[segment.performance]) {
-    const result = {
-      ...fromCache,
-      ...media,
-      formattedTitle: segment.title ? segment.title.replaceAll("_", " ") : "",
-      formatedDuration: formatTime(segment.duration),
-      status: segment.status,
-      id: segment.id,
-      title: segment.title,
-      duration: segment.duration,
-    };
-    return result;
-  }
-
   const formattedDate = dateFromString(segment.eventDate).formated;
   const formattedArtist = segment.artistName.replaceAll("_", " ");
   const formattedVenue = segment.venueName.replaceAll("_", " ");
@@ -52,7 +37,7 @@ const formatSegments = (rawSegments: any[]) => {
   for (let i = 0; i < len; i++) {
     const segment = rawSegments[i];
     totalDuration += parseInt(segment.duration);
-    formattedSegments[i] = formatSegment(segment, {});
+    formattedSegments[i] = formatSegment(segment);
   }
   return { totalDuration: formatTime(totalDuration), formattedSegments };
 };

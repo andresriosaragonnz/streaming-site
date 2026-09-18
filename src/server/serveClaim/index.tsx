@@ -51,10 +51,17 @@ export const serveClaim = async (c: any) => {
     c.env.AUTH_SECRET,
   );
 
-  // 4. Overwrite cookie with updated combined token
+  // Detect HTTPS context to disable 'Secure' attribute during local HTTP dev
+  const isSecure =
+    c.req.url.startsWith("https://") ||
+    c.req.header("x-forwarded-proto") === "https";
+
+  const secureFlag = isSecure ? "; Secure" : "";
+
+  // 4. Overwrite cookie with updated combined token (using Lax for top-level navigation support)
   c.header(
     "Set-Cookie",
-    `auth_token=${updatedToken}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${60 * 60 * 24 * 365}`,
+    `auth_token=${updatedToken}; Path=/; HttpOnly${secureFlag}; SameSite=Lax; Max-Age=${60 * 60 * 24 * 365}`,
   );
 
   // 5. Render KitaJS component directly into Hono HTML response
