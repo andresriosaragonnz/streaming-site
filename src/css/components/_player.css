@@ -207,9 +207,10 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   width: 76px;
   height: 36px;
-  padding: 0 6px;
+  padding: 0 10px;
   background-color: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 20px;
@@ -221,15 +222,20 @@
     box-shadow 0.2s ease;
 }
 
-/* Labels inside toggle track */
-.toggle label::before {
-  position: absolute;
-  right: 10px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+/* Internal SVG Icons */
+.toggle-icon {
+  z-index: 1;
+  pointer-events: none;
   color: var(--text-subtle);
-  transition: opacity 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+.toggle-icon-video {
+  margin-left: 1px;
+}
+
+.toggle-icon-audio {
+  margin-right: 1px;
 }
 
 /* Sliding Knob */
@@ -242,6 +248,7 @@
   background-color: var(--text-main);
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  z-index: 2;
   transition:
     transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
     background-color 0.25s ease;
@@ -263,15 +270,18 @@
   border-color: var(--accent-green);
 }
 
-.toggle input[type="checkbox"]:checked + label::before {
-  left: 10px;
-  right: auto;
-  color: var(--accent-green);
-}
-
 .toggle input[type="checkbox"]:checked + label::after {
   transform: translateX(40px);
   background-color: var(--accent-green);
+}
+
+/* Active State Icon Color Tweaks */
+.toggle input[type="checkbox"]:checked + label .toggle-icon-audio {
+  color: var(--text-main);
+}
+
+.toggle input[type="checkbox"]:not(:checked) + label .toggle-icon-video {
+  color: var(--bg-deep);
 }
 
 .meta-title-card {

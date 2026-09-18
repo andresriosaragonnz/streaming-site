@@ -128,7 +128,6 @@ export const TitleBar = ({ player }: TitleBarProps) => (
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            // data-bind-class="player.isCurrentFavorite ? 'is-active-favorite' : ''"
           >
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
@@ -137,24 +136,8 @@ export const TitleBar = ({ player }: TitleBarProps) => (
         {/* Audio/Video Mode Switcher */}
         <div
           class="toggle-container"
-          style="display: flex; align-items: center; gap: 6px;"
+          style="display: flex; align-items: center;"
         >
-          {/* Camera Icon (Left / Video Mode) */}
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-
           <div class="toggle">
             <input
               type="checkbox"
@@ -162,28 +145,43 @@ export const TitleBar = ({ player }: TitleBarProps) => (
               data-action="toggle-audio-mode"
               data-bind-checked="player.isAudioMode"
             />
-            <label
-              for="player-mode-toggle"
-              aria-label="Toggle Audio Mode"
-            ></label>
-          </div>
+            <label for="player-mode-toggle" aria-label="Toggle Audio Mode">
+              {/* Video Mode Icon (Left) */}
+              <svg
+                class="toggle-icon toggle-icon-video"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
 
-          {/* Musical Note Icon (Right / Audio Mode) */}
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M9 18V5l12-2v13" />
-            <circle cx="6" cy="18" r="3" />
-            <circle cx="18" cy="16" r="3" />
-          </svg>
+              {/* Audio Mode Icon (Right) */}
+              <svg
+                class="toggle-icon toggle-icon-audio"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18V5l12-2v13" />
+                <circle cx="6" cy="18" r="3" />
+                <circle cx="18" cy="16" r="3" />
+              </svg>
+            </label>
+          </div>
         </div>
 
         {/* Favorites & Playlist Management Modal Dialog */}
