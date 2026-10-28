@@ -12,7 +12,7 @@ interface UserPayload {
 export const serveClaim = async (c: any) => {
   const incomingToken = c.req.query("token");
   if (!incomingToken) return c.text("Missing token", 400);
-
+  console.log({ incomingToken });
   // 1. Verify incoming claim token
   const incomingPayload = await verifyAuthToken<UserPayload>(
     incomingToken,
