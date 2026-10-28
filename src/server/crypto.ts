@@ -52,12 +52,12 @@ export async function verifyAuthToken<T = any>(
   token: string,
   secret: string,
 ): Promise<T | null> {
+  if (!token) return null;
   const parts = token.split(".");
   if (parts.length !== 3) return null;
 
   const [encodedHeader, encodedPayload, encodedSignature] = parts;
   const dataToVerify = `${encodedHeader}.${encodedPayload}`;
-
   const key = await getCryptoKey(secret);
 
   // Convert signature back to ArrayBuffer
@@ -66,14 +66,13 @@ export async function verifyAuthToken<T = any>(
   for (let i = 0; i < binarySignature.length; i++) {
     signatureBuffer[i] = binarySignature.charCodeAt(i);
   }
-
   const isValid = await crypto.subtle.verify(
     "HMAC",
     key,
     signatureBuffer,
     encoder.encode(dataToVerify),
   );
-
+  console.log({ isValid });
   if (!isValid) return null;
 
   try {
@@ -81,4 +80,66 @@ export async function verifyAuthToken<T = any>(
   } catch {
     return null;
   }
+}
+
+/* ==========================================================================
+   Videographer Credentials AES-GCM Encryption / Decryption
+   ========================================================================== */
+
+export interface VideographerConfig {
+  accountId: string;
+  accessKeyId: string;
+  secretAccessKey: string;
+  bucketName: string;
+}
+
+// Derive a 256-bit AES-GCM CryptoKey from your master secret
+async function getMasterKey(masterSecret: string): Promise<CryptoKey> {
+  const keyData = encoder.encode(masterSecret);
+  const hash = await crypto.subtle.digest("SHA-256", keyData);
+  return crypto.subtle.importKey("raw", hash, { name: "AES-GCM" }, false, [
+    "encrypt",
+    "decrypt",
+  ]);
+}
+
+// Encrypt full VideographerConfig object into a Base64 string + IV
+export async function encryptVideographerConfig(
+  config: VideographerConfig,
+  masterSecret: string,
+): Promise<{ encryptedCredentials: string; iv: string }> {
+  const key = await getMasterKey(masterSecret);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const jsonString = JSON.stringify(config);
+
+  const encrypted = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    encoder.encode(jsonString),
+  );
+
+  return {
+    encryptedCredentials: Buffer.from(encrypted).toString("base64"),
+    iv: Buffer.from(iv).toString("base64"),
+  };
+}
+
+// Decrypt encrypted Base64 string back into VideographerConfig object
+export async function decryptVideographerConfig(
+  encryptedBase64: string,
+  ivBase64: string,
+  masterSecret: string,
+): Promise<VideographerConfig> {
+  const key = await getMasterKey(masterSecret);
+  const encrypted = Buffer.from(encryptedBase64, "base64");
+  const iv = Buffer.from(ivBase64, "base64");
+
+  const decrypted = await crypto.subtle.decrypt(
+    { name: "AES-GCM", iv },
+    key,
+    encrypted,
+  );
+
+  const jsonString = new TextDecoder().decode(decrypted);
+  return JSON.parse(jsonString) as VideographerConfig;
 }

@@ -23,6 +23,7 @@ export const formatSegment = (segment: any) => {
     performance: segment.performance,
     formattedPerformance,
     title: segment.title,
+    masterSize: segment.masterSize,
     venueName: segment.venueName,
     status: segment.status,
   };

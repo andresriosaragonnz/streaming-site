@@ -10,3 +10,7 @@
     font-size: 1.3rem;
   }
 }
+
+.capitalize-words {
+  text-transform: capitalize;
+}

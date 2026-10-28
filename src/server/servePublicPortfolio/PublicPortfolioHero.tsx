@@ -4,6 +4,8 @@ export interface PublicPortfolioHeroProps {
   heroImage: string;
   title: string;
   link: string;
+  isAllowed: string;
+  performance: string;
   count: number | string;
 }
 
@@ -12,6 +14,8 @@ export const PublicPortfolioHero = ({
   title,
   link,
   count,
+  performance,
+  isAllowed,
 }: PublicPortfolioHeroProps) => (
   <div class="artist-hero">
     <HeroImage heroImage={heroImage} />
@@ -26,7 +30,11 @@ export const PublicPortfolioHero = ({
         See network
       </button>
       <p class="performance-count">{count} Documented</p>
-      <div id="performance-link" data-artist={link}></div>
+      {isAllowed && (
+        <div id="performance-link">
+          <a href={`/private/${link}`}>Private dashboard</a>
+        </div>
+      )}
       <div id="artist-name" data-artist={link}></div>
     </div>
   </div>

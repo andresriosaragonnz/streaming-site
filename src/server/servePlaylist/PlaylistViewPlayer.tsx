@@ -1,6 +1,5 @@
 import { VideoPlayer } from "../../components/VideoPlayer";
 import { AudioPlayer } from "../../components/AudioPlayer";
-import { AddToPlaylist } from "../../components/AddToPlaylist";
 import { TitleBar } from "../../components/TitleBar";
 import { ShareIcon } from "../../components/ShareIcon";
 
@@ -48,6 +47,5 @@ export const PlaylistViewPlayer = ({
       {/* Audio View Context */}
       <AudioPlayer firstMp3={firstMp3} />
     </div>
-    <AddToPlaylist />
   </section>
 );

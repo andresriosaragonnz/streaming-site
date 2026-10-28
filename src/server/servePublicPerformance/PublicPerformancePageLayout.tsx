@@ -10,11 +10,13 @@ import { GraphModal } from "../../components/GraphModal";
 export interface PublicPerformancePageLayoutProps {
   segments: Segment[];
   graphDataJS: string;
+  isAllowed?: boolean;
 }
 
 export const PublicPerformancePageLayout = ({
   segments = [],
   graphDataJS,
+  isAllowed,
 }: PublicPerformancePageLayoutProps) => {
   const { formattedSegments, totalDuration } = formatSegments(segments);
   const firstSegment = formattedSegments[0] ?? {
@@ -25,6 +27,7 @@ export const PublicPerformancePageLayout = ({
     formattedArtist: "",
     formattedPerformance: "",
     formattedVenue: "",
+    performance: "",
     formattedDate: "",
   };
 
@@ -32,11 +35,12 @@ export const PublicPerformancePageLayout = ({
     cardImage,
     sourceMp3,
     formattedTitle,
-    artistName,
     formattedArtist,
     formattedPerformance,
     formattedVenue,
     formattedDate,
+    artistName,
+    performance,
   } = firstSegment;
   const cards = formattedSegments.map((segment) => (
     <PublicSegmentCard
@@ -46,7 +50,6 @@ export const PublicPerformancePageLayout = ({
       duration={segment.formatedDuration}
     />
   ));
-
   return (
     <html lang="en">
       <head>
@@ -82,6 +85,8 @@ export const PublicPerformancePageLayout = ({
             posterImage={`${cardImage}.jpg`}
             artistLink={artistName}
             artistName={formattedArtist}
+            performanceLink={performance}
+            isAllowed={isAllowed}
           />
 
           <PublicViewSidebar

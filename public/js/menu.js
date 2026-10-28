@@ -43,18 +43,6 @@ function renderPrivateBands() {
     section.style.display = "block";
 
     // add private Link
-    const peformanceLink = document.getElementById("performance-link");
-    if (!peformanceLink) {
-      return;
-    }
-    const currentArtist = peformanceLink.getAttribute("data-artist");
-    if (bands.includes(currentArtist)) {
-      const a = document.createElement("a");
-      a.href = `/private/${currentArtist}`;
-      a.textContent = "See Private dashboard";
-
-      peformanceLink.appendChild(a);
-    }
   } catch (e) {
     console.error("Failed to read allowed_bands from localStorage:", e);
   }

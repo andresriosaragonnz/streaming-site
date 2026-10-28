@@ -11,16 +11,18 @@ import type { Segment } from "../../ts/types";
 export interface PublicPortfolioLayoutProps {
   segments: Segment[];
   graphDataJS?: string;
+  isAllowed: boolean;
 }
 
 export const PublicPortfolioLayout = ({
   segments = [],
   graphDataJS = "[]",
+  isAllowed,
 }: PublicPortfolioLayoutProps) => {
   // 1. Process and format segments
   const { formattedSegments } = formatSegments(segments);
   const firstSegment = formattedSegments[0] ?? {};
-  const { formattedArtist, artistName } = firstSegment;
+  const { formattedArtist, artistName, performance } = firstSegment;
 
   // 2. Extract performance groupings (pulling public performances)
   const performances = getPerformancesFromSegments(formattedSegments);
@@ -54,13 +56,23 @@ export const PublicPortfolioLayout = ({
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>
-          {formattedArtist ? `${formattedArtist} - Portfolio` : "Performance"}
+          {formattedArtist ? `${formattedArtist} Portfolio` : "Performance"}
         </title>
+
+        {/* Explicit Icon Declarations to Prevent Browser Fallback Polling */}
+        <link
+          rel="icon"
+          type="image/png"
+          href="/favicon-96x96.png"
+          sizes="96x96"
+        />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         {/* Prefetch links to speed up navigation to public performances */}
         {prefetchUrls.map((url) => {
           const href = url.startsWith("/") ? url : `/${url}`;
-          return <link rel="prefetch" href={href} as="document" />;
+
+          return <link rel="prefetch" key={href} href={href} as="document" />;
         })}
         <link rel="stylesheet" href="/css/main.css" />
         <script src="/js/orb.js"></script>
@@ -79,7 +91,9 @@ export const PublicPortfolioLayout = ({
           heroImage={heroImage}
           title={formattedArtist}
           link={artistName}
+          performance={performance}
           count={publicPerformances.length}
+          isAllowed={isAllowed}
         />
 
         <main class="performance-grid">{cards}</main>

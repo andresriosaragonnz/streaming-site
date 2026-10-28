@@ -1,0 +1,347 @@
+{
+  "fragmentation": {
+    "name": "MP4 Slicing",
+    "nodes": [
+      {
+        "id": "source",
+        "title": "Input Video",
+        "subtitle": "Master Video Source",
+        "badge": "File",
+        "x": 80,
+        "y": 180,
+        "html": "<div id=\"mp4Card\" class=\"mp4-card\"><div class=\"mp4-card-title\">concert.mp4</div><div class=\"mp4-card-meta\">2.4 GB | Single File</div></div>"
+      },
+      {
+        "id": "transcoder",
+        "title": "FFmpeg Transcoder",
+        "subtitle": "Segmentation Engine",
+        "badge": "Process",
+        "x": 360,
+        "y": 180
+      },
+      {
+        "id": "hlsGrid",
+        "title": "HLS Segments",
+        "subtitle": "Stream Playlist Manifest",
+        "badge": ".m3u8",
+        "x": 640,
+        "y": 120,
+        "html": "<div id=\"fragGrid\" class=\"fragment-grid\"><div class=\"fragment-cell\" id=\"seg-0\">seg_0.ts</div><div class=\"fragment-cell\" id=\"seg-1\">seg_1.ts</div><div class=\"fragment-cell\" id=\"seg-2\">seg_2.ts</div><div class=\"fragment-cell\" id=\"seg-3\">seg_3.ts</div><div class=\"fragment-cell\" id=\"seg-4\">seg_4.ts</div><div class=\"fragment-cell\" id=\"seg-5\">seg_5.ts</div><div class=\"fragment-cell\" id=\"seg-6\">seg_6.ts</div><div class=\"fragment-cell\" id=\"seg-7\">seg_7.ts</div></div>"
+      }
+    ],
+    "connections": [
+      { "from": "source", "to": "transcoder" },
+      { "from": "transcoder", "to": "hlsGrid" }
+    ],
+    "steps": [
+      {
+        "title": "1. Ingest Master Video",
+        "description": "Stream raw full-length concert MP4 into FFmpeg processing pipeline.",
+        "action": {
+          "type": "emit",
+          "from": "source",
+          "to": "transcoder",
+          "color": "cyan",
+          "state": "active",
+          "targetState": "processing"
+        }
+      },
+      {
+        "title": "2. Slice Video & Generate Segments",
+        "description": "FFmpeg splits the contiguous MP4 into 2-second keyframe-aligned HLS fragments.",
+        "action": {
+          "type": "fragmentGrid",
+          "cardId": "mp4Card",
+          "cellPrefix": "seg",
+          "count": 8,
+          "from": "transcoder",
+          "to": "hlsGrid",
+          "targetState": "success"
+        }
+      }
+    ]
+  },
+  "pipeline": {
+    "name": "Full Pipeline",
+    "nodes": [
+      {
+        "id": "camera",
+        "title": "Camera App",
+        "subtitle": "Mobile Capture",
+        "badge": "iOS/Android",
+        "x": 40,
+        "y": 180
+      },
+      {
+        "id": "recorder",
+        "title": "Headless Recorder",
+        "subtitle": "Linux Audio Engine",
+        "badge": "DAW",
+        "x": 240,
+        "y": 100
+      },
+      {
+        "id": "pc",
+        "title": "Main PC",
+        "subtitle": "Sync & Mix Engine",
+        "badge": "Workstation",
+        "x": 440,
+        "y": 180
+      },
+      {
+        "id": "r2",
+        "title": "Cloudflare R2",
+        "subtitle": "Object Storage",
+        "badge": "Cloud",
+        "x": 640,
+        "y": 100
+      },
+      {
+        "id": "db",
+        "title": "iknowthatband.org",
+        "subtitle": "Web & Segment DB",
+        "badge": "SQLite/Hono",
+        "x": 640,
+        "y": 260
+      }
+    ],
+    "connections": [
+      { "from": "camera", "to": "recorder" },
+      { "from": "camera", "to": "pc" },
+      { "from": "recorder", "to": "pc" },
+      { "from": "pc", "to": "r2" },
+      { "from": "r2", "to": "db" }
+    ],
+    "steps": [
+      {
+        "title": "1. Connect Hardware",
+        "description": "Camera connects to Headless Recorder for multitrack audio sync.",
+        "action": {
+          "type": "emit",
+          "from": "camera",
+          "to": "recorder",
+          "color": "cyan",
+          "state": "active",
+          "targetState": "active"
+        }
+      },
+      {
+        "title": "2. Ingest Media to PC",
+        "description": "Pass raw video and uncompressed multitrack audio to processing PC.",
+        "action": {
+          "type": "emitParallel",
+          "packets": [
+            { "from": "camera", "to": "pc", "color": "cyan" },
+            { "from": "recorder", "to": "pc", "color": "amber" }
+          ],
+          "targetStates": [{ "id": "pc", "state": "processing" }]
+        }
+      },
+      {
+        "title": "3. Upload HLS Assets",
+        "description": "Transcode, slice video, and stream segment fragments to R2 storage.",
+        "action": {
+          "type": "emit",
+          "from": "pc",
+          "to": "r2",
+          "color": "amber",
+          "targetState": "success"
+        }
+      },
+      {
+        "title": "4. Sync Segment DB",
+        "description": "Write new HLS segment manifests and timestamps to iknowthatband.org.",
+        "action": {
+          "type": "emit",
+          "from": "r2",
+          "to": "db",
+          "color": "green",
+          "targetState": "success"
+        }
+      }
+    ]
+  },
+  "cacheFlow": {
+    "name": "Cache Branching",
+    "nodes": [
+      {
+        "id": "client",
+        "title": "User Browser",
+        "subtitle": "Web Client",
+        "badge": "HTTP",
+        "x": 60,
+        "y": 180
+      },
+      {
+        "id": "router",
+        "title": "Hono API Router",
+        "subtitle": "Edge Worker",
+        "badge": "Worker",
+        "x": 280,
+        "y": 180
+      },
+      {
+        "id": "cache",
+        "title": "In-Memory Cache",
+        "subtitle": "Redis Cache",
+        "badge": "Fast",
+        "x": 520,
+        "y": 100
+      },
+      {
+        "id": "database",
+        "title": "SQLite Database",
+        "subtitle": "Persistent Store",
+        "badge": "Disk",
+        "x": 520,
+        "y": 260
+      }
+    ],
+    "connections": [
+      { "from": "client", "to": "router" },
+      { "from": "router", "to": "cache", "class": "active-green" },
+      { "from": "router", "to": "database", "class": "active-amber" }
+    ],
+    "steps": [
+      {
+        "title": "1. Client Request",
+        "description": "User requests player catalog and segment indexes.",
+        "action": {
+          "type": "emit",
+          "from": "client",
+          "to": "router",
+          "color": "cyan",
+          "state": "active",
+          "targetState": "active"
+        }
+      },
+      {
+        "title": "2. Cache Hit (Fast Path)",
+        "description": "Router checks Redis cache. Data returned in < 2ms.",
+        "action": {
+          "type": "emit",
+          "from": "router",
+          "to": "cache",
+          "color": "green",
+          "targetState": "success"
+        }
+      },
+      {
+        "title": "3. Cold DB Fetch (Fallback)",
+        "description": "If cache misses, perform secondary query to main SQLite store.",
+        "action": {
+          "type": "emit",
+          "from": "router",
+          "to": "database",
+          "color": "amber",
+          "targetState": "processing"
+        }
+      }
+    ]
+  },
+  "artistApproval": {
+    "name": "Artist Segment Approval",
+    "nodes": [
+      {
+        "id": "igMessage",
+        "title": "Instagram Direct",
+        "subtitle": "Access Token Dispatch",
+        "badge": "IG DM",
+        "x": 40,
+        "y": 180,
+        "html": "<div style=\"padding: 8px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent-cyan); background: rgba(0, 229, 255, 0.08); border-radius: 4px;\">Token: #band_7f9a2</div>"
+      },
+      {
+        "id": "artistDashboard",
+        "title": "Artist Dashboard",
+        "subtitle": "Private Review Portal",
+        "badge": "Auth",
+        "x": 280,
+        "y": 80,
+        "html": "<div class=\"vertical-approval-list\"><div id=\"appr-0\" class=\"approval-pill status-red\"><span>01. Soundcheck</span> <span>🔒 Private</span></div><div id=\"appr-1\" class=\"approval-pill status-red\"><span>02. Song One</span> <span>🔒 Private</span></div><div id=\"appr-2\" class=\"approval-pill status-red\"><span>03. Song Two</span> <span>🔒 Private</span></div><div id=\"appr-3\" class=\"approval-pill status-red\"><span>04. Jam / Banter</span> <span>🔒 Private</span></div><div id=\"appr-4\" class=\"approval-pill status-red\"><span>05. Encore</span> <span>🔒 Private</span></div><div id=\"appr-5\" class=\"approval-pill status-red\"><span>06. Outro</span> <span>🔒 Private</span></div></div>"
+      },
+      {
+        "id": "segmentDB",
+        "title": "Segment Database",
+        "subtitle": "Metadata & Visibility",
+        "badge": "D1/SQLite",
+        "x": 580,
+        "y": 80
+      },
+      {
+        "id": "publicSite",
+        "title": "iknowthatband.org",
+        "subtitle": "Public Band Archive",
+        "badge": "Web",
+        "x": 580,
+        "y": 240,
+        "html": "<div id=\"publicTracksBox\" style=\"display: flex; flex-direction: column; gap: 4px; width: 180px;\"></div>"
+      }
+    ],
+    "connections": [
+      { "from": "igMessage", "to": "artistDashboard" },
+      { "from": "artistDashboard", "to": "segmentDB" },
+      { "from": "segmentDB", "to": "publicSite", "class": "active-green" }
+    ],
+    "steps": [
+      {
+        "title": "1. Receive IG Token",
+        "description": "Artist gets an authentication token via IG DM to open their private review portal.",
+        "action": {
+          "type": "emit",
+          "from": "igMessage",
+          "to": "artistDashboard",
+          "color": "cyan",
+          "state": "active",
+          "targetState": "processing"
+        }
+      },
+      {
+        "title": "2. Curate & Approve Segments",
+        "description": "Artist reviews the tracks, turning selected private segments green one by one for public release.",
+        "autoAdvance": true,
+        "action": {
+          "type": "approvalGrid",
+          "from": "artistDashboard",
+          "to": "segmentDB",
+          "itemPrefix": "appr",
+          "count": 6,
+          "approvedCount": 4,
+          "delay": 300,
+          "state": "processing",
+          "targetState": "success"
+        }
+      },
+      {
+        "title": "3. Sync Approved DB Metadata",
+        "description": "Visibility flags are updated in D1/SQLite for approved segments.",
+        "autoAdvance": true,
+        "action": {
+          "type": "emit",
+          "from": "segmentDB",
+          "to": "publicSite",
+          "color": "green",
+          "state": "success",
+          "targetState": "success"
+        }
+      },
+      {
+        "title": "4. Render Live Public Segments",
+        "description": "The approved public segments generate live one by one on iknowthatband.org.",
+        "action": {
+          "type": "generateGrid",
+          "from": "segmentDB",
+          "to": "publicSite",
+          "containerId": "publicTracksBox",
+          "itemPrefix": "pub-track",
+          "labelPrefix": "Live Track",
+          "count": 4,
+          "color": "green",
+          "delay": 200,
+          "state": "success",
+          "targetState": "success"
+        }
+      }
+    ]
+  }
+}

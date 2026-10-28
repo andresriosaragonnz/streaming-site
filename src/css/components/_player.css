@@ -79,6 +79,7 @@
 .performance-title {
   text-transform: capitalize;
   font-size: larger;
+  color: var(--text-main);
 }
 
 .performance-title-big {

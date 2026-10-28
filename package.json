@@ -19,6 +19,7 @@
     "disable-remote": "npx wrangler d1 execute db --remote --command=\"UPDATE segments SET status = 'private';\"",
     "enable-remote": "npx wrangler d1 execute db --remote --command=\"UPDATE segments SET status = 'public';\"",
     "db:reset": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --local --file=./schema.sql && bunx wrangler d1 execute DB --local --file=./seed.sql",
+    "db:resetremote": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --remote --file=./schema.sql && bunx wrangler d1 execute DB --remote --file=./seed.sql",
     "compile-js": "bun run scripts/build.ts"
   },
   "type": "module",
@@ -36,7 +37,10 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
     "@kitajs/html": "^4.2.13",
+    "aws4fetch": "^1.0.20",
     "hono": "^4.12.32"
   }
 }

@@ -13,7 +13,11 @@ import {
   serveDisable,
   serveEnable,
   servePublicPortfolio,
+  serveExpireToken,
   servePublicPerformance,
+  serveDownload,
+  serveTech,
+  serveAudit,
 } from "./server";
 
 type Bindings = {
@@ -36,7 +40,9 @@ app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
 app.get("/disable", serveDisable);
 app.get("/enable", serveEnable);
+app.get("/expiretoken", serveExpireToken);
 app.get("/admin/generate-token", serveGenerateToken);
+app.get("/admin/audit", serveAudit);
 app.get("/auth/claim", serveClaim);
 
 // Explicit POST routes
@@ -58,6 +64,8 @@ app.get("/private/:slug", servePrivateDashboard);
 // ---------------------------------------------------------
 // 4. Specific Parametric Private Routes
 // ---------------------------------------------------------
+app.get("/download/:slug", serveDownload);
+app.get("/tech", serveTech);
 app.get("/private/performance/:slug", servePrivatePerformance);
 app.get("/private/:slug", servePrivateDashboard);
 // Explicit extension guard for missing static assets

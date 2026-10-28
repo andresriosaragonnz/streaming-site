@@ -2,6 +2,7 @@ import { TitleBar } from "../../components/TitleBar";
 import { VideoPlayer } from "../../components/VideoPlayer";
 import { AudioPlayer } from "../../components/AudioPlayer";
 import { ConstellationBtn } from "../../components/ConstellationBtn";
+import { AddToPlaylist } from "../../components/AddToPlaylist";
 
 export interface PublicViewPlayerProps {
   studioTitle: string;
@@ -10,6 +11,8 @@ export interface PublicViewPlayerProps {
   firstMp3: string;
   artistLink: string;
   artistName: string;
+  isAllowed?: boolean;
+  performanceLink: string;
 }
 
 export const PublicViewPlayer = ({
@@ -18,7 +21,9 @@ export const PublicViewPlayer = ({
   posterImage,
   firstMp3,
   artistLink,
+  isAllowed,
   artistName,
+  performanceLink,
 }: PublicViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
     {/* Navigation & Mode Toggle Header */}
@@ -48,6 +53,13 @@ export const PublicViewPlayer = ({
         </button>
       </div>
       <h2 class="performance-title break-hyphens">{studioTitle}</h2>
+      {isAllowed && (
+        <div id="performance-link" data-performance={artistLink}>
+          <a href={`/private/performance/${performanceLink}`}>
+            Private version
+          </a>
+        </div>
+      )}
       <h3
         class="performance-subtitle break-hyphens"
         data-bind-text="player.currentTitle"

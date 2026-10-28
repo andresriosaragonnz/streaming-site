@@ -1,12 +1,14 @@
 import { verifyAuthToken } from "./crypto";
 import { parseCookies } from "./parseCookie";
 import type { UserPayload } from "./types";
+import { UnauthorizedPageLayout } from "./serveUnauthorized";
+import { hashNameToId } from "../utils/makeId";
 
 export const usePrivate = async (c: any, next: any) => {
   const cookies = parseCookies(c.req.header("Cookie"));
   const token = cookies["auth_token"];
   if (!token) {
-    return c.text("403 Forbidden: Missing authentication cookie", 403);
+    return c.html("<!doctype html>\n" + <UnauthorizedPageLayout />);
   }
   const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
   if (!payload) {
@@ -18,12 +20,18 @@ export const usePrivate = async (c: any, next: any) => {
     return c.text("403 Forbidden: Token expired", 403);
   }
 
-  const requestedGroup = c.req.param("slug"); // e.g. "queen" from /private/queen/...
-  console.log({ token, requestedGroup });
+  const requestedArtist = c.req.param("slug");
+  const artistId = hashNameToId(requestedArtist);
+  const sql = `SELECT * FROM artists WHERE id = ?`;
+  const { id, token_version } = await c.env.DB.prepare(sql)
+    .bind(artistId)
+    .first();
+  const withVersion = `${id}_${token_version}`;
+
   // Check if requested group is in user's privilege list
-  if (!payload.allowed.includes(requestedGroup)) {
+  if (!payload.allowed.includes(withVersion)) {
     return c.text(
-      `403 Forbidden: You do not have access to ${requestedGroup}`,
+      `403 Forbidden: You do not have access to ${requestedArtist}`,
       403,
     );
   }

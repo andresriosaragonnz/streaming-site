@@ -68,6 +68,11 @@
 .item-active-highlight {
   background: var(--bg-selected);
 }
+
+.item-private-red {
+  background: var(--bg-private);
+}
+
 .sidebar-item-card .item-thumbnail {
   display: block;
   width: 100%; /* Or fixed thumbnail width if inside a sidebar list */

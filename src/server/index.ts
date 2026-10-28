@@ -1,5 +1,5 @@
 export { commitStatus } from "./commitStatus";
-export { serveGenerateToken } from "./generateToken";
+export { serveGenerateToken } from "./serveGenerateToken";
 export { savePagesToTarget } from "./savePagesToTarget";
 export { serveClaim } from "./serveClaim";
 export { serveDisable } from "./serveDisabled";
@@ -13,3 +13,7 @@ export { servePrivatePerformance } from "./servePrivatePerformance";
 export { servePublicPortfolio } from "./servePublicPortfolio";
 export { usePrivate } from "./usePrivate";
 export { servePublicPerformance } from "./servePublicPerformance";
+export { serveExpireToken } from "./serveExpireToken";
+export { serveDownload } from "./serveDownload";
+export { serveTech } from "./serveTech";
+export { serveAudit } from "./serveAudit";

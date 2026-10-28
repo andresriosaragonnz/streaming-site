@@ -37,6 +37,7 @@ export const servePlaylist = async (c: any) => {
 
     // 3. Decode Base64 and validate ID format strictly (alphanumeric, dashes, underscores)
     const decodedString = atob(shareParam);
+
     const ids = decodedString
       .split(",")
       .map((id) => id.trim())
@@ -73,7 +74,6 @@ export const servePlaylist = async (c: any) => {
     );
     // 9. Set defensive headers (Cache-Control & Content Security Policy)
     c.header("Cache-Control", "private, no-store, max-age=0");
-
     return c.html(
       "<!doctype html>\n" +
       <PlaylistPageLayout pageTitle={nameParam} segments={sanitizedSegments} />,

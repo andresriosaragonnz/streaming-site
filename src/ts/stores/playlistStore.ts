@@ -58,7 +58,6 @@ export class PlaylistStore {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(userPlaylists));
       } else {
         delete userPlaylists[this.state.playlistName];
-        console.log({ userPlaylists });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(userPlaylists));
         if (Object.keys(userPlaylists).length === 0) {
           localStorage.removeItem(STORAGE_KEY);

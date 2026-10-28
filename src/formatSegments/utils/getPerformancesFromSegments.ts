@@ -19,7 +19,7 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
     const initial = {
       artistName: encodeURIComponent(artistName),
       formattedArtist,
-      link: `${performance}`,
+      link: `${artistName}/${venueName}-${eventDate}`,
       venueName: venueName,
       formattedVenueName: venueName.replaceAll("_", " "),
       eventDate,

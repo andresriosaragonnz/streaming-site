@@ -1,7 +1,7 @@
 import { serve } from "bun";
 import { join } from "path";
 
-const TARGET_DIR = "/home/andres/acer/fragments/target";
+const TARGET_DIR = "/media/work/fragments/target";
 const PORT = 8787;
 
 serve({

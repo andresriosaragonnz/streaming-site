@@ -20,8 +20,15 @@ export const PrivatePerformancePageLayout = ({
   segments = [],
 }: PrivatePerformancePageLayoutProps) => {
   const { formattedSegments } = formatSegments(segments);
-  const { cardImage, formattedArtist, venueName, formattedDate, artistName } =
-    formattedSegments[0];
+  const {
+    cardImage,
+    formattedArtist,
+    venueName,
+    formattedDate,
+    artistName,
+    eventDate,
+    masterSize,
+  } = formattedSegments[0];
   const cards = formattedSegments.map((segment, index) => (
     <PrivateSegmentCard
       index={index}
@@ -49,10 +56,11 @@ export const PrivatePerformancePageLayout = ({
             artistName={artistName}
             posterImage={cardImage}
             segments={formattedSegments}
+            performance={`${venueName}-${eventDate}`}
+            masterSize={masterSize}
           />
           <PrivateViewSidebar cards={cards} />
         </div>
-
         <script type="application/json" id="studio-segments-data">
           {JSON.stringify(formattedSegments)}
         </script>

@@ -15,7 +15,7 @@ export const PrivateDashboardLayout = ({ segments = [] }) => {
   const cards = performances.private.map((performance) => {
     const { segments, images } = performance;
     const publicSegments = segments.filter(
-      (seg: any) => (seg.status = "public"),
+      (seg: any) => seg.status === "public",
     ).length;
     const privateSegments = segments.length - publicSegments;
     const random = getRandomElements(images, 8);

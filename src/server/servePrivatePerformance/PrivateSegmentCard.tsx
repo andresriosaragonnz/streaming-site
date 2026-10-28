@@ -25,7 +25,7 @@ export const PrivateSegmentCard = ({
       data-action="select-segment"
       data-id={id}
       data-index={index}
-      data-bind-class-toggle={`item-active-highlight:player.currentIndex === ${index}`}
+      data-bind-class={`{ 'item-active-highlight': player.currentIndex === ${index} }`}
       role="button"
       tabindex="0"
       aria-label={`Select ${title}`}

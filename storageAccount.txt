@@ -1,0 +1,7 @@
+Account ID
+
+4f88d857d7e2ff5668d29087437da4f9
+
+S3 API
+https://4f88d857d7e2ff5668d29087437da4f9.r2.cloudflarestorage.com
+

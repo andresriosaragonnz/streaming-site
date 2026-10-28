@@ -13,7 +13,8 @@ type Bindings = {
 };
 
 interface UserPayload {
-  allowed: string[]; // e.g., ['queen', 'freddie-mercury']
+  allowed: string;
+  v: number;
   exp?: number; // Expiration timestamp (optional)
 }
 
