@@ -36,9 +36,9 @@ export const servePublicPerformance = async (c: any) => {
   );
   const adminHeader = c.req.header("X-Mobile-Admin-Key");
   const isAdmin = adminHeader == c.env.MOBILE_ADMIN_SECRET;
-  if (!isAdmin && !isAllowed) {
-    return c.text("Unauthorized device", 401);
-  }
+  // if (!isAdmin && !isAllowed) {
+  //   return c.text("Unauthorized device", 401);
+  // }
 
   // 2. Derive a lightweight cache validator (ETag) from results
   const segmentCount = results?.length || 0;

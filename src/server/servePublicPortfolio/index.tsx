@@ -21,9 +21,9 @@ export const servePublicPortfolio = async (c: any) => {
   const isAllowed = await getIsAllowed(artistId, c);
   const adminHeader = c.req.header("X-Mobile-Admin-Key");
   const isAdmin = adminHeader == c.env.MOBILE_ADMIN_SECRET;
-  if (!isAdmin && !isAllowed) {
-    return c.html("<!doctype html>\n" + <PendingLayout />);
-  }
+  // if (!isAdmin && !isAllowed) {
+  //   return c.html("<!doctype html>\n" + <PendingLayout />);
+  // }
   const segmentCount = results?.length || 0;
   const lastUpdated =
     results?.reduce((max: any, item: any) => {
