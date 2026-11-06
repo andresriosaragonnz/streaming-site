@@ -1,5 +1,6 @@
 import { createAuthToken } from "../crypto";
 import { isAdminRequest } from "../auth";
+import { parseGroupParam } from "../parseGroup";
 import type { UserPayload } from "../types";
 import { hashNameToId } from "../../utils/makeId";
 
@@ -8,12 +9,12 @@ export const serveGenerateToken = async (c: any) => {
     return c.text("Unauthorized", 401);
   }
 
-  const group = c.req.query("group");
-  if (!group || typeof group !== "string") {
-    return c.text("Missing params", 400);
+  const parsedGroup = parseGroupParam(c.req.query("group"));
+  if (!parsedGroup.ok) {
+    return c.text(parsedGroup.message, 400);
   }
 
-  const id = hashNameToId(group);
+  const id = hashNameToId(parsedGroup.value);
   const artist = await c.env.DB.prepare(
     `SELECT id, token_version FROM artists WHERE id = ?`,
   )

@@ -6,6 +6,41 @@ import { ClaimLayout } from "./ClaimLayout";
 import { getVideographers } from "../getVideographers";
 import { formatSegments } from "../../formatSegments";
 
+interface ClaimPair {
+  artistId: string;
+  tokenVersion: number;
+}
+
+type ParseClaimsResult =
+  | { ok: true; value: ClaimPair[] }
+  | { ok: false; message: string };
+
+/**
+ * Parses normalized `${artistId}_${tokenVersion}` claims once so the handler
+ * only deals with typed pairs. Malformed claims are rejected up front.
+ */
+const parseAllowedClaims = (allowed: string[]): ParseClaimsResult => {
+  const pairs: ClaimPair[] = [];
+
+  for (const claim of allowed) {
+    const separator = claim.indexOf("_");
+    if (separator === -1) {
+      return { ok: false, message: "Invalid or tampered token" };
+    }
+
+    const artistId = claim.slice(0, separator);
+    const tokenVersion = Number(claim.slice(separator + 1));
+
+    if (!artistId || !Number.isFinite(tokenVersion)) {
+      return { ok: false, message: "Invalid or tampered token" };
+    }
+
+    pairs.push({ artistId, tokenVersion });
+  }
+
+  return { ok: true, value: pairs };
+};
+
 export const serveClaim = async (c: any) => {
   try {
     const incomingToken = c.req.query("token");
@@ -28,14 +63,12 @@ export const serveClaim = async (c: any) => {
       return c.text("Invalid or tampered token", 403);
     }
 
-    const incomingPairs = incomingAllowed.map((claim) => {
-      const separator = claim.indexOf("_");
-      return {
-        artistId: separator === -1 ? claim : claim.slice(0, separator),
-        tokenVersion: Number(claim.slice(separator + 1)),
-      };
-    });
+    const parsedClaims = parseAllowedClaims(incomingAllowed);
+    if (!parsedClaims.ok) {
+      return c.text(parsedClaims.message, 403);
+    }
 
+    const incomingPairs = parsedClaims.value;
     const incomingArtistIds = Array.from(
       new Set(incomingPairs.map(({ artistId }) => artistId)),
     );
@@ -57,7 +90,6 @@ export const serveClaim = async (c: any) => {
 
     const isRevoked = incomingPairs.some(
       ({ artistId, tokenVersion }) =>
-        !Number.isFinite(tokenVersion) ||
         currentVersions.get(artistId) !== tokenVersion,
     );
 

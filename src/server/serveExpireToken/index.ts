@@ -1,17 +1,18 @@
 import { hashNameToId } from "../../utils/makeId";
 import { isAdminRequest } from "../auth";
+import { parseGroupParam } from "../parseGroup";
 
 export const serveExpireToken = async (c: any) => {
   if (!isAdminRequest(c)) {
     return c.text("Unauthorized", 401);
   }
 
-  const group = c.req.query("group");
-  if (!group || typeof group !== "string") {
-    return c.text("Missing params", 400);
+  const parsedGroup = parseGroupParam(c.req.query("group"));
+  if (!parsedGroup.ok) {
+    return c.text(parsedGroup.message, 400);
   }
 
-  const id = hashNameToId(group);
+  const id = hashNameToId(parsedGroup.value);
   await c.env.DB.prepare(
     `UPDATE artists SET token_version = token_version + 1 WHERE id = ?`,
   )

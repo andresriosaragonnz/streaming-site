@@ -4,11 +4,41 @@ import {
 } from "../getVideographers";
 import { getAuthPayload, hasArtistAccess } from "../auth";
 
-export const serveDownload = async (c: any) => {
-  const performance = c.req.param("slug");
+const MAX_PERFORMANCE_LENGTH = 256;
 
+type ParseResult =
+  | { ok: true; value: string }
+  | { ok: false; message: string };
+
+/**
+ * Native runtime validation for the download performance identifier.
+ *
+ * Bun does not ship a schema validator, so plain type guards are used; the
+ * handler only deals with validated values.
+ */
+const parsePerformanceParam = (value: unknown): ParseResult => {
+  if (typeof value !== "string") {
+    return { ok: false, message: "Invalid performance parameter" };
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.length === 0 || trimmed.length > MAX_PERFORMANCE_LENGTH) {
+    return { ok: false, message: "Invalid performance parameter" };
+  }
+
+  return { ok: true, value: trimmed };
+};
+
+export const serveDownload = async (c: any) => {
+  const performanceParam = c.req.param("slug");
   const payload = await getAuthPayload(c);
   if (!payload) return c.text("Unauthorized", 401);
+
+  const parsedPerformance = parsePerformanceParam(performanceParam);
+  if (!parsedPerformance.ok) {
+    return c.text(parsedPerformance.message, 400);
+  }
+  const performance = parsedPerformance.value;
 
   const segment = await c.env.DB.prepare(
     `SELECT * FROM segments WHERE performance = ? LIMIT 1`,
@@ -30,10 +60,7 @@ export const serveDownload = async (c: any) => {
     return c.text("Forbidden: Unauthorized access to master video", 403);
   }
 
-  const signing = await getVideographerSigningConfig(
-    c,
-    segment.videographer,
-  );
+  const signing = await getVideographerSigningConfig(c, segment.videographer);
   if (!signing) {
     return c.text("Media source unavailable", 404);
   }
@@ -46,7 +73,7 @@ export const serveDownload = async (c: any) => {
     900, // 15 minutes
   );
 
-  const objectPath = `${segment.performance}.mp4`;
+  const objectPath = `${segment.performance}.zip`;
   const downloadUrl = `${signing.worker}/${objectPath}?token=${encodeURIComponent(
     hmacToken,
   )}&download=1`;
