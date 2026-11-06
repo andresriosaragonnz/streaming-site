@@ -1,5 +1,6 @@
 import { getAuthPayload, hasArtistAccess } from "./auth";
 import { UnauthorizedPageLayout } from "./serveUnauthorized";
+import { parsePerformanceParam } from "./parsePerformance";
 
 /**
  * Guards `/private/performance/:slug`.
@@ -13,10 +14,12 @@ export const usePrivatePerformance = async (c: any, next: any) => {
     return c.html("<!doctype html>\n" + <UnauthorizedPageLayout />, 401);
   }
 
-  const performance = c.req.param("slug");
-  if (!performance) {
-    return c.text("Bad Request", 400);
+  const performanceParam = c.req.param("slug");
+  const parsedPerformance = parsePerformanceParam(performanceParam);
+  if (!parsedPerformance.ok) {
+    return c.text(parsedPerformance.message, 400);
   }
+  const performance = parsedPerformance.value;
 
   const { results } = await c.env.DB.prepare(
     `SELECT DISTINCT s.artistId, a.id, a.token_version

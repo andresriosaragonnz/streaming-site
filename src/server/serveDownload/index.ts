@@ -3,31 +3,7 @@ import {
   getVideographerSigningConfig,
 } from "../getVideographers";
 import { getAuthPayload, hasArtistAccess } from "../auth";
-
-const MAX_PERFORMANCE_LENGTH = 256;
-
-type ParseResult =
-  | { ok: true; value: string }
-  | { ok: false; message: string };
-
-/**
- * Native runtime validation for the download performance identifier.
- *
- * Bun does not ship a schema validator, so plain type guards are used; the
- * handler only deals with validated values.
- */
-const parsePerformanceParam = (value: unknown): ParseResult => {
-  if (typeof value !== "string") {
-    return { ok: false, message: "Invalid performance parameter" };
-  }
-
-  const trimmed = value.trim();
-  if (trimmed.length === 0 || trimmed.length > MAX_PERFORMANCE_LENGTH) {
-    return { ok: false, message: "Invalid performance parameter" };
-  }
-
-  return { ok: true, value: trimmed };
-};
+import { parsePerformanceParam } from "../parsePerformance";
 
 export const serveDownload = async (c: any) => {
   const performanceParam = c.req.param("slug");
