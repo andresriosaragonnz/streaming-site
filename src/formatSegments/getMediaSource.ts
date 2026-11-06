@@ -17,9 +17,9 @@ export const getMediaSource = (
   const config = videographers[videographer];
   const { worker, segmentToken } = config;
   return {
-    heroImage: `${worker}/${id}/hero.jpg?token=${segmentToken}dd`,
-    cardImage: `${worker}/${id}/card.jpg?token=${segmentToken}dd`,
-    sourceVideo480p: `${worker}/${id}/output_480.m3u8?token=${segmentToken}dddd`,
+    heroImage: `${worker}/${id}/hero.jpg?token=${segmentToken}`,
+    cardImage: `${worker}/${id}/card.jpg?token=${segmentToken}`,
+    sourceVideo480p: `${worker}/${id}/output_480.m3u8?token=${segmentToken}`,
     sourceVideo1080p: `${worker}/${id}/output_1080.m3u8?token=${segmentToken}`,
     sourceMp3: `${worker}/${id}/audio.mp3?token=${segmentToken}`,
   };

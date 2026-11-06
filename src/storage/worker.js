@@ -1,41 +1,38 @@
-const PROD_ORIGIN = "https://iknowthatband.org";
+const ALLOWED_ORIGIN = "https://iknowthatband.org";
+
+const MIME_TYPES = {
+  mp3: "audio/mpeg",
+  m3u8: "application/x-mpegURL",
+  ts: "video/MP2T",
+  mp4: "video/mp4",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  webp: "image/webp",
+};
 
 export default {
   async fetch(request, env) {
-    const referer = request.headers.get("referer") || "";
-
-    // 1. Validate Origin (Prod + Local Dev Subnets)
-    const isAllowedOrigin =
-      referer.startsWith(PROD_ORIGIN) ||
-      referer.startsWith("http://localhost:") ||
-      referer.startsWith("http://127.0.0.1:") ||
-      /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?\//.test(referer);
-
-    // Extract Origin header for CORS response
-    let corsOrigin = PROD_ORIGIN;
-    if (referer) {
-      try {
-        corsOrigin = new URL(referer).origin;
-      } catch (e) {}
-    }
-
-    // Handle CORS preflight
+    // Handle CORS preflight options request
     if (request.method === "OPTIONS") {
       return new Response(null, {
         headers: {
-          "Access-Control-Allow-Origin": corsOrigin,
+          "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
           "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
           "Access-Control-Allow-Headers": "*",
         },
       });
     }
 
-    if (!isAllowedOrigin) {
+    const url = new URL(request.url);
+    const referer = request.headers.get("referer") || "noref";
+
+    // 1. Check Referer header
+    if (!referer.startsWith(ALLOWED_ORIGIN)) {
       return new Response("Forbidden: Invalid Origin", { status: 403 });
     }
 
     // 2. Extract token from query params (?token=expires.signature)
-    const url = new URL(request.url);
     const token = url.searchParams.get("token");
     if (!token) {
       return new Response("Forbidden: Missing Auth Token", { status: 403 });
@@ -49,19 +46,16 @@ export default {
       return new Response("Forbidden: Token Expired", { status: 403 });
     }
 
-    // 4. Sanitize object key and extract segment ID (handles leading //)
+    // 4. Sanitize object key (handles leading //)
     const objectKey = url.pathname.replace(/^\/+/, "");
     if (!objectKey) {
       return new Response("Not Found", { status: 404 });
     }
 
-    // Extracts "j7d04" from "j7d04/audio.mp3"
-    const segmentId = objectKey.split("/")[0];
-
-    // 5. Verify HMAC-SHA256 signature against segmentId
+    // 5. Verify HMAC-SHA256 signature against env.VIDEOGRAPHER_NAME
     const isValid = await verifyHmac(
       env.PLATFORM_SECRET,
-      `${segmentId}:${expires}`,
+      `${env.VIDEOGRAPHER_NAME}:${expires}`,
       signature,
     );
 
@@ -79,16 +73,28 @@ export default {
 
     const headers = new Headers();
     object.writeHttpMetadata(headers);
-    headers.set("etag", object.httpEtag);
-    headers.set("Access-Control-Allow-Origin", corsOrigin);
 
-    // Handle direct master video downloads vs standard streaming
+    // Fallback Content-Type if R2 metadata is absent
+    const ext = objectKey.split(".").pop()?.toLowerCase();
+    if (!headers.has("content-type") && ext && MIME_TYPES[ext]) {
+      headers.set("Content-Type", MIME_TYPES[ext]);
+    }
+
+    headers.set("etag", object.httpEtag);
+    headers.set("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+    headers.set("Accept-Ranges", "bytes");
+
+    // Handle direct master video downloads vs standard asset streaming
     const isDownload = url.searchParams.get("download") === "1";
     if (isDownload) {
       const filename = objectKey.split("/").pop() || "master.mp4";
       headers.set("Content-Disposition", `attachment; filename="${filename}"`);
     } else {
       headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    }
+
+    if (request.method === "HEAD") {
+      return new Response(null, { headers });
     }
 
     return new Response(object.body, { headers });
@@ -99,6 +105,13 @@ export default {
  * Web Crypto HMAC verification helper.
  */
 async function verifyHmac(secret, data, signatureBase64) {
+  if (!secret) {
+    console.error(
+      "PLATFORM_SECRET is missing or empty in Worker environment variables.",
+    );
+    return false;
+  }
+
   const enc = new TextEncoder();
   const key = await crypto.subtle.importKey(
     "raw",

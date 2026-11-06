@@ -9,6 +9,7 @@ workers_dev = false
 [vars]
 APP_URL = "https://iknowthatband.org"
 CLOUDFLARE_SOURCE = "https://media.iknowthatband.org"
+MASTER_ENCRYPTION_KEY = "local-dev-secret"
 # Production Routes (Clean hostnames without /*)
 routes = [
   { pattern = "iknowthatband.org", custom_domain = true },     # 👈 Removed /*
