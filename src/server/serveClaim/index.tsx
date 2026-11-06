@@ -1,115 +1,149 @@
 import { createAuthToken, verifyAuthToken } from "../crypto";
+import { getAllowedClaims } from "../auth";
 import { parseCookies } from "../parseCookie";
+import type { UserPayload } from "../types";
 import { ClaimLayout } from "./ClaimLayout";
 import { getVideographers } from "../getVideographers";
-
 import { formatSegments } from "../../formatSegments";
-
-interface UserPayload {
-  sub: string;
-  allowed: string;
-  v: number;
-  exp?: number;
-}
 
 export const serveClaim = async (c: any) => {
   try {
     const incomingToken = c.req.query("token");
     if (!incomingToken) return c.text("Missing token", 400);
-    // 1. Verify incoming claim token
+
     const incomingPayload = await verifyAuthToken<UserPayload>(
       incomingToken,
       c.env.AUTH_SECRET,
     );
     if (!incomingPayload) return c.text("Invalid or tampered token", 403);
+    if (
+      incomingPayload.exp &&
+      Date.now() / 1000 > incomingPayload.exp
+    ) {
+      return c.text("Token expired", 403);
+    }
 
-    // 2. Check if device already has an existing auth_token cookie
-    const rawCookie = c.req.header("Cookie");
-    const cookies = parseCookies(rawCookie);
+    const incomingAllowed = getAllowedClaims(incomingPayload);
+    if (incomingAllowed.length === 0) {
+      return c.text("Invalid or tampered token", 403);
+    }
+
+    const incomingPairs = incomingAllowed.map((claim) => {
+      const separator = claim.indexOf("_");
+      return {
+        artistId: separator === -1 ? claim : claim.slice(0, separator),
+        tokenVersion: Number(claim.slice(separator + 1)),
+      };
+    });
+
+    const incomingArtistIds = Array.from(
+      new Set(incomingPairs.map(({ artistId }) => artistId)),
+    );
+
+    // Reject revoked claims before rendering any private segment data.
+    const incomingPlaceholders = incomingArtistIds.map(() => "?").join(", ");
+    const { results: incomingArtists } = await c.env.DB.prepare(
+      `SELECT id, token_version FROM artists WHERE id IN (${incomingPlaceholders})`,
+    )
+      .bind(...incomingArtistIds)
+      .all();
+
+    const currentVersions = new Map(
+      ((incomingArtists || []) as Array<{
+        id: string;
+        token_version: number;
+      }>).map((artist) => [artist.id, artist.token_version]),
+    );
+
+    const isRevoked = incomingPairs.some(
+      ({ artistId, tokenVersion }) =>
+        !Number.isFinite(tokenVersion) ||
+        currentVersions.get(artistId) !== tokenVersion,
+    );
+
+    if (isRevoked) {
+      return c.text("Token revoked", 403);
+    }
+
+    const cookies = parseCookies(c.req.header("Cookie"));
     const existingToken = cookies["auth_token"];
-    let mergedAllowed = [`${incomingPayload.allowed}_${incomingPayload.v}`];
+
+    let mergedAllowed = [...incomingAllowed];
     if (existingToken) {
       const existingPayload = await verifyAuthToken<UserPayload>(
         existingToken,
         c.env.AUTH_SECRET,
       );
-      console.log({ existingPayload });
-      // Merge previous privileges with new privileges if existing token is valid
-      if (existingPayload && Array.isArray(existingPayload.allowed)) {
-        mergedAllowed = Array.from(
-          new Set([
-            ...existingPayload.allowed,
-            `${incomingPayload.allowed}_${incomingPayload.v}`,
-          ]),
-        );
+
+      if (existingPayload) {
+        const notExpired =
+          !existingPayload.exp || Date.now() / 1000 <= existingPayload.exp;
+        if (notExpired) {
+          mergedAllowed = Array.from(
+            new Set([...getAllowedClaims(existingPayload), ...incomingAllowed]),
+          );
+        }
       }
     }
 
-    // 3. Create a new JWT containing the combined permissions
-    const combinedPayload: UserPayload = {
-      allowed: mergedAllowed,
-    };
-
+    const combinedPayload: UserPayload = { allowed: mergedAllowed };
     const updatedToken = await createAuthToken(
       combinedPayload,
       c.env.AUTH_SECRET,
     );
 
-    // Detect HTTPS context to disable 'Secure' attribute during local HTTP dev
+    // Detect HTTPS context to disable 'Secure' during local HTTP dev.
     const isSecure =
       c.req.url.startsWith("https://") ||
       c.req.header("x-forwarded-proto") === "https";
-
     const secureFlag = isSecure ? "; Secure" : "";
 
-    // 4. Overwrite cookie with updated combined token (using Lax for top-level navigation support)
     c.header(
       "Set-Cookie",
       `auth_token=${updatedToken}; Path=/; HttpOnly${secureFlag}; SameSite=Lax; Max-Age=${60 * 60 * 24 * 365}`,
     );
-    const sql = `SELECT * FROM segments WHERE artistId = ?`;
 
-    const { results: segments } = await c.env.DB.prepare(sql)
-      .bind(incomingPayload.allowed)
+    const { results: segments } = await c.env.DB.prepare(
+      `SELECT * FROM segments WHERE artistId = ?`,
+    )
+      .bind(incomingArtistIds[0])
       .all();
+
     const videographers = await getVideographers(c);
     const { formattedSegments, totalDuration } = formatSegments(
       segments,
       videographers,
     );
 
-    // 1. Build dynamic placeholder string: "?, ?, ?"
-    const placeholders = mergedAllowed.map(() => "?").join(", ");
-    const values = mergedAllowed.map((v: string) => v.split("_")[0]);
-    // 2. Prepare and run SQL query
-    const query = `
-        SELECT DISTINCT artistName 
-        FROM segments 
-        WHERE artistId IN (${placeholders})
-      `;
-
-    const { results } = await c.env.DB.prepare(query)
-      .bind(...values)
+    const artistIds = Array.from(
+      new Set(mergedAllowed.map((claim) => claim.split("_")[0])),
+    );
+    const placeholders = artistIds.map(() => "?").join(", ");
+    const { results } = await c.env.DB.prepare(
+      `SELECT DISTINCT artistName FROM segments WHERE artistId IN (${placeholders})`,
+    )
+      .bind(...artistIds)
       .all();
 
-    // Extract simple array of names: ['Band A', 'Band B']
-    const artistNames = results.map((r: any) => r.artistName);
+    const artistNames = results.map((row: any) => row.artistName);
+
+    c.header("Cache-Control", "private, no-store");
     return c.html(
       "<!doctype html>\n" +
-      (
-        <ClaimLayout
-          segments={segments}
-          artists={artistNames}
-          formattedSegments={formattedSegments}
-          totalDuration={totalDuration}
-        />
-      ),
+        (
+          <ClaimLayout
+            segments={segments}
+            artists={artistNames}
+            formattedSegments={formattedSegments}
+            totalDuration={totalDuration}
+          />
+        ),
     );
-
-    // 5. Render KitaJS component directly into Hono HTML response
-    // return c.html(<ClaimPage artists={mergedAllowed} />);
-  } catch (e) {
-    console.log(e);
-    return c.html("<!doctype html>\n" + <div>Error</div>);
+  } catch (error) {
+    console.error(
+      "Claim failed:",
+      error instanceof Error ? error.message : "unknown error",
+    );
+    return c.html("<!doctype html>\n" + <div>Error</div>, 500);
   }
 };

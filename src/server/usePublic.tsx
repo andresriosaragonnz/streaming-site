@@ -1,38 +1,36 @@
-import { verifyAuthToken } from "./crypto";
-import { parseCookies } from "./parseCookie";
-import type { UserPayload } from "./types";
+import { getAuthPayload, hasArtistAccess } from "./auth";
 import { hashNameToId } from "../utils/makeId";
 
+/**
+ * Optional public-page middleware. Kept for callers that want to surface
+ * owner-only controls without blocking anonymous visitors.
+ */
 export const usePublic = async (c: any, next: any) => {
-  const cookies = parseCookies(c.req.header("Cookie"));
-  const token = cookies["auth_token"];
-  if (!token) {
-    await next();
-  }
-  const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
+  const payload = await getAuthPayload(c);
   if (!payload) {
-    return c.text("403 Forbidden: Invalid token", 403);
-  }
-
-  // Check Expiration if defined
-  if (payload.exp && Date.now() / 1000 > payload.exp) {
-    return c.text("403 Forbidden: Token expired", 403);
+    await next();
+    return;
   }
 
   const requestedArtist = c.req.param("slug");
+  if (!requestedArtist) {
+    await next();
+    return;
+  }
+
   const artistId = hashNameToId(requestedArtist);
-  const sql = `SELECT * FROM artists WHERE id = ?`;
-  const { id, token_version } = await c.env.DB.prepare(sql)
+  const artist = await c.env.DB.prepare(
+    `SELECT id, token_version FROM artists WHERE id = ?`,
+  )
     .bind(artistId)
     .first();
-  const withVersion = `${id}_${token_version}`;
 
-  // Check if requested group is in user's privilege list
-  if (!payload.allowed.includes(withVersion)) {
+  if (!artist || !hasArtistAccess(payload, artist.id, artist.token_version)) {
     return c.text(
       `403 Forbidden: You do not have access to ${requestedArtist}`,
       403,
     );
   }
+
   await next();
 };

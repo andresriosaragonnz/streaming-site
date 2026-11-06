@@ -9,6 +9,7 @@ export interface PrivatePerformanceCardProps {
   publicSegments: number | string;
   privateSegments: number | string;
   performance: number | string;
+  segmentToken?: string;
 }
 
 export const PrivatePerformanceCard = ({
@@ -19,13 +20,18 @@ export const PrivatePerformanceCard = ({
   duration,
   publicSegments,
   privateSegments,
+  segmentToken,
 }: PrivatePerformanceCardProps) => (
   <a
     href={`/private/performance/${performance}`}
     class="card"
     style="text-decoration: none; color: inherit"
   >
-    <ItemThumbnail cardImage={cardImage} title={formattedVenueName} />
+    <ItemThumbnail
+      cardImage={cardImage}
+      title={formattedVenueName}
+      segmentToken={segmentToken}
+    />
 
     <div class="card-metadata">
       <div>

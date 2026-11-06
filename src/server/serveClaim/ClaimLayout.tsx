@@ -33,6 +33,8 @@ export const ClaimLayout = ({
     );
   });
   const jsonArtists = JSON.stringify(artists);
+  const heroSegment =
+    formattedSegments[getRandomIndex(formattedSegments)] ?? {};
 
   const scriptCode = `
     try {
@@ -63,9 +65,8 @@ export const ClaimLayout = ({
           <Menu />
         </div>
         <ClaimHero
-          heroImage={
-            formattedSegments[getRandomIndex(formattedSegments)].heroImage
-          }
+          heroImage={heroSegment.heroImage}
+          segmentToken={heroSegment.segmentToken}
           title={formattedArtist}
           link={artistName}
           count={performances.private.length}

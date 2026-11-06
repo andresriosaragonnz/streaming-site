@@ -1,18 +1,14 @@
 import { PublicPerformancePageLayout } from "./PublicPerformancePageLayout";
 import { NotFound } from "./NotFound";
-import { parseCookies } from "../parseCookie";
-import { verifyAuthToken } from "../crypto";
 import { getVideographers } from "../getVideographers";
 import { formatSegments } from "../../formatSegments";
-import type { UserPayload } from "../types";
+import { getAuthPayload, hasArtistAccess, isAdminRequest } from "../auth";
 
 export const servePublicPerformance = async (c: any) => {
   const slug = c.req.param("slug");
   const performance = c.req.param("performance");
-  const cookies = parseCookies(c.req.header("Cookie"));
   const videographers = await getVideographers(c);
-  const token = cookies["auth_token"];
-  const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
+  const payload = await getAuthPayload(c);
 
   // 1. Fetch D1 segment data & KV graph data in parallel
   const performanceKey = `${slug}-${performance}`;
@@ -29,15 +25,15 @@ export const servePublicPerformance = async (c: any) => {
   }
   const artistId = results[0].artistId;
   const currentArtist = await c.env.DB.prepare(
-    `SELECT * FROM artists WHERE id = ?`,
+    `SELECT id, token_version FROM artists WHERE id = ?`,
   )
     .bind(artistId)
     .first();
-  const isAllowed = payload?.allowed.includes(
-    `${currentArtist.id}_${currentArtist.token_version}`,
-  );
+  const isAllowed = currentArtist
+    ? hasArtistAccess(payload, currentArtist.id, currentArtist.token_version)
+    : false;
   const adminHeader = c.req.header("X-Mobile-Admin-Key");
-  const isAdmin = adminHeader == c.env.MOBILE_ADMIN_SECRET;
+  const isAdmin = isAdminRequest(c);
   // if (!isAdmin && !isAllowed) {
   //   return c.text("Unauthorized device", 401);
   // }

@@ -250,7 +250,6 @@ export class UI {
     );
 
     UI.requestSync();
-    console.log("⚡ [UI Binder] Dynamic, strict-mode binder initialized.");
   }
 }
 

@@ -26,6 +26,7 @@ export const PublicPerformanceCard = ({
     class="card"
     // rel="prefetch"
     data-bg={altImage}
+    data-image-token={segmentToken}
     style="text-decoration: none; color: inherit"
   >
     <CardThumbnail

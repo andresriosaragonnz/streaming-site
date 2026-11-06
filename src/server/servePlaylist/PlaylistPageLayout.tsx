@@ -23,8 +23,12 @@ export const PlaylistPageLayout = ({
     segmentToken: "",
   };
 
-  const { cardImage, sourceMp3, formattedTitle, artistLink, formattedArtist } =
+  const { cardImage, sourceMp3, formattedTitle, artistLink, formattedArtist, segmentToken } =
     firstSegment;
+
+  const posterImage = segmentToken
+    ? `${cardImage}.jpg?token=${encodeURIComponent(segmentToken)}`
+    : `${cardImage}.jpg`;
 
   const cards = segments.map((segment, index) => (
     <PlaylistSegmentCard
@@ -50,7 +54,7 @@ export const PlaylistPageLayout = ({
           <PlaylistViewPlayer
             pageTitle={pageTitle}
             firstTitle={formattedTitle}
-            posterImage={cardImage}
+            posterImage={posterImage}
             firstMp3={sourceMp3}
             artistLink={artistLink}
             artistName={formattedArtist}

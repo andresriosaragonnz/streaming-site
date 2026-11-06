@@ -1,23 +1,17 @@
-import { createHmac } from "node:crypto";
-import { parseCookies } from "../parseCookie";
-import { verifyAuthToken } from "../crypto";
-import type { UserPayload } from "../types";
+import {
+  generateSegmentToken,
+  getVideographerSigningConfig,
+} from "../getVideographers";
+import { getAuthPayload, hasArtistAccess } from "../auth";
 
 export const serveDownload = async (c: any) => {
   const performance = c.req.param("slug");
-  const cookies = parseCookies(c.req.header("Cookie"));
-  const token = cookies["auth_token"];
 
-  // 1. Validate authorization payload
-  const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
+  const payload = await getAuthPayload(c);
   if (!payload) return c.text("Unauthorized", 401);
 
-  // 2. Fetch segment & videographer endpoint metadata from D1
   const segment = await c.env.DB.prepare(
-    `SELECT s.*, v.media_endpoint 
-     FROM segments s
-     JOIN videographers v ON s.videographer_id = v.id
-     WHERE s.performance = ?`,
+    `SELECT * FROM segments WHERE performance = ? LIMIT 1`,
   )
     .bind(performance)
     .first();
@@ -26,39 +20,37 @@ export const serveDownload = async (c: any) => {
     return c.text("Segment or master file not found", 404);
   }
 
-  // 3. Verify artist access token version
-  const currentArtist = await c.env.DB.prepare(
-    `SELECT * FROM artists WHERE id = ?`,
+  const artist = await c.env.DB.prepare(
+    `SELECT id, token_version FROM artists WHERE id = ?`,
   )
     .bind(segment.artistId)
     .first();
 
-  const isAllowed = payload?.allowed.includes(
-    `${currentArtist.id}_${currentArtist.token_version}`,
-  );
-
-  if (!isAllowed) {
+  if (!artist || !hasArtistAccess(payload, artist.id, artist.token_version)) {
     return c.text("Forbidden: Unauthorized access to master video", 403);
   }
 
-  // 4. Generate 15-minute HMAC token for the master .mp4 download
-  const objectPath = `${performance}.mp4`;
-  const secret =
-    c.env.PLATFORM_SECRET || process.env.PLATFORM_SECRET || "default-secret";
-  const expires = Math.floor(Date.now() / 1000) + 900; // 15 minutes
+  const signing = await getVideographerSigningConfig(
+    c,
+    segment.videographer,
+  );
+  if (!signing) {
+    return c.text("Media source unavailable", 404);
+  }
 
-  const signatureBase64 = createHmac("sha256", secret)
-    .update(`${objectPath}:${expires}`)
-    .digest("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  // The media Worker signs `${VIDEOGRAPHER_NAME}:${expires}`, which is also
+  // what generateSegmentToken produces.
+  const hmacToken = await generateSegmentToken(
+    signing.name,
+    signing.storageKey,
+    900, // 15 minutes
+  );
 
-  const hmacToken = `${expires}.${signatureBase64}`;
+  const objectPath = `${segment.performance}.mp4`;
+  const downloadUrl = `${signing.worker}/${objectPath}?token=${encodeURIComponent(
+    hmacToken,
+  )}&download=1`;
 
-  // 5. Build download URL pointing to videographer worker proxy (with download=1 query flag)
-  const downloadUrl = `${segment.media_endpoint}/${objectPath}?token=${hmacToken}&download=1`;
-
-  // 6. Direct 302 redirect
+  c.header("Cache-Control", "no-store");
   return c.redirect(downloadUrl, 302);
 };

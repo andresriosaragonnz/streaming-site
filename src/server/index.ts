@@ -12,6 +12,8 @@ export { servePrivateDashboard } from "./servePrivateDashboard";
 export { servePrivatePerformance } from "./servePrivatePerformance";
 export { servePublicPortfolio } from "./servePublicPortfolio";
 export { usePrivate } from "./usePrivate";
+export { usePrivatePerformance } from "./usePrivatePerformance";
+export { useAdmin } from "./auth";
 export { servePublicPerformance } from "./servePublicPerformance";
 export { serveExpireToken } from "./serveExpireToken";
 export { serveDownload } from "./serveDownload";

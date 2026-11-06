@@ -1,6 +1,7 @@
 import { PublicPortfolioLayout } from "./PublicPortfolioLayout";
 import { PendingLayout } from "../servePending";
 import { getIsAllowed } from "../getIsAllowed";
+import { isAdminRequest } from "../auth";
 import { getVideographers } from "../getVideographers";
 import { formatSegments } from "../../formatSegments";
 
@@ -21,8 +22,7 @@ export const servePublicPortfolio = async (c: any) => {
   }
   const artistId = results[0].artistId;
   const isAllowed = await getIsAllowed(artistId, c);
-  const adminHeader = c.req.header("X-Mobile-Admin-Key");
-  const isAdmin = adminHeader == c.env.MOBILE_ADMIN_SECRET;
+  const isAdmin = isAdminRequest(c);
   // if (!isAdmin && !isAllowed) {
   //   return c.html("<!doctype html>\n" + <PendingLayout />);
   // }

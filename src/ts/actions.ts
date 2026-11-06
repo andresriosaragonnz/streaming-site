@@ -49,7 +49,6 @@ export function initAppActions(): void {
   // 1. Audio & Video Player Actions
   // ---------------------------------------------------------------------------
   UI.registerAction("toggle-audio-mode", () => {
-    console.log("toggle-audio-mode");
     window.playerStore?.toggleMode?.();
   });
 
@@ -71,7 +70,6 @@ export function initAppActions(): void {
   UI.registerAction("select-segment", (trigger: HTMLElement) => {
     const card = trigger.closest("[data-id]") as HTMLElement | null;
     const id = card?.dataset.id ?? trigger.dataset.id;
-    console.log("select segment", id);
     if (id && window.playerStore) {
       stopPlayback();
       window.playerStore.selectSegment(id);
@@ -276,7 +274,6 @@ export function initAppActions(): void {
 
   UI.registerAction("sync-segment-title", (trigger: HTMLElement) => {
     const inputEl = trigger as HTMLInputElement;
-    console.log("clidk");
     window.reviewStore?.syncTitle(inputEl.value);
   });
 

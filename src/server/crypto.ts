@@ -27,6 +27,10 @@ export async function createAuthToken(
   payload: object,
   secret: string,
 ): Promise<string> {
+  if (typeof secret !== "string" || secret.length === 0) {
+    throw new Error("Missing AUTH_SECRET");
+  }
+
   const header = { alg: "HS256", typ: "JWT" };
   const encodedHeader = base64urlEncode(JSON.stringify(header));
   const encodedPayload = base64urlEncode(JSON.stringify(payload));
@@ -53,6 +57,8 @@ export async function verifyAuthToken<T = any>(
   secret: string,
 ): Promise<T | null> {
   if (!token) return null;
+  if (typeof secret !== "string" || secret.length === 0) return null;
+
   const parts = token.split(".");
   if (parts.length !== 3) return null;
 
@@ -72,7 +78,6 @@ export async function verifyAuthToken<T = any>(
     signatureBuffer,
     encoder.encode(dataToVerify),
   );
-  console.log({ isValid });
   if (!isValid) return null;
 
   try {

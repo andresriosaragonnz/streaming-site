@@ -45,8 +45,9 @@ export const PublicPortfolioLayout = ({
   ).slice(0, 6);
 
   // Pick a random hero image from available segments
-  const heroImage =
-    formattedSegments[getRandomIndex(formattedSegments)]?.heroImage || "";
+  const heroSegment =
+    formattedSegments[getRandomIndex(formattedSegments)] ?? ({} as Segment);
+  const heroImage = heroSegment.heroImage || "";
 
   return (
     <html lang="en">
@@ -87,9 +88,10 @@ export const PublicPortfolioLayout = ({
 
         <PublicPortfolioHero
           heroImage={heroImage}
+          segmentToken={heroSegment.segmentToken}
           title={formattedArtist}
           link={artistName}
-          performance={performance}
+          performance={String(performance || "")}
           count={publicPerformances.length}
           isAllowed={isAllowed}
         />

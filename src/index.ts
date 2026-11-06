@@ -5,6 +5,8 @@ import {
   servePlaylist,
   commitStatus,
   usePrivate,
+  usePrivatePerformance,
+  useAdmin,
   serveGenerateToken,
   serveClaim,
   serveOptions,
@@ -38,42 +40,50 @@ app.get("/", (c) => {
 // ---------------------------------------------------------
 app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
-app.get("/disable", serveDisable);
+app.get("/auth/claim", serveClaim);
+
+// ---------------------------------------------------------
+// 3. Admin & Destructive Routes (protected by header key)
+// ---------------------------------------------------------
+app.use("/admin/*", useAdmin);
+app.use("/disable", useAdmin);
+app.use("/enable", useAdmin);
+app.use("/expiretoken", useAdmin);
+
+app.post("/disable", serveDisable);
 app.get("/enable", serveEnable);
 app.get("/expiretoken", serveExpireToken);
 app.get("/admin/generate-token", serveGenerateToken);
 app.get("/admin/audit", serveAudit);
-app.get("/auth/claim", serveClaim);
 
-// Explicit POST routes
+// ---------------------------------------------------------
+// 4. Public / Artist APIs
+// ---------------------------------------------------------
 app.post("/api/commit-status", commitStatus);
 app.get("/api/playlists/portfolio-components", servePlaylistPortfolioCards);
-
-// API GET routes
 app.get("/api/search-options", serveOptions);
 
 // ---------------------------------------------------------
-// 3. Middlewares (Must be attached BEFORE the routes they protect)
+// 5. Private Auth Middlewares (must precede the routes they protect)
 // ---------------------------------------------------------
-// Replace "/private/*" with "/private/:slug/*" or "/private/:slug"
-app.use("/private/performance/:slug/", usePrivate);
+app.use("/private/performance/:slug", usePrivatePerformance);
 app.use("/private/:slug", usePrivate);
 
+app.get("/private/performance/:slug", servePrivatePerformance);
 app.get("/private/:slug", servePrivateDashboard);
 
 // ---------------------------------------------------------
-// 4. Specific Parametric Private Routes
+// 6. Specific Parametric Private Routes
 // ---------------------------------------------------------
 app.get("/download/:slug", serveDownload);
 app.get("/tech", serveTech);
-app.get("/private/performance/:slug", servePrivatePerformance);
-app.get("/private/:slug", servePrivateDashboard);
+
 // Explicit extension guard for missing static assets
 app.get("/:file{.+\\.(?:png|ico|jpg|jpeg|svg|css|js)$}", (c) =>
   c.text("Asset Not Found", 404),
 );
 // ---------------------------------------------------------
-// 5. Catch-All Parametric Route (MUST BE ABSOLUTE LAST)
+// 7. Catch-All Parametric Route (MUST BE ABSOLUTE LAST)
 // ---------------------------------------------------------
 app.get("/:slug/:performance", servePublicPerformance);
 app.get("/:slug", servePublicPortfolio);

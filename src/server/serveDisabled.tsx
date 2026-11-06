@@ -7,7 +7,7 @@ const Disable = () => {
 };
 
 export const serveDisable = async (c: any) => {
-  const sql = `UPDATE segments SET status = 'private'`;
-  await c.env.DB.prepare(sql).all();
+  await c.env.DB.prepare(`UPDATE segments SET status = 'private'`).run();
+  c.header("Cache-Control", "no-store");
   return c.html("<!doctype html>\n" + <Disable />);
 };

@@ -9,7 +9,6 @@ export function CardThumbnail({
   altText,
   segmentToken,
 }: CardThumbnailProps) {
-  console.log({ segmentToken, cardImage });
   return (
     <picture class="card-thumbnail">
       <source

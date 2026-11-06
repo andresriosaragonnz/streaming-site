@@ -1,5 +1,3 @@
-import { CLOUDFLARE_SOURCE } from "./constants.js";
-
 export interface MediaSources {
   heroImage: string;
   cardImage: string;
@@ -19,7 +17,7 @@ export const getMediaSource = (
   const config = videographers[videographer];
   const { worker, segmentToken } = config;
   return {
-    heroImage: `${worker}/${id}/desktop.jpg?token=${segmentToken}`,
+    heroImage: `${worker}/${id}`,
     segmentToken,
     cardImage: `${worker}/${id}/card`,
     sourceVideo480p: `${worker}/${id}/output_480.m3u8?token=${segmentToken}`,

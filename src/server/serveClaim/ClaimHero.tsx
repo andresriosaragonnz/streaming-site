@@ -2,6 +2,7 @@ import { HeroImage } from "../../components/HeroImage";
 
 export interface ClaimHeroProps {
   heroImage: string;
+  segmentToken?: string;
   title: string;
   link: string;
   count: number | string;
@@ -10,13 +11,14 @@ export interface ClaimHeroProps {
 
 export const ClaimHero = ({
   heroImage,
+  segmentToken,
   title,
   link,
   count,
   totalDuration,
 }: ClaimHeroProps) => (
   <div class="artist-hero">
-    <HeroImage heroImage={heroImage} />
+    <HeroImage heroImage={heroImage} segmentToken={segmentToken} />
     {/* 3. Foreground Content Overlay */}
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>

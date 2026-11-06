@@ -1,39 +1,36 @@
-import { verifyAuthToken } from "./crypto";
-import { parseCookies } from "./parseCookie";
-import type { UserPayload } from "./types";
-import { UnauthorizedPageLayout } from "./serveUnauthorized";
+import { getAuthPayload, hasArtistAccess } from "./auth";
 import { hashNameToId } from "../utils/makeId";
+import { UnauthorizedPageLayout } from "./serveUnauthorized";
 
 export const usePrivate = async (c: any, next: any) => {
-  const cookies = parseCookies(c.req.header("Cookie"));
-  const token = cookies["auth_token"];
-  if (!token) {
-    return c.html("<!doctype html>\n" + <UnauthorizedPageLayout />);
-  }
-  const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
+  const payload = await getAuthPayload(c);
   if (!payload) {
-    return c.text("403 Forbidden: Invalid token", 403);
-  }
-
-  // Check Expiration if defined
-  if (payload.exp && Date.now() / 1000 > payload.exp) {
-    return c.text("403 Forbidden: Token expired", 403);
+    return c.html("<!doctype html>\n" + <UnauthorizedPageLayout />, 401);
   }
 
   const requestedArtist = c.req.param("slug");
+  if (!requestedArtist) {
+    return c.text("Bad Request", 400);
+  }
+
   const artistId = hashNameToId(requestedArtist);
-  const sql = `SELECT * FROM artists WHERE id = ?`;
-  const { id, token_version } = await c.env.DB.prepare(sql)
+  const artist = await c.env.DB.prepare(
+    `SELECT id, token_version FROM artists WHERE id = ?`,
+  )
     .bind(artistId)
     .first();
-  const withVersion = `${id}_${token_version}`;
 
-  // Check if requested group is in user's privilege list
-  if (!payload.allowed.includes(withVersion)) {
+  if (!artist) {
+    return c.text("Artist not found", 404);
+  }
+
+  if (!hasArtistAccess(payload, artist.id, artist.token_version)) {
     return c.text(
       `403 Forbidden: You do not have access to ${requestedArtist}`,
       403,
     );
   }
+
+  c.header("Cache-Control", "private, no-store");
   await next();
 };

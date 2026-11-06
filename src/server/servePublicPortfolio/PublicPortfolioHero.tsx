@@ -2,15 +2,17 @@ import { HeroImage } from "../../components/HeroImage";
 
 export interface PublicPortfolioHeroProps {
   heroImage: string;
+  segmentToken?: string;
   title: string;
   link: string;
-  isAllowed: string;
+  isAllowed: boolean;
   performance: string;
   count: number | string;
 }
 
 export const PublicPortfolioHero = ({
   heroImage,
+  segmentToken,
   title,
   link,
   count,
@@ -18,7 +20,7 @@ export const PublicPortfolioHero = ({
   isAllowed,
 }: PublicPortfolioHeroProps) => (
   <div class="artist-hero">
-    <HeroImage heroImage={heroImage} />
+    <HeroImage heroImage={heroImage} segmentToken={segmentToken} />
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>
       <button

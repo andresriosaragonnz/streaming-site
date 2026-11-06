@@ -94,6 +94,7 @@ export const serveAudit = async (c: any) => {
 
   const missingSegments = auditResults.filter((s) => !s.existsInR2);
   const totalVerified = auditResults.length - missingSegments.length;
+  c.header("Cache-Control", "no-store");
   return c.html(
     <AuditDashboard
       data={{

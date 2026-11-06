@@ -13,6 +13,8 @@ export const PrivateDashboardLayout = ({
   const { formattedArtist, artistName } = formattedSegments[0];
   const performances = getPerformancesFromSegments(formattedSegments);
   const portfolioImages = [] as string[][];
+  const heroSegment =
+    formattedSegments[getRandomIndex(formattedSegments)] ?? {};
 
   const cards = performances.private.map((performance) => {
     const { segments, images } = performance;
@@ -44,9 +46,8 @@ export const PrivateDashboardLayout = ({
           <Menu />
         </div>
         <PrivateDashboardHero
-          heroImage={
-            formattedSegments[getRandomIndex(formattedSegments)].heroImage
-          }
+          heroImage={heroSegment.heroImage}
+          segmentToken={heroSegment.segmentToken}
           title={formattedArtist}
           link={artistName}
           count={performances.private.length}

@@ -13,8 +13,12 @@ type Bindings = {
 };
 
 interface UserPayload {
-  allowed: string;
-  v: number;
+  /**
+   * Fully qualified artist claims in the form `${artistId}_${tokenVersion}`.
+   * String values are still accepted at runtime for older cookies.
+   */
+  allowed: string[];
+  v?: number;
   exp?: number; // Expiration timestamp (optional)
 }
 

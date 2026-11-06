@@ -1,4 +1,8 @@
-const CLOUDFLARE_SOURCE =
-  process?.env?.CLOUDFLARE_SOURCE ||
-  "https://pub-4ff69b5c3aa4452eb92763e09e67aa3c.r2.dev";
-export { CLOUDFLARE_SOURCE };
+/**
+ * Source for non-segment static artwork only (for example the empty playlist
+ * hero). Segment media must always use the signed videographer Worker URLs
+ * produced by `getMediaSource`.
+ */
+const PUBLIC_ASSET_SOURCE =
+  process?.env?.CLOUDFLARE_SOURCE || "https://media.iknowthatband.org";
+export { PUBLIC_ASSET_SOURCE };

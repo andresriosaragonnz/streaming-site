@@ -9,6 +9,7 @@ export interface SegmentDataItem {
   status: string;
   formatedDuration: string;
   cardImage: string;
+  segmentToken: string;
 }
 
 export interface PrivatePerformancePageLayoutProps {
@@ -26,7 +27,11 @@ export const PrivatePerformancePageLayout = ({
     artistName,
     eventDate,
     masterSize,
+    segmentToken,
   } = formattedSegments[0];
+  const posterImage = segmentToken
+    ? `${cardImage}.jpg?token=${encodeURIComponent(segmentToken)}`
+    : `${cardImage}.jpg`;
   const cards = formattedSegments.map((segment, index) => (
     <PrivateSegmentCard
       index={index}
@@ -35,6 +40,7 @@ export const PrivatePerformancePageLayout = ({
       status={segment.status}
       formatedDuration={segment.formatedDuration}
       cardImage={segment.cardImage}
+      segmentToken={segment.segmentToken}
     />
   ));
   return (
@@ -52,7 +58,7 @@ export const PrivatePerformancePageLayout = ({
           <PrivateViewPlayer
             studioTitle={`${formattedArtist}-${venueName}-${formattedDate}`}
             artistName={artistName}
-            posterImage={cardImage}
+            posterImage={posterImage}
             segments={formattedSegments}
             performance={`${venueName}-${eventDate}`}
             masterSize={masterSize}

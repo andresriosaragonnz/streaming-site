@@ -41,7 +41,11 @@ export const PublicPerformancePageLayout = ({
     artistName,
     performance,
   } = firstSegment;
-  console.log({ firstSegment });
+
+  const posterImage = firstSegment.segmentToken
+    ? `${cardImage}.jpg?token=${encodeURIComponent(firstSegment.segmentToken)}`
+    : `${cardImage}.jpg`;
+
   const cards = formattedSegments.map((segment) => (
     <PublicSegmentCard
       id={segment.id}
@@ -66,7 +70,7 @@ export const PublicPerformancePageLayout = ({
             rel="preload"
             as="image"
             fetchpriority="high"
-            href={`${cardImage}.jpg`}
+            href={posterImage}
             type="image/jpeg"
           />
         )}
@@ -83,10 +87,10 @@ export const PublicPerformancePageLayout = ({
             studioTitle={`${formattedVenue} ${formattedDate}`}
             firstTitle={formattedTitle}
             firstMp3={sourceMp3}
-            posterImage={`${cardImage}.jpg`}
+            posterImage={posterImage}
             artistLink={artistName}
             artistName={formattedArtist}
-            performanceLink={performance}
+            performanceLink={String(performance)}
             isAllowed={isAllowed}
           />
 

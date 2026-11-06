@@ -14,7 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!bgPath) return;
 
     const cleanPath = bgPath.replace(/\/$/, "");
-    const targetUrl = `${cleanPath}/desktop.jpg`;
+    const token = card.getAttribute("data-image-token");
+    const targetUrl = `${cleanPath}/desktop.jpg${
+      token ? `?token=${encodeURIComponent(token)}` : ""
+    }`;
 
     // Set target URL on fade element immediately
     fadeImg.src = targetUrl;

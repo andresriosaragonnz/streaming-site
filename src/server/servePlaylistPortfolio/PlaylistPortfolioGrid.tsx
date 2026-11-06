@@ -1,13 +1,19 @@
 import { PlaylistCard } from "./PlaylistCard";
 import { PlaylistHero } from "./PlaylistHero";
-import { getCardImage } from "../../formatSegments/getCardImage";
 import { getHeroImage } from "../../formatSegments/getHeroImage";
 import { getRandomIndex } from "../../formatSegments/utils/getRandomIndex";
 
+export interface PortfolioItem {
+  id: string;
+  name: string;
+  trackCount: number | string;
+  cardImage: string;
+  heroImage: string;
+  segmentToken: string;
+}
+
 export interface PlaylistPortfolioGridProps {
-  ids: string[];
-  names: string[];
-  ls: string[];
+  items: PortfolioItem[];
 }
 
 export interface PortfolioRenderResult {
@@ -17,11 +23,9 @@ export interface PortfolioRenderResult {
 }
 
 export const renderPortfolioGrid = ({
-  ids,
-  names,
-  ls,
+  items = [],
 }: PlaylistPortfolioGridProps): PortfolioRenderResult => {
-  if (!ids || ids.length === 0) {
+  if (items.length === 0) {
     const emptyHero = (
       <PlaylistHero heroImage={getHeroImage("playlists")} count={0} />
     );
@@ -39,34 +43,35 @@ export const renderPortfolioGrid = ({
     };
   }
 
-  const portfolioImages: string[] = [];
   let totalTracks = 0;
 
-  const cards = ids.map((id, index) => {
-    const cardImage = getCardImage(id);
-    const trackCount = parseInt(ls[index] || "0", 10);
-    totalTracks += trackCount;
-
-    const heroImg = getHeroImage(id);
-    if (heroImg) portfolioImages.push(heroImg);
+  const cards = items.map((item) => {
+    totalTracks += Number(item.trackCount) || 0;
 
     return (
       <PlaylistCard
-        playlistName={names[index] || id}
-        playlistLength={ls[index] || "0"}
-        altImage={cardImage}
-        cardImage={cardImage}
+        playlistName={item.name}
+        playlistLength={item.trackCount}
+        altImage={item.heroImage}
+        cardImage={item.cardImage}
+        segmentToken={item.segmentToken}
       />
     );
   });
 
-  const selectedHeroImage =
-    portfolioImages.length > 0
-      ? portfolioImages[getRandomIndex(portfolioImages)]
-      : "/images/default-hero.jpg";
+  const heroItems = items.filter((item) => item.heroImage);
+  const selectedHeroItem = heroItems[getRandomIndex(heroItems)] ?? null;
+
+  const selectedHeroImage = selectedHeroItem?.heroImage
+    ? selectedHeroItem.heroImage
+    : getHeroImage("playlists");
 
   const hero = (
-    <PlaylistHero heroImage={selectedHeroImage} count={ids.length} />
+    <PlaylistHero
+      heroImage={selectedHeroImage}
+      segmentToken={selectedHeroItem?.segmentToken}
+      count={items.length}
+    />
   );
 
   return {

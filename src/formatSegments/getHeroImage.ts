@@ -1,5 +1,5 @@
-import { CLOUDFLARE_SOURCE } from "./constants.js";
+import { PUBLIC_ASSET_SOURCE } from "./constants.js";
 
-const getHeroImage = (image: string) => `${CLOUDFLARE_SOURCE}/${image}`;
+const getHeroImage = (image: string) => `${PUBLIC_ASSET_SOURCE}/${image}`;
 
 export { getHeroImage };
