@@ -15,7 +15,7 @@ export const formatSegment = (segment: any, videographers: any) => {
     ...media,
     artistName: escapeHtml(segment.artistName),
     artistId: escapeHtml(segment.artistId),
-    duration: escapeHtml(segment.duration),
+    duration: segment.duration,
     eventDate: escapeHtml(segment.eventDate),
     formatedDuration: formatTime(segment.duration),
     formattedArtist,

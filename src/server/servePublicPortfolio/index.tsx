@@ -1,10 +1,12 @@
 import { PublicPortfolioLayout } from "./PublicPortfolioLayout";
 import { PendingLayout } from "../servePending";
 import { getIsAllowed } from "../getIsAllowed";
+import { getVideographers } from "../getVideographers";
+import { formatSegments } from "../../formatSegments";
 
 export const servePublicPortfolio = async (c: any) => {
   const slug = c.req.param("slug");
-
+  const videographers = await getVideographers(c);
   // 1. Fetch D1 segment data & KV graph data in parallel
   const [graphData, { results }] = await Promise.all([
     c.env.PAGE_CACHE.get("graphDataJsonString"),
@@ -33,7 +35,6 @@ export const servePublicPortfolio = async (c: any) => {
       return itemTime > max ? itemTime : max;
     }, 0) || "";
   const etag = `W/"port-${slug}-${segmentCount}-${lastUpdated}-${isAllowed}"`;
-  console.log(etag, { isAllowed });
   // Handle client conditional requests (If-None-Match)
   if (c.req.header("If-None-Match") === etag) {
     return c.body(null, 304, {
@@ -48,13 +49,13 @@ export const servePublicPortfolio = async (c: any) => {
     "public, max-age=3600, s-maxage=604800, stale-while-revalidate=86400",
   );
   c.header("ETag", etag);
-
+  const { formattedSegments } = formatSegments(results, videographers);
   // 4. Render HTML
   return c.html(
     "<!doctype html>\n" +
     (
       <PublicPortfolioLayout
-        segments={results}
+        formattedSegments={formattedSegments}
         graphDataJS={graphData}
         isAllowed={isAllowed}
       />

@@ -1,4 +1,3 @@
-import { formatSegments } from "../../formatSegments";
 import { getPerformancesFromSegments } from "../../formatSegments/utils/getPerformancesFromSegments";
 import { getRandomElements } from "../../formatSegments/utils/getRandomElement";
 import { getRandomIndex } from "../../formatSegments/utils/getRandomIndex";
@@ -9,18 +8,17 @@ import { PublicPortfolioHero } from "./PublicPortfolioHero";
 import type { Segment } from "../../ts/types";
 
 export interface PublicPortfolioLayoutProps {
-  segments: Segment[];
+  formattedSegments: Segment[];
   graphDataJS?: string;
   isAllowed: boolean;
 }
 
 export const PublicPortfolioLayout = ({
-  segments = [],
+  formattedSegments = [],
   graphDataJS = "[]",
   isAllowed,
 }: PublicPortfolioLayoutProps) => {
   // 1. Process and format segments
-  const { formattedSegments } = formatSegments(segments);
   const firstSegment = formattedSegments[0] ?? {};
   const { formattedArtist, artistName, performance } = firstSegment;
 
@@ -69,11 +67,11 @@ export const PublicPortfolioLayout = ({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         {/* Prefetch links to speed up navigation to public performances */}
-        {prefetchUrls.map((url) => {
+        {/* {prefetchUrls.map((url) => {
           const href = url.startsWith("/") ? url : `/${url}`;
 
           return <link rel="prefetch" key={href} href={href} as="document" />;
-        })}
+        })} */}
         <link rel="stylesheet" href="/css/main.css" />
         <script src="/js/orb.js"></script>
 

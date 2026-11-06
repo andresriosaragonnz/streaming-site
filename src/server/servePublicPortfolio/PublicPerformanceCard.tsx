@@ -1,4 +1,4 @@
-import { ItemThumbnail } from "../../components/ItemThumbnail";
+import { CardThumbnail } from "../../components/CardThumbnail";
 
 export interface PublicPerformanceCardProps {
   altImage: string;
@@ -8,6 +8,7 @@ export interface PublicPerformanceCardProps {
   formattedDate: string;
   formattedVenueName: string;
   venueName: string;
+  segmentToken: string;
 }
 
 export const PublicPerformanceCard = ({
@@ -18,15 +19,20 @@ export const PublicPerformanceCard = ({
   formattedDate,
   formattedVenueName,
   venueName,
+  segmentToken,
 }: PublicPerformanceCardProps) => (
   <a
     href={`${artistName}/${venueName}-${eventDate}`}
     class="card"
-    rel="prefetch"
+    // rel="prefetch"
     data-bg={altImage}
     style="text-decoration: none; color: inherit"
   >
-    <ItemThumbnail cardImage={cardImage} title={formattedVenueName} />
+    <CardThumbnail
+      cardImage={cardImage}
+      altText={formattedVenueName}
+      segmentToken={segmentToken}
+    />
 
     <div class="card-metadata">
       <h3 class="capitalize-words h3">{formattedVenueName}</h3>

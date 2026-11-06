@@ -1,6 +1,5 @@
 import { PrivateViewPlayer } from "./PrivateViewPlayer";
 import { PrivateViewSidebar } from "./PrivateViewSidebar";
-import { formatSegments } from "../../formatSegments/index";
 import { PrivateSegmentCard } from "./PrivateSegmentCard";
 import { Toast } from "../../components/ToastContainer";
 import { Favicon } from "../../components/Favicon";
@@ -13,13 +12,12 @@ export interface SegmentDataItem {
 }
 
 export interface PrivatePerformancePageLayoutProps {
-  segments: SegmentDataItem[];
+  formattedSegments: any[];
 }
 
 export const PrivatePerformancePageLayout = ({
-  segments = [],
+  formattedSegments = [],
 }: PrivatePerformancePageLayoutProps) => {
-  const { formattedSegments } = formatSegments(segments);
   const {
     cardImage,
     formattedArtist,

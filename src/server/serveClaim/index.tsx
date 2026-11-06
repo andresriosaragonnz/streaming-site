@@ -1,6 +1,9 @@
 import { createAuthToken, verifyAuthToken } from "../crypto";
 import { parseCookies } from "../parseCookie";
 import { ClaimLayout } from "./ClaimLayout";
+import { getVideographers } from "../getVideographers";
+
+import { formatSegments } from "../../formatSegments";
 
 interface UserPayload {
   sub: string;
@@ -13,13 +16,11 @@ export const serveClaim = async (c: any) => {
   try {
     const incomingToken = c.req.query("token");
     if (!incomingToken) return c.text("Missing token", 400);
-    console.log({ incomingToken });
     // 1. Verify incoming claim token
     const incomingPayload = await verifyAuthToken<UserPayload>(
       incomingToken,
       c.env.AUTH_SECRET,
     );
-    console.log({ incomingPayload });
     if (!incomingPayload) return c.text("Invalid or tampered token", 403);
 
     // 2. Check if device already has an existing auth_token cookie
@@ -71,17 +72,21 @@ export const serveClaim = async (c: any) => {
     const { results: segments } = await c.env.DB.prepare(sql)
       .bind(incomingPayload.allowed)
       .all();
+    const videographers = await getVideographers(c);
+    const { formattedSegments, totalDuration } = formatSegments(
+      segments,
+      videographers,
+    );
 
     // 1. Build dynamic placeholder string: "?, ?, ?"
     const placeholders = mergedAllowed.map(() => "?").join(", ");
     const values = mergedAllowed.map((v: string) => v.split("_")[0]);
-    console.log({ values });
     // 2. Prepare and run SQL query
     const query = `
-  SELECT DISTINCT artistName 
-  FROM segments 
-  WHERE artistId IN (${placeholders})
-`;
+        SELECT DISTINCT artistName 
+        FROM segments 
+        WHERE artistId IN (${placeholders})
+      `;
 
     const { results } = await c.env.DB.prepare(query)
       .bind(...values)
@@ -89,10 +94,16 @@ export const serveClaim = async (c: any) => {
 
     // Extract simple array of names: ['Band A', 'Band B']
     const artistNames = results.map((r: any) => r.artistName);
-    console.log({ artistNames, values });
     return c.html(
       "<!doctype html>\n" +
-      <ClaimLayout segments={segments} artists={artistNames} />,
+      (
+        <ClaimLayout
+          segments={segments}
+          artists={artistNames}
+          formattedSegments={formattedSegments}
+          totalDuration={totalDuration}
+        />
+      ),
     );
 
     // 5. Render KitaJS component directly into Hono HTML response

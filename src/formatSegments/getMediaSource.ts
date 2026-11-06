@@ -6,6 +6,7 @@ export interface MediaSources {
   sourceVideo480p: string;
   sourceVideo1080p: string;
   sourceMp3: string;
+  segmentToken: string;
 }
 
 export const getMediaSource = (
@@ -14,11 +15,13 @@ export const getMediaSource = (
   videographers: any,
 ): MediaSources => {
   // Single HMAC calculation per segment
+
   const config = videographers[videographer];
   const { worker, segmentToken } = config;
   return {
-    heroImage: `${worker}/${id}/hero.jpg?token=${segmentToken}`,
-    cardImage: `${worker}/${id}/card.jpg?token=${segmentToken}`,
+    heroImage: `${worker}/${id}/desktop.jpg?token=${segmentToken}`,
+    segmentToken,
+    cardImage: `${worker}/${id}/card`,
     sourceVideo480p: `${worker}/${id}/output_480.m3u8?token=${segmentToken}`,
     sourceVideo1080p: `${worker}/${id}/output_1080.m3u8?token=${segmentToken}`,
     sourceMp3: `${worker}/${id}/audio.mp3?token=${segmentToken}`,

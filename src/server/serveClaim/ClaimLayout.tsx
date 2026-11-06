@@ -6,8 +6,12 @@ import { Menu } from "../../components/Menu";
 import { ClaimHero } from "./ClaimHero";
 import { PrivatePerformanceCard } from "../servePrivateDashboard/PrivatePerformanceCard";
 
-export const ClaimLayout = ({ segments = [], artists }: any) => {
-  const { formattedSegments, totalDuration } = formatSegments(segments);
+export const ClaimLayout = ({
+  segments = [],
+  artists,
+  formattedSegments,
+  totalDuration,
+}: any) => {
   const { formattedArtist, artistName } = formattedSegments[0];
   const performances = getPerformancesFromSegments(formattedSegments);
   const portfolioImages = [] as string[][];

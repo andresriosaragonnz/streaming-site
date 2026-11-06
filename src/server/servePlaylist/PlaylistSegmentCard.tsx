@@ -7,6 +7,7 @@ export interface PlaylistSegmentCardProps {
   formattedArtist: string;
   cardImage: string;
   id: string;
+  segmentToken: string;
 }
 
 export const PlaylistSegmentCard = ({
@@ -15,6 +16,7 @@ export const PlaylistSegmentCard = ({
   formattedArtist,
   cardImage,
   id,
+  segmentToken,
 }: PlaylistSegmentCardProps) => {
   const cardId = `playlist-segment-card-${index}`;
 
@@ -33,7 +35,11 @@ export const PlaylistSegmentCard = ({
       ondragend="window.playlistDragEngine?.handleDragEnd()"
     >
       <div class="item-meta">
-        <CardThumbnail cardImage={cardImage} altText={title} />
+        <CardThumbnail
+          cardImage={cardImage}
+          altText={title}
+          segmentToken={segmentToken}
+        />
       </div>
       <div class="item-meta">
         <div class="title-text">

@@ -7,7 +7,6 @@ export const servePlaylist = async (c: any) => {
   let shareParam = c.req.query("share");
   const rawNameParam = c.req.query("name") || "playlist";
   const videographers = await getVideographers(c);
-  console.log({ videographers });
 
   // 1. Sanitize & escape name parameter to prevent Reflected XSS
   const nameParam = escapeHtml(rawNameParam.trim().slice(0, 50));

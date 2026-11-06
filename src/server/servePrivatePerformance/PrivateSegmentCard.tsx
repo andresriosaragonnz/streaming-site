@@ -7,6 +7,7 @@ export interface PrivateSegmentCardProps {
   status: string;
   formatedDuration: string;
   cardImage: string;
+  segmentToken: string;
 }
 
 export const PrivateSegmentCard = ({
@@ -16,6 +17,7 @@ export const PrivateSegmentCard = ({
   status,
   formatedDuration,
   cardImage,
+  segmentToken,
 }: PrivateSegmentCardProps) => {
   const isPublic = status === "public";
 
@@ -31,7 +33,11 @@ export const PrivateSegmentCard = ({
       aria-label={`Select ${title}`}
     >
       <div class="item-meta">
-        <CardThumbnail cardImage={cardImage} altText={title} />
+        <CardThumbnail
+          cardImage={cardImage}
+          altText={title}
+          segmentToken={segmentToken}
+        />
 
         <div class="status-text">
           {/* Target review.state.tracks so binder evaluates the proxy state array directly */}

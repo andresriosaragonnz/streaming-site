@@ -20,6 +20,7 @@ export const PlaylistPageLayout = ({
     formattedTitle: "",
     artistLink: "",
     formattedArtist: "",
+    segmentToken: "",
   };
 
   const { cardImage, sourceMp3, formattedTitle, artistLink, formattedArtist } =
@@ -32,6 +33,7 @@ export const PlaylistPageLayout = ({
       formattedArtist={segment.formattedArtist}
       cardImage={segment.cardImage}
       id={segment.id}
+      segmentToken={segment.segmentToken}
     />
   ));
 
@@ -50,13 +52,10 @@ export const PlaylistPageLayout = ({
             firstTitle={formattedTitle}
             posterImage={cardImage}
             firstMp3={sourceMp3}
-          />
-          <PlaylistViewSidebar
             artistLink={artistLink}
             artistName={formattedArtist}
-            cards={cards}
-            pageTitle={pageTitle}
           />
+          <PlaylistViewSidebar cards={cards} pageTitle={pageTitle} />
         </div>
 
         <script type="application/json" id="studio-segments-data">

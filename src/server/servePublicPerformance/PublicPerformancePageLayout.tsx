@@ -8,17 +8,16 @@ import { formatSegments } from "../../formatSegments";
 import { GraphModal } from "../../components/GraphModal";
 
 export interface PublicPerformancePageLayoutProps {
-  segments: Segment[];
+  formattedSegments: Segment[];
   graphDataJS: string;
   isAllowed?: boolean;
 }
 
 export const PublicPerformancePageLayout = ({
-  segments = [],
+  formattedSegments = [],
   graphDataJS,
   isAllowed,
 }: PublicPerformancePageLayoutProps) => {
-  const { formattedSegments, totalDuration } = formatSegments(segments);
   const firstSegment = formattedSegments[0] ?? {
     cardImage: "",
     sourceMp3: "",
@@ -42,12 +41,14 @@ export const PublicPerformancePageLayout = ({
     artistName,
     performance,
   } = firstSegment;
+  console.log({ firstSegment });
   const cards = formattedSegments.map((segment) => (
     <PublicSegmentCard
       id={segment.id}
       title={segment.formattedTitle}
       cardImage={segment.cardImage}
       duration={segment.formatedDuration}
+      segmentToken={segment.segmentToken}
     />
   ));
   return (

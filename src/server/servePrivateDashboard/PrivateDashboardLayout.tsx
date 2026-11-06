@@ -6,8 +6,10 @@ import { Menu } from "../../components/Menu";
 import { PrivateDashboardHero } from "./PrivateDashboardHero";
 import { PrivatePerformanceCard } from "./PrivatePerformanceCard";
 
-export const PrivateDashboardLayout = ({ segments = [] }) => {
-  const { formattedSegments, totalDuration } = formatSegments(segments);
+export const PrivateDashboardLayout = ({
+  formattedSegments = [],
+  totalDuration,
+}: any) => {
   const { formattedArtist, artistName } = formattedSegments[0];
   const performances = getPerformancesFromSegments(formattedSegments);
   const portfolioImages = [] as string[][];

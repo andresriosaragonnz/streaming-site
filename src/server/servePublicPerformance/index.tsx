@@ -2,13 +2,15 @@ import { PublicPerformancePageLayout } from "./PublicPerformancePageLayout";
 import { NotFound } from "./NotFound";
 import { parseCookies } from "../parseCookie";
 import { verifyAuthToken } from "../crypto";
+import { getVideographers } from "../getVideographers";
+import { formatSegments } from "../../formatSegments";
 import type { UserPayload } from "../types";
 
 export const servePublicPerformance = async (c: any) => {
   const slug = c.req.param("slug");
   const performance = c.req.param("performance");
   const cookies = parseCookies(c.req.header("Cookie"));
-
+  const videographers = await getVideographers(c);
   const token = cookies["auth_token"];
   const payload = await verifyAuthToken<UserPayload>(token, c.env.AUTH_SECRET);
 
@@ -44,7 +46,6 @@ export const servePublicPerformance = async (c: any) => {
   const segmentCount = results?.length || 0;
 
   // Extract the highest updated_at timestamp from the set
-  console.log(results);
   const lastUpdated =
     results?.reduce((max: any, item: any) => {
       const itemTime = item.updated_at
@@ -53,7 +54,6 @@ export const servePublicPerformance = async (c: any) => {
       return itemTime > max ? itemTime : max;
     }, 0) || "";
   const etag = `W/"perf-${slug}-${performance}-${segmentCount}-${lastUpdated}-${isAllowed}-${isAdmin}"`;
-  console.log(etag);
 
   // Handle client conditional requests (If-None-Match)
   if (c.req.header("If-None-Match") === etag) {
@@ -62,6 +62,10 @@ export const servePublicPerformance = async (c: any) => {
       "Cache-Control": "public, max-age=0, must-revalidate",
     });
   }
+  const { formattedSegments, totalDuration } = formatSegments(
+    results,
+    videographers,
+  );
 
   // 3. Set Edge CDN & Browser Cache Headers
   c.header(
@@ -74,7 +78,7 @@ export const servePublicPerformance = async (c: any) => {
     "<!doctype html>\n" +
     (
       <PublicPerformancePageLayout
-        segments={results}
+        formattedSegments={formattedSegments}
         graphDataJS={graphData}
         isAllowed={isAllowed}
       />

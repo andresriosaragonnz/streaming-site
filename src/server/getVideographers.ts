@@ -11,7 +11,7 @@ export async function generateSegmentToken(
 ): Promise<string> {
   const expires = Math.floor(Date.now() / 1000) + expiresInSeconds;
   const message = `${id}:${expires}`;
-
+  console.log({ id, secret });
   const enc = new TextEncoder();
   const keyBuffer = enc.encode(secret);
   const messageBuffer = enc.encode(message);
@@ -49,6 +49,7 @@ export const getVideographers = async (c: any) => {
       videographer.iv,
       c.env.MASTER_ENCRYPTION_KEY,
     );
+    console.log({ storageKey });
     const segmentToken = await generateSegmentToken(
       videographer.name,
       storageKey,

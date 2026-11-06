@@ -8,6 +8,8 @@ export interface PlaylistViewPlayerProps {
   firstTitle: string;
   posterImage: string;
   firstMp3: string;
+  artistLink: string;
+  artistName: string;
 }
 
 export const PlaylistViewPlayer = ({
@@ -15,11 +17,21 @@ export const PlaylistViewPlayer = ({
   firstTitle,
   posterImage,
   firstMp3,
+  artistLink,
+  artistName,
 }: PlaylistViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
     <TitleBar player />
     <div class="performance-title-big">{pageTitle}</div>
     <div style="display:flex;flex-direction:row;gap:8px">
+      <a
+        class="sidebar-artist-button"
+        href={artistLink ? `/${artistLink}` : "#"}
+        data-bind-href="player.currentArtistLink ? '/' + player.currentArtistLink : '#'"
+        data-bind-text="player.currentArtistName"
+      >
+        {artistName}
+      </a>
       <div
         class="performance-title break-hyphens"
         data-bind-text="player.currentTrack ? player.currentTrack.title : ''"

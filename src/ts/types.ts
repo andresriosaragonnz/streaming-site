@@ -12,6 +12,7 @@ export interface Segment {
   artistName: string;
   formattedPerformance: string;
   formatedDuration: string;
+  segmentToken: string;
   [key: string]: unknown;
 }
 
@@ -22,7 +23,7 @@ export interface PlaylistsMap {
 export interface PerformanceData {
   segments: Segment[];
   images: string[];
-
+  segmentToken: string;
   artistName: string;
   formattedArtist: string;
   link: string;

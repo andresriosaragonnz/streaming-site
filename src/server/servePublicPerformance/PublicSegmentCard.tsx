@@ -6,6 +6,7 @@ export interface PublicSegmentCardProps {
   cardImage: string;
   duration?: string;
   isSelected?: boolean;
+  segmentToken: string;
 }
 
 export const PublicSegmentCard = ({
@@ -14,6 +15,7 @@ export const PublicSegmentCard = ({
   cardImage,
   duration,
   isSelected = false,
+  segmentToken,
 }: PublicSegmentCardProps) => (
   <div
     class={`sidebar-item-card ${isSelected ? "is-selected" : ""}`}
@@ -25,7 +27,11 @@ export const PublicSegmentCard = ({
     aria-selected={isSelected}
   >
     <div class="item-meta">
-      <CardThumbnail cardImage={cardImage} altText={title} />
+      <CardThumbnail
+        cardImage={cardImage}
+        altText={title}
+        segmentToken={segmentToken}
+      />
     </div>
 
     <div class="title-text">

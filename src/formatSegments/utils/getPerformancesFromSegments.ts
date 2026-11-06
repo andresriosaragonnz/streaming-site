@@ -15,38 +15,43 @@ const getPerformancesFromSegmentsStatus = (segments: any) => {
       formattedArtist,
       id,
       duration,
+      segmentToken,
+      cardImage,
     } = segment;
-    const initial = {
-      artistName: encodeURIComponent(artistName),
-      formattedArtist,
-      link: `${artistName}/${venueName}-${eventDate}`,
-      venueName: venueName,
-      formattedVenueName: venueName.replaceAll("_", " "),
-      eventDate,
-      formattedDate,
-      segments: [segment],
-      images: duration > 60 ? [heroImage] : [],
-      status,
-      performance,
-      duration: duration,
-    };
     const currentPerformance = performancesIndex[performance];
     if (currentPerformance) {
       currentPerformance.duration += duration;
       if (duration > 60) {
         currentPerformance.images.push(heroImage);
+        currentPerformance.cardImages.push(cardImage);
       }
       currentPerformance.segments.push(segment);
     } else {
-      performancesIndex[performance] = initial;
+      performancesIndex[performance] = {
+        artistName: encodeURIComponent(artistName),
+        formattedArtist,
+        link: `${artistName}/${venueName}-${eventDate}`,
+        venueName: venueName,
+        formattedVenueName: venueName.replaceAll("_", " "),
+        eventDate,
+        formattedDate,
+        segments: [segment],
+        images: duration > 60 ? [heroImage] : [],
+        cardImages: duration > 60 ? [cardImage] : [],
+        status,
+        performance,
+        duration: duration,
+        segmentToken,
+        cardImage,
+      };
     }
   }
   const performances = Object.values(performancesIndex).map(
     (performance: any) => {
-      const { images } = performance;
-      const randomIndex = getRandomIndex(images);
+      const { images, cardImages } = performance;
+      const randomIndex = getRandomIndex(cardImages);
       const randomIndex2 = getRandomIndex(images);
-      performance.cardImage = `${images[randomIndex]}/card`;
+      performance.cardImage = `${cardImages[randomIndex]}`;
       performance.altImage = `${images[randomIndex2]}`;
       performance.duration = formatTime(performance.duration);
       return performance;

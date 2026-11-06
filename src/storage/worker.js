@@ -74,7 +74,7 @@ export default {
     const headers = new Headers();
     object.writeHttpMetadata(headers);
 
-    // Fallback Content-Type if R2 metadata is absent
+    // Set fallback Content-Type if R2 metadata is absent
     const ext = objectKey.split(".").pop()?.toLowerCase();
     if (!headers.has("content-type") && ext && MIME_TYPES[ext]) {
       headers.set("Content-Type", MIME_TYPES[ext]);
@@ -89,14 +89,31 @@ export default {
     if (isDownload) {
       const filename = objectKey.split("/").pop() || "master.mp4";
       headers.set("Content-Disposition", `attachment; filename="${filename}"`);
-    } else {
-      headers.set("Cache-Control", "public, max-age=31536000, immutable");
     }
 
     if (request.method === "HEAD") {
       return new Response(null, { headers });
     }
 
+    // 7. Intercept HLS .m3u8 manifests and append token to relative chunk URLs (.ts)
+    if (objectKey.endsWith(".m3u8")) {
+      const originalText = await object.text();
+      const tokenQuery = `token=${encodeURIComponent(token)}`;
+
+      // Rewrites chunk lines (e.g., segment_1080_000.ts -> segment_1080_000.ts?token=...)
+      // Also handles sub-manifest playlists if using a master playlist setup
+      const rewrittenText = originalText.replace(
+        /^([^#\s]+\.(?:ts|m3u8))(?:\?.*)?$/gm,
+        (match, path) => `${path}?${tokenQuery}`,
+      );
+
+      headers.set("Content-Type", "application/x-mpegURL");
+      headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+
+      return new Response(rewrittenText, { headers });
+    }
+
+    headers.set("Cache-Control", "public, max-age=31536000, immutable");
     return new Response(object.body, { headers });
   },
 };

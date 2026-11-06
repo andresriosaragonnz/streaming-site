@@ -80,6 +80,7 @@
   text-transform: capitalize;
   font-size: larger;
   color: var(--text-main);
+  padding: 0.8rem;
 }
 
 .performance-title-big {
