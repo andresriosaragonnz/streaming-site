@@ -1,12 +1,12 @@
 let orbInstance = null;
 let rafId = null;
 
-export function scheduleGraphRender(customData) {
+export function scheduleGraphRender(customData, isFull = false) {
   if (rafId) {
     cancelAnimationFrame(rafId);
   }
   rafId = requestAnimationFrame(() => {
-    renderGraph(customData);
+    renderGraph(customData, isFull);
     rafId = null;
   });
 }
@@ -14,7 +14,7 @@ export function scheduleGraphRender(customData) {
 /**
  * Resolves the graph payload using pre-calculated artistClusters when available.
  */
-function resolveGraphPayload(customData) {
+function resolveGraphPayload(customData, isFull = false) {
   const rawData = customData || window.__GRAPH_DATA__;
   if (!rawData) return null;
 
@@ -25,8 +25,10 @@ function resolveGraphPayload(customData) {
     (activeLink ? activeLink.replace(/^artist\//, "") : "") ||
     perfLinkEl?.getAttribute("data-artist") ||
     "";
-  console.log(rawArtist);
-  const currentArtist = decodeURIComponent(rawArtist).toLowerCase().trim();
+
+  const currentArtist = isFull
+    ? null
+    : decodeURIComponent(rawArtist).toLowerCase().trim();
 
   if (currentArtist && rawData.artistClusters) {
     const key = currentArtist;
@@ -79,7 +81,8 @@ function syncSeeVideosLink(targetArtist) {
     }
   }
 }
-export function renderGraph(customData) {
+
+export function renderGraph(customData, isFull = false) {
   const container = document.getElementById("graph");
   if (!container) return;
 
@@ -102,7 +105,7 @@ export function renderGraph(customData) {
     if (rect.width === 0 || rect.height === 0) return;
   }
 
-  const payload = resolveGraphPayload(customData);
+  const payload = resolveGraphPayload(customData, isFull);
   if (!payload || !payload.nodes || !payload.nodes.length) {
     console.warn("⚠️ [Network] No graph payload available.");
     return;
@@ -320,7 +323,7 @@ if (typeof window !== "undefined") {
       window.graphStore.activeNodeLink = "";
     }
 
-    scheduleGraphRender();
+    scheduleGraphRender(null, true);
   });
 
   window.addEventListener("modal-ready", () => {

@@ -237,11 +237,34 @@ export function initAppActions(): void {
     window.graphStore?.toggleDrawer(),
   );
 
-  UI.registerAction("reset-graph", () => {
-    window.graphStore?.setActiveNode("");
-    if (typeof window.scheduleGraphRender === "function") {
-      window.scheduleGraphRender();
+  UI.registerAction("reset-graph", (trigger, event) => {
+    event?.preventDefault();
+
+    // 1. Clear artist attributes from DOM triggers
+    const artistNameEl = document.getElementById("artist-name");
+    if (artistNameEl) artistNameEl.removeAttribute("data-artist");
+
+    const perfLinkEl = document.getElementById("performance-link");
+    if (perfLinkEl) perfLinkEl.removeAttribute("data-artist");
+
+    // 2. Clear node links WITHOUT closing the drawer/modal
+    if (window.graphStore) {
+      if (typeof window.graphStore.setActiveNode === "function") {
+        window.graphStore.setActiveNode("");
+      } else {
+        window.graphStore.activeNodeLink = "";
+      }
+      // Keep the graph view open
+      window.graphStore.isDrawerOpen = true;
     }
+
+    // 3. Render full graph view
+    if (typeof (window as any).scheduleGraphRender === "function") {
+      (window as any).scheduleGraphRender(null, true);
+    }
+
+    window.dispatchEvent(new CustomEvent("graph-state-changed"));
+    UI.requestSync();
   });
 
   // ---------------------------------------------------------------------------

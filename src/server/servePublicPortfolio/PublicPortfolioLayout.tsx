@@ -1,11 +1,11 @@
+import { GraphModal } from "../../components/GraphModal";
+import { Menu } from "../../components/Menu";
 import { getPerformancesFromSegments } from "../../formatSegments/utils/getPerformancesFromSegments";
 import { getRandomElements } from "../../formatSegments/utils/getRandomElement";
 import { getRandomIndex } from "../../formatSegments/utils/getRandomIndex";
-import { Menu } from "../../components/Menu";
-import { GraphModal } from "../../components/GraphModal";
+import type { Segment } from "../../ts/types";
 import { PublicPerformanceCard } from "./PublicPerformanceCard";
 import { PublicPortfolioHero } from "./PublicPortfolioHero";
-import type { Segment } from "../../ts/types";
 
 export interface PublicPortfolioLayoutProps {
   formattedSegments: Segment[];
