@@ -1,13 +1,28 @@
 import { CLOUDFLARE_SOURCE } from "./constants.js";
 
-const getMediaSource = (id: string) => {
+export interface MediaSources {
+  heroImage: string;
+  cardImage: string;
+  sourceVideo480p: string;
+  sourceVideo1080p: string;
+  sourceMp3: string;
+}
+
+export const getMediaSource = (
+  id: string,
+  videographer: string,
+  videographers: any,
+): MediaSources => {
+  // Single HMAC calculation per segment
+  const config = videographers[videographer];
+  const { worker, segmentToken } = config;
   return {
-    heroImage: `${CLOUDFLARE_SOURCE}/${id}`,
-    sourceVideo480p: `${CLOUDFLARE_SOURCE}/${id}/output_480.m3u8`,
-    cardImage: `${CLOUDFLARE_SOURCE}/${id}/card`,
-    sourceVideo1080p: `${CLOUDFLARE_SOURCE}/${id}/output_1080.m3u8`,
-    sourceMp3: `${CLOUDFLARE_SOURCE}/${id}/audio.mp3`,
+    heroImage: `${worker}/${id}/hero.jpg?token=${segmentToken}dd`,
+    cardImage: `${worker}/${id}/card.jpg?token=${segmentToken}dd`,
+    sourceVideo480p: `${worker}/${id}/output_480.m3u8?token=${segmentToken}dddd`,
+    sourceVideo1080p: `${worker}/${id}/output_1080.m3u8?token=${segmentToken}`,
+    sourceMp3: `${worker}/${id}/audio.mp3?token=${segmentToken}`,
   };
 };
 
-export { getMediaSource };
+export default getMediaSource;

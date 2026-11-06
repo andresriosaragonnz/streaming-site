@@ -87,10 +87,8 @@ export async function verifyAuthToken<T = any>(
    ========================================================================== */
 
 export interface VideographerConfig {
-  accountId: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  bucketName: string;
+  storageKey: string;
+  worker: string;
 }
 
 // Derive a 256-bit AES-GCM CryptoKey from your master secret

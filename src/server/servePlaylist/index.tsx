@@ -1,20 +1,13 @@
 import { formatSegments } from "../../formatSegments/index";
 import { PlaylistPageLayout } from "./PlaylistPageLayout";
-
-// Helper to escape HTML characters
-function escapeHtml(str: string): string {
-  if (typeof str !== "string") return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+import { escapeHtml } from "../escapeHtml";
+import { getVideographers } from "../getVideographers";
 
 export const servePlaylist = async (c: any) => {
   let shareParam = c.req.query("share");
   const rawNameParam = c.req.query("name") || "playlist";
+  const videographers = await getVideographers(c);
+  console.log({ videographers });
 
   // 1. Sanitize & escape name parameter to prevent Reflected XSS
   const nameParam = escapeHtml(rawNameParam.trim().slice(0, 50));
@@ -59,17 +52,18 @@ export const servePlaylist = async (c: any) => {
     // 6. Fast O(1) Lookup Map instead of O(N * M) .find()
     const resultMap = new Map(results.map((r: any) => [r.id, r]));
     const found = ids.map((id) => resultMap.get(id)).filter(Boolean); // Cleanly drop missing IDs
-    const formatted = formatSegments(found);
+
+    const formatted = formatSegments(found, videographers);
     // 7. Sanitize DB record fields to guard against Second-Order XSS
     const sanitizedSegments = formatted.formattedSegments.map(
       (segment: any) => ({
         ...segment,
-        title: escapeHtml(segment.title),
-        formattedTitle: escapeHtml(segment.formattedTitle),
-        formattedArtist: escapeHtml(segment.formattedArtist),
-        formattedVenue: escapeHtml(segment.formattedVenue),
-        artistName: escapeHtml(segment.artistName),
-        venueName: escapeHtml(segment.venueName),
+        title: segment.title,
+        formattedTitle: segment.formattedTitle,
+        formattedArtist: segment.formattedArtist,
+        formattedVenue: segment.formattedVenue,
+        artistName: segment.artistName,
+        venueName: segment.venueName,
       }),
     );
     // 9. Set defensive headers (Cache-Control & Content Security Policy)
