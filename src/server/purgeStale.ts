@@ -23,7 +23,9 @@ export async function purgeStalePages(
   let kvCursor: string | undefined = undefined;
 
   do {
-    const listResult = await kv.list({ cursor: kvCursor });
+    const listResult: KVNamespaceListResult<unknown, string> = await kv.list(
+      kvCursor ? { cursor: kvCursor } : {},
+    );
 
     const staleKvKeys = listResult.keys
       .map((k) => k.name)

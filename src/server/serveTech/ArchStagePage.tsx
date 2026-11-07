@@ -34,7 +34,7 @@ export function ArchStagePage() {
         <title>ArchFlow Engine</title>
         <link rel="stylesheet" href="/css/archflow.css" />
 
-        <script is:inline>{scriptContent}</script>
+        <script>{scriptContent}</script>
         <script src="/js/engine.js" defer></script>
       </head>
       <body class="grid-bg">

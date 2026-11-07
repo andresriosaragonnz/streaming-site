@@ -8,12 +8,12 @@ export const rebuildPages = async (env: any): Promise<RebuildPagesResult> => {
   const totalStart = performance.now();
   console.log("🚀 [Rebuild] Starting full page rebuild...");
 
-  // 1. Fetch all segments
+  // 1. Fetch public segments only (graph must never expose private-only artists)
   const fetchStart = performance.now();
-  const sql = `SELECT * FROM segments `;
+  const sql = `SELECT * FROM segments WHERE status = 'public'`;
   const { results: allSegments } = await env.DB.prepare(sql).all();
   console.log(
-    `📦 [Rebuild] Fetched ${allSegments.length} segments in ${(performance.now() - fetchStart).toFixed(2)}ms`,
+    `📦 [Rebuild] Fetched ${allSegments.length} public segments in ${(performance.now() - fetchStart).toFixed(2)}ms`,
   );
 
   // 2. Single pass: Format segments, extract artist nodes, and group formatted segments

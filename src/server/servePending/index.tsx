@@ -24,7 +24,11 @@ export const PendingLayout = ({}) => {
           sizes="180x180"
           href="/apple-touch-icon.png?v=1"
         />
-        <link rel="mask-icon" href="/favicon.svg?v=1" color="#000000" />
+        <link
+          rel="mask-icon"
+          href="/favicon.svg?v=1"
+          {...({ color: "#000000" } as any)}
+        />
         <link rel="manifest" href="/site.webmanifest?v=1" />
 
         <link rel="stylesheet" href="/css/main.css?v=1" />

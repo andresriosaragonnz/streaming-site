@@ -42,7 +42,7 @@ export function AudioPlayer({ firstMp3 }: AudioPlayerProps) {
         >
           <audio
             id="r2-audio-player"
-            controls
+            controls="controls"
             preload="metadata"
             style="width: 100%; display: block;"
             src={firstMp3}

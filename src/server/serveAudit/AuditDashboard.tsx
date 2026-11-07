@@ -1,5 +1,7 @@
-export function AuditDashboard({ data }: any) {
-  const { summary, auditResults, missingSegments } = data;
+import type { AuditDataResult } from "./index";
+
+export function AuditDashboard({ data }: { data: AuditDataResult }) {
+  const { summary, auditResults } = data;
 
   return (
     <html lang="en">

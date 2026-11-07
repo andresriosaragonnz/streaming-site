@@ -16,7 +16,6 @@ export const CommitModal = ({ segments }: CommitModalProps) => (
           {/* Public Segments */}
           {segments?.map((segment, index) => (
             <li
-              key={`pub-${segment.id || index}`}
               class="commit-segment-item"
               data-bind-show={`Boolean(review.tracks[${index}]?.isPublic)`}
             >
@@ -33,7 +32,6 @@ export const CommitModal = ({ segments }: CommitModalProps) => (
           {/* Private Segments */}
           {segments?.map((segment, index) => (
             <li
-              key={`priv-${segment.id || index}`}
               class="commit-segment-item"
               data-bind-show={`!review.tracks[${index}]?.isPublic`}
             >
