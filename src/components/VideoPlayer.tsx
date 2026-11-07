@@ -18,7 +18,7 @@ export const VideoPlayer = ({
         controls
         playsinline
         preload="none"
-        poster={posterImage ? `${posterImage}.jpg` : ""}
+        poster={posterImage || ""}
         data-action="video-element"
         style="width: 100%; height: 100%; object-fit: cover; display: block;"
       />

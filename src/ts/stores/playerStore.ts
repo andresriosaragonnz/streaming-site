@@ -19,6 +19,7 @@ export interface MediaSegment {
   sourceVideo480p?: string;
   sourceVideo?: string; // Fallback
   cardImage?: string;
+  segmentToken?: string;
   duration?: number;
 }
 
@@ -256,9 +257,14 @@ export class PlayerStore {
         const quality: VideoQuality = getTargetQuality();
         const videoSrc = getSegmentVideoSource(track, quality);
         if (track.cardImage) {
-          const posterUrl = this.currentCardImage;
-          videoEl.setAttribute("poster", `${posterUrl}`);
-          videoEl.poster = `${posterUrl}`;
+          const cardImage = track.cardImage.endsWith(".jpg")
+            ? track.cardImage
+            : `${track.cardImage}.jpg`;
+          const posterUrl = track.segmentToken
+            ? `${cardImage}?token=${encodeURIComponent(track.segmentToken)}`
+            : cardImage;
+          videoEl.setAttribute("poster", posterUrl);
+          videoEl.poster = posterUrl;
         }
 
         if (videoSrc && videoEl.src !== videoSrc) {
