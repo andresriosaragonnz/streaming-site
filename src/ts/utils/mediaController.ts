@@ -113,14 +113,7 @@ function attachMediaListeners(
     const currentModeIsAudio = window.playerStore?.isAudioMode ?? true;
     if (isAudio === currentModeIsAudio) {
       window.playerStore?.setPlaying(false);
-
-      const store = window.playerStore;
-      if (store) {
-        const nextIdx = store.state.currentIndex + 1;
-        if (nextIdx < store.state.segments.length) {
-          store.selectSegment(nextIdx);
-        }
-      }
+      window.playerStore?.nextSegment();
     }
   });
 

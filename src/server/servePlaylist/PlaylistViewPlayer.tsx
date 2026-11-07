@@ -51,7 +51,7 @@ export const PlaylistViewPlayer = ({
     </div>
     <div
       class="video-player-mock"
-      data-bind-class-toggle="is-audio-mode:player.isAudioMode"
+      data-bind-class="player.isAudioMode ? 'video-player-mock is-audio-mode' : 'video-player-mock'"
     >
       {/* Video View Context */}
       <VideoPlayer posterImage={posterImage} />

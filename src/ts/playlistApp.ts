@@ -6,7 +6,6 @@ import { initToastStore, ToastStore } from "./stores/toastStore.js";
 import { initMediaController } from "./utils/mediaController.js";
 import { initCarouselScroll } from "./utils/carousel.js";
 import { PlaylistDragEngine } from "./utils/playlistDrag.js";
-import { initToastListener } from "./utils/toastUtils.js";
 
 declare global {
   interface Window {
@@ -33,8 +32,6 @@ const mediaEngineScript = document.createElement("script");
 mediaEngineScript.src = "/js/mediaInit.js";
 
 mediaEngineScript.onload = () => {
-  initToastListener();
-
   // Parse server-rendered segment data
   const segmentsDataEl = document.getElementById("studio-segments-data");
   let initialSegments: any[] = [];

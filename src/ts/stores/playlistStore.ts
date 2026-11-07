@@ -17,7 +17,6 @@ export interface PlaylistState {
   playlistName: string;
   tracks: PlaylistTrack[];
   currentIndex: number;
-  isShareModalOpen: boolean;
   shareUrl: string;
 }
 
@@ -28,7 +27,6 @@ export class PlaylistStore {
     playlistName: "Favorites",
     tracks: [],
     currentIndex: 0,
-    isShareModalOpen: false,
     shareUrl: "",
   };
 
@@ -85,55 +83,29 @@ export class PlaylistStore {
   // Getters for Binder Expressions
   // ---------------------------------------------------------------------------
 
-  get currentTrack(): PlaylistTrack | undefined {
-    return this.state.tracks[this.state.currentIndex];
-  }
-
-  get totalTracks(): number {
-    return this.state.tracks.length;
-  }
-
   get shareUrl(): string {
     return this.state.shareUrl;
-  }
-
-  get isShareModalOpen(): boolean {
-    return this.state.isShareModalOpen;
-  }
-
-  get hasTracks(): boolean {
-    return this.state.tracks.length > 0;
-  }
-
-  get activeTrackId(): string | undefined {
-    return this.currentTrack?.id;
   }
 
   // ---------------------------------------------------------------------------
   // Store Actions & Mutations
   // ---------------------------------------------------------------------------
 
-  public selectTrack(index: number): void {
-    if (index < 0 || index >= this.state.tracks.length) return;
-    this.state.currentIndex = index;
+  /**
+   * Persists a reordered list of segment IDs as the active playlist order.
+   */
+  public setTrackOrder(ids: string[]): void {
+    const byId = new Map(this.state.tracks.map((track) => [track.id, track]));
+    const reordered = ids
+      .map((id) => byId.get(id))
+      .filter((track): track is PlaylistTrack => Boolean(track));
+
+    if (reordered.length !== this.state.tracks.length) return;
+
+    this.state.tracks = reordered;
+    this.syncUserPlaylistsToStorage();
+    this.generateShareUrl();
     this.notify();
-  }
-
-  public selectTrackById(id: string): void {
-    const index = this.state.tracks.findIndex((t) => t.id === id);
-    if (index !== -1) {
-      this.selectTrack(index);
-    }
-  }
-
-  public addTrack(track: PlaylistTrack): void {
-    const exists = this.state.tracks.some((t) => t.id === track.id);
-    if (!exists) {
-      this.state.tracks.push(track);
-      this.syncUserPlaylistsToStorage();
-      this.generateShareUrl();
-      this.notify();
-    }
   }
 
   /**
@@ -190,44 +162,6 @@ export class PlaylistStore {
     }
   }
 
-  public setPlaylistName(name: string): void {
-    this.state.playlistName = name;
-    this.generateShareUrl();
-    this.notify();
-  }
-
-  public reorderTracks(fromIndex: number, toIndex: number): void {
-    if (
-      fromIndex < 0 ||
-      fromIndex >= this.state.tracks.length ||
-      toIndex < 0 ||
-      toIndex >= this.state.tracks.length
-    ) {
-      return;
-    }
-
-    const [movedTrack] = this.state.tracks.splice(fromIndex, 1);
-    this.state.tracks.splice(toIndex, 0, movedTrack);
-
-    if (this.state.currentIndex === fromIndex) {
-      this.state.currentIndex = toIndex;
-    } else if (
-      this.state.currentIndex > fromIndex &&
-      this.state.currentIndex <= toIndex
-    ) {
-      this.state.currentIndex--;
-    } else if (
-      this.state.currentIndex < fromIndex &&
-      this.state.currentIndex >= toIndex
-    ) {
-      this.state.currentIndex++;
-    }
-
-    this.syncUserPlaylistsToStorage();
-    this.generateShareUrl();
-    this.notify();
-  }
-
   public generateShareUrl(): string {
     if (typeof window === "undefined") return "";
 
@@ -240,11 +174,6 @@ export class PlaylistStore {
       this.state.playlistName,
     );
     return this.state.shareUrl;
-  }
-
-  public toggleShareModal(isOpen?: boolean): void {
-    this.state.isShareModalOpen = isOpen ?? !this.state.isShareModalOpen;
-    this.notify();
   }
 }
 

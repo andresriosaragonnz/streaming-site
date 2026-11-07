@@ -61,13 +61,9 @@ export class PlaylistDragEngine {
           listContainer.insertBefore(movedCard, targetCard);
         }
 
-        // 3. Re-index card element attributes for future interactions
+        // 3. Re-index card ids and drag handler indices
         Array.from(listContainer.children).forEach((child, newIdx) => {
           child.setAttribute("id", `playlist-segment-card-${newIdx}`);
-          child.setAttribute(
-            "onclick",
-            `window.playerStore.selectSegment(${newIdx})`,
-          );
           child.setAttribute(
             "ondragstart",
             `window.playlistDragEngine?.handleDragStart(${newIdx}, event)`,
@@ -84,40 +80,17 @@ export class PlaylistDragEngine {
             "ondragend",
             `window.playlistDragEngine?.handleDragEnd()`,
           );
-          child.setAttribute(
-            "data-bind-class-toggle",
-            `is-active:player.isSegmentActive_${newIdx}`,
-          );
         });
       }
     }
 
-    // 4. Update active playing index to keep the current track playing smoothly
-    const currentActiveIdx = player.state.currentIndex;
-    if (currentActiveIdx === fromIndex) {
-      player.state.currentIndex = toIndex;
-    } else if (currentActiveIdx > fromIndex && currentActiveIdx <= toIndex) {
-      player.state.currentIndex -= 1;
-    } else if (currentActiveIdx < fromIndex && currentActiveIdx >= toIndex) {
-      player.state.currentIndex += 1;
-    }
-
-    // 5. Save reordered list into playerStore state
+    // 4. Persist reordered segments (active track is ID-based, so it stays selected)
     player.state.segments = segments;
 
-    // 6. Sync reordered IDs to playlistsStore (e.g. active/current playlist)
-    const activePlaylistName =
-      listContainer?.getAttribute("data-playlist-name");
-    const playlistsStore = window.playlistStore;
-
-    if (playlistsStore?.state?.playlists) {
-      const reorderedIds = segments.map((seg: any) => seg.id).filter(Boolean);
-      // Re-assigning state.playlists triggers Proxy set() and saves to localStorage
-      playlistsStore.state.playlists = {
-        ...playlistsStore.state.playlists,
-        [activePlaylistName]: reorderedIds,
-      };
-    }
+    // 5. Sync reordered IDs to the active playlist in localStorage
+    window.playlistStore?.setTrackOrder(
+      segments.map((seg: any) => seg.id).filter(Boolean),
+    );
 
     this.handleDragEnd();
   }

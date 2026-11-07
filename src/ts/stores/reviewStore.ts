@@ -98,15 +98,7 @@ export class ReviewStore {
     message: string,
     type: "success" | "info" | "error" = "info",
   ): void {
-    if (typeof window !== "undefined" && window.toastStore) {
-      window.toastStore.trigger(message, type);
-    } else if (typeof window !== "undefined") {
-      window.dispatchEvent(
-        new CustomEvent("app-toast-trigger", {
-          detail: { message, type },
-        }),
-      );
-    }
+    window.toastStore?.trigger(message, type);
   }
 
   // ---------------------------------------------------------------------------
@@ -206,7 +198,7 @@ export class ReviewStore {
       );
 
       // 2. Spread full track objects ensuring status string aligns with isPublic
-      const payloadSegments = this.state.tracks.map((t) => ({
+      const payloadSegments: TrackSegment[] = this.state.tracks.map((t) => ({
         ...t,
         status: t.isPublic ? "public" : "private",
       }));

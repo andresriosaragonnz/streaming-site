@@ -2,6 +2,7 @@ import { UI } from "./binder.js";
 import "./actions.js"; // Registers all data-action handlers
 import { initPlayerStore, PlayerStore } from "./stores/playerStore.js";
 import { initReviewStore, ReviewStore } from "./stores/reviewStore.js";
+import { initToastStore, ToastStore } from "./stores/toastStore.js";
 import { initMediaController } from "./utils/mediaController.js";
 import { initCarouselScroll } from "./utils/carousel.js";
 
@@ -9,6 +10,7 @@ declare global {
   interface Window {
     playerStore?: PlayerStore;
     reviewStore?: ReviewStore;
+    toastStore?: ToastStore;
 
     setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
@@ -40,6 +42,7 @@ mediaEngineScript.onload = () => {
 
   // Instantiate active reactive stores
   const playerStore = initPlayerStore(initialSegments);
+  initToastStore();
   initReviewStore(initialSegments);
 
   // Initialize native media element listeners (Audio, Video & Adaptive Quality)

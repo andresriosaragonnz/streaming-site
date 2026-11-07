@@ -76,8 +76,6 @@ export function initToastStore(): ToastStore {
   const store = new ToastStore();
   if (typeof window !== "undefined") {
     window.toastStore = store;
-    window.UI?.registerStore("toast", "toastStore");
-    window.UI?.listenToEvents("toast-state-changed");
   }
   return store;
 }

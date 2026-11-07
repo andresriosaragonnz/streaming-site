@@ -161,6 +161,46 @@ export class PlayerStore {
   }
 
   /**
+   * Advances to the next segment in the current play order.
+   * Starts playback once the new media source is ready.
+   */
+  public nextSegment(): void {
+    const next = this.state.segments[this.currentIndex + 1];
+    if (!next) {
+      this.setPlaying(false);
+      return;
+    }
+
+    this.selectSegment(next.id);
+    this.playActiveMedia();
+  }
+
+  /**
+   * Plays the active audio/video element, waiting for the source to load.
+   */
+  private playActiveMedia(): void {
+    if (typeof document === "undefined") return;
+
+    const mediaEl = document.getElementById(
+      this.state.isAudioMode ? "r2-audio-player" : "r2-video-player",
+    ) as HTMLMediaElement | null;
+
+    if (!mediaEl || !mediaEl.src) return;
+
+    const play = () => {
+      mediaEl
+        .play()
+        .catch((err) => console.error("[PlayerStore] Autoplay error:", err));
+    };
+
+    if (mediaEl.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      play();
+    } else {
+      mediaEl.addEventListener("canplay", play, { once: true });
+    }
+  }
+
+  /**
    * Populates client-side `#playlist-select` element options directly.
    */
   public populatePlaylistDropdown(): void {
