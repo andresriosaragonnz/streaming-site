@@ -1,4 +1,5 @@
 import { Favicon } from "../../components/Favicon";
+import { buildPublicNetworkGraph } from "../calculateNetwork";
 
 const EMPTY_GRAPH_DATA =
   '{"nodes":[],"edges":[],"artistClusters":{},"artistLookup":{}}';
@@ -55,8 +56,6 @@ export const StatusPage = ({ graphDataJS, stats }: StatusPageProps) => (
 );
 
 export const serveStatus = async (c: any) => {
-  const graphData = await c.env.PAGE_CACHE.get("graphDataJsonString");
-
   const statsResult = await c.env.DB.prepare(
     `SELECT
        COUNT(DISTINCT performance) AS totalPerformances,
@@ -75,6 +74,38 @@ export const serveStatus = async (c: any) => {
       ? (stats.acknowledgedPerformances / stats.totalPerformances) * 100
       : 0;
 
+  // Recalculate the public network graph from source segments (same as rebuildPages).
+  const graphResult = await c.env.DB.prepare(
+    `SELECT * FROM segments WHERE status = 'public'`,
+  ).all();
+  const allSegments = graphResult?.results ?? [];
+
+  const artistMap = new Map<string, { name: string; rawArtist: string }>();
+  const groupedByArtist: Record<string, any[]> = {};
+  const len = allSegments.length;
+  const formattedSegments = new Array(len);
+  for (let i = 0; i < len; i++) {
+    const seg = allSegments[i];
+    const artistName = seg.artistName;
+    formattedSegments[i] = seg;
+    if (artistName) {
+      if (!artistMap.has(artistName)) {
+        artistMap.set(artistName, {
+          name: artistName,
+          rawArtist: artistName,
+        });
+        groupedByArtist[artistName] = [];
+      }
+      groupedByArtist[artistName].push(seg);
+    }
+  }
+  const rawNodes = Array.from(artistMap.values());
+  const graphDataJS = buildPublicNetworkGraph(formattedSegments, rawNodes);
+  const graphDataJsonString = JSON.stringify(graphDataJS);
+
+  // Reset the graph cache once the status page has (re)calculated the graph.
+  await c.env.PAGE_CACHE.delete("graphDataJsonString");
+
   c.header(
     "Cache-Control",
     "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
@@ -82,6 +113,6 @@ export const serveStatus = async (c: any) => {
 
   return c.html(
     "<!doctype html>\n" +
-      <StatusPage graphDataJS={graphData || EMPTY_GRAPH_DATA} stats={stats} />,
+      <StatusPage graphDataJS={graphDataJsonString || EMPTY_GRAPH_DATA} stats={stats} />,
   );
 };
