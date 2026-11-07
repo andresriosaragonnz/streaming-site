@@ -17,6 +17,7 @@ import {
   servePublicPortfolio,
   serveExpireToken,
   servePublicPerformance,
+  serveStatus,
   serveDownload,
   serveTech,
   serveAudit,
@@ -40,6 +41,7 @@ app.get("/", (c) => {
 // ---------------------------------------------------------
 // 2. Fixed API & Static Endpoints (MUST precede parametric routes)
 // ---------------------------------------------------------
+app.get("/status", serveStatus);
 app.get("/myplaylists", servePlaylistPortfolio);
 app.get("/playlist", servePlaylist);
 app.get("/auth/claim", serveClaim);

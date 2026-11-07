@@ -164,7 +164,7 @@ export async function renderGraph(customData, isFull = false) {
               ? "#ff3e3e"
               : "#00d2ff"
             : "#0072d2",
-          label: nodeData.name || nodeData.label || "",
+          label: String(nodeData.label || nodeData.name || "").replace(/_/g, " "),
           fontSize: currentFocusId ? (isTarget ? 7 : 4) : 3.5,
           fontColor: "#ffffff",
           x: nodeData.x ?? node.x,
@@ -252,7 +252,7 @@ export async function renderGraph(customData, isFull = false) {
               ? "#ff3e3e"
               : "#00d2ff"
             : "#0072d2",
-          label: nodeData.name || nodeData.label || "",
+          label: String(nodeData.label || nodeData.name || "").replace(/_/g, " "),
           fontSize: currentFocusId ? (isTarget ? 7 : 4) : 3.5,
           fontColor: "#ffffff",
           x: nodeData.x ?? node.x,
@@ -338,5 +338,17 @@ if (typeof window !== "undefined") {
     document.addEventListener("DOMContentLoaded", handleGraphStateChange);
   } else {
     handleGraphStateChange();
+  }
+
+  // Standalone status page: render the full network once layout is settled.
+  const renderStatusGraph = () => {
+    if (!document.getElementById("status-graph")) return;
+    scheduleGraphRender(null, true);
+  };
+
+  if (document.readyState === "complete") {
+    renderStatusGraph();
+  } else {
+    window.addEventListener("load", renderStatusGraph, { once: true });
   }
 }

@@ -15,6 +15,7 @@ export { usePrivate } from "./usePrivate";
 export { usePrivatePerformance } from "./usePrivatePerformance";
 export { useAdmin } from "./auth";
 export { servePublicPerformance } from "./servePublicPerformance";
+export { serveStatus } from "./serveStatus";
 export { serveExpireToken } from "./serveExpireToken";
 export { serveDownload } from "./serveDownload";
 export { serveTech } from "./serveTech";
