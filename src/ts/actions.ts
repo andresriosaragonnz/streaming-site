@@ -22,7 +22,6 @@ const openModalHooks: Record<string, () => void> = {
     } else {
       window.reviewStore?.toggleGraphDrawer(true);
     }
-    window.dispatchEvent(new CustomEvent("modal-ready"));
   },
 };
 
@@ -219,13 +218,10 @@ export function initAppActions(): void {
       window.graphStore.openDrawer();
     }
 
-    // 3. Render full graph view
+    // 3. Render full graph view (store notify already triggers binder sync)
     if (typeof (window as any).scheduleGraphRender === "function") {
       (window as any).scheduleGraphRender(null, true);
     }
-
-    window.dispatchEvent(new CustomEvent("graph-state-changed"));
-    UI.requestSync();
   });
 
   // ---------------------------------------------------------------------------

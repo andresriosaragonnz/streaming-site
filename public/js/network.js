@@ -1,12 +1,36 @@
 let orbInstance = null;
 let rafId = null;
+let orbLoadPromise = null;
+
+/**
+ * Lazily loads the heavy Orb bundle on first graph render.
+ */
+function ensureOrbLoaded() {
+  if (typeof window !== "undefined" && window.Orb) {
+    return Promise.resolve(true);
+  }
+  if (orbLoadPromise) return orbLoadPromise;
+
+  orbLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "/js/orb.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => {
+      orbLoadPromise = null;
+      reject(new Error("Failed to load /js/orb.js"));
+    };
+    document.head.appendChild(script);
+  });
+  return orbLoadPromise;
+}
 
 export function scheduleGraphRender(customData, isFull = false) {
   if (rafId) {
     cancelAnimationFrame(rafId);
   }
   rafId = requestAnimationFrame(() => {
-    renderGraph(customData, isFull);
+    void renderGraph(customData, isFull);
     rafId = null;
   });
 }
@@ -82,9 +106,14 @@ function syncSeeVideosLink(targetArtist) {
   }
 }
 
-export function renderGraph(customData, isFull = false) {
+export async function renderGraph(customData, isFull = false) {
   const container = document.getElementById("graph");
   if (!container) return;
+
+  const orbReady = ensureOrbLoaded().catch((err) => {
+    console.error("❌ [Network] Failed to load Orb:", err);
+    return false;
+  });
 
   const wrapper = document.getElementById("graph-viewport-wrapper");
   const cachedDims = window.graphStore?.dimensions;
@@ -178,6 +207,12 @@ export function renderGraph(customData, isFull = false) {
   }
 
   // Initial Full Render (only executed once when instance is null)
+  const orbLoaded = await orbReady;
+  if (!orbLoaded) return;
+
+  // Another call may have constructed the instance while Orb was loading.
+  if (orbInstance) return;
+
   container.innerHTML = "";
 
   try {
@@ -257,12 +292,6 @@ export function renderGraph(customData, isFull = false) {
         if (window.graphStore) {
           window.graphStore.setActiveNode(targetLink);
         }
-
-        window.dispatchEvent(
-          new CustomEvent("node-selected", {
-            detail: { link: targetLink, artist: artistName },
-          }),
-        );
       });
     }
 
@@ -293,8 +322,8 @@ if (typeof window !== "undefined") {
     const drawerEl = document.getElementById("graph-drawer-container");
     const isOpen = Boolean(window.graphStore?.isDrawerOpen);
 
+    // Drawer class is owned by the binder's data-bind-class.
     if (drawerEl) {
-      drawerEl.classList.toggle("is-open", isOpen);
       drawerEl.setAttribute("aria-hidden", String(!isOpen));
     }
 
@@ -303,46 +332,7 @@ if (typeof window !== "undefined") {
     }
   };
 
-  document.addEventListener("click", (event) => {
-    const trigger = event.target.closest("[data-action='reset-graph']");
-    if (!trigger) return;
-
-    event.preventDefault();
-
-    const perfLinkEl = document.getElementById("performance-link");
-    if (perfLinkEl) {
-      perfLinkEl.removeAttribute("data-artist");
-    }
-
-    if (
-      window.graphStore &&
-      typeof window.graphStore.setActiveNode === "function"
-    ) {
-      window.graphStore.setActiveNode("");
-    } else if (window.graphStore) {
-      window.graphStore.activeNodeLink = "";
-    }
-
-    scheduleGraphRender(null, true);
-  });
-
-  window.addEventListener("modal-ready", () => {
-    if (window.graphStore?.isDrawerOpen) {
-      scheduleGraphRender();
-    }
-  });
-
   window.addEventListener("graph-state-changed", handleGraphStateChange);
-
-  // ⚡ Update graph data when node selection changes
-  window.addEventListener("node-selected", (e) => {
-    if (e.detail?.artist) {
-      syncSeeVideosLink(e.detail.artist);
-    }
-    if (window.graphStore?.isDrawerOpen) {
-      scheduleGraphRender();
-    }
-  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", handleGraphStateChange);

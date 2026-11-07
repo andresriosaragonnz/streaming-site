@@ -74,7 +74,6 @@ export const PublicPortfolioLayout = ({
           return <link rel="prefetch" key={href} href={href} as="document" />;
         })} */}
         <link rel="stylesheet" href="/css/main.css" />
-        <script src="/js/orb.js"></script>
 
         {/* Image data payload for client-side scripts */}
         <script type="application/json" id="page-images">

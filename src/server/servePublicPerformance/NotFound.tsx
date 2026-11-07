@@ -12,7 +12,6 @@ export const NotFound = () => {
 
         <link rel="stylesheet" href="/css/review-studio.css" />
         <link rel="stylesheet" href="/css/main.css" />
-        <script src="/js/orb.js"></script>
       </head>
       <body>
         <div class="studio-container">

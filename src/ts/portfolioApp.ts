@@ -12,6 +12,10 @@ const initArtistPortfolioApp = () => {
   // Instantiate only the graph drawer store
   initGraphStore();
 
+  // Register graph store with binder so data-bind-class drives the drawer
+  UI.registerStore("graph", "graphStore");
+  UI.listenToEvents("graph-state-changed");
+
   // Initial pass for UI binder
   UI.requestSync();
 };
