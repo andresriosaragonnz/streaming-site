@@ -13,7 +13,6 @@ declare global {
     playlistStore?: PlaylistStore;
     toastStore?: ToastStore;
     playlistDragEngine: PlaylistDragEngine;
-    setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
 }
 
@@ -27,11 +26,7 @@ if (document.readyState === "loading") {
   initCarouselScroll();
 }
 
-// 3. Load media engine script
-const mediaEngineScript = document.createElement("script");
-mediaEngineScript.src = "/js/mediaInit.js";
-
-mediaEngineScript.onload = () => {
+function initApp(): void {
   // Parse server-rendered segment data
   const segmentsDataEl = document.getElementById("studio-segments-data");
   let initialSegments: any[] = [];
@@ -51,8 +46,6 @@ mediaEngineScript.onload = () => {
       : null;
   const initialPlaylistName = urlParams?.get("name") || "Favorites";
 
-  // Instantiate active reactive stores
-
   const playerStore = initPlayerStore(initialSegments);
   playerStore.populatePlaylistDropdown();
   initToastStore();
@@ -71,10 +64,10 @@ mediaEngineScript.onload = () => {
   console.log(
     "🚀 [App] App initialized with playerStore, playlistStore, toastStore & mediaController.",
   );
-};
+}
 
-mediaEngineScript.onerror = () => {
-  console.error("Failed to load /js/mediaInit.js engine script.");
-};
-
-document.head.appendChild(mediaEngineScript);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}

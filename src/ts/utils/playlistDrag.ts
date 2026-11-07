@@ -102,6 +102,3 @@ export class PlaylistDragEngine {
     this.draggedIndex = null;
   }
 }
-
-// Register global instance
-(window as any).playlistDragEngine = new PlaylistDragEngine();

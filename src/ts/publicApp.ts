@@ -13,7 +13,6 @@ declare global {
     toastStore?: ToastStore;
     playlistStore?: PlaylistStore;
     graphStore?: GraphStore;
-    setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
 }
 
@@ -29,11 +28,7 @@ initGraphStore();
 UI.registerStore("graph", "graphStore");
 UI.listenToEvents("graph-state-changed");
 
-// 3. Load media engine script
-const mediaEngineScript = document.createElement("script");
-mediaEngineScript.src = "/js/mediaInit.js";
-
-mediaEngineScript.onload = () => {
+function initApp(): void {
   // Parse server-rendered segment data
   const segmentsDataEl = document.getElementById("studio-segments-data");
   let initialSegments: any[] = [];
@@ -75,10 +70,10 @@ mediaEngineScript.onload = () => {
   console.log(
     "🚀 [PublicApp] App initialized with playerStore, toastStore, playlistStore, graphStore & mediaController.",
   );
-};
+}
 
-mediaEngineScript.onerror = () => {
-  console.error("Failed to load /js/mediaInit.js engine script.");
-};
-
-document.head.appendChild(mediaEngineScript);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}

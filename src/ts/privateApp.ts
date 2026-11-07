@@ -11,8 +11,6 @@ declare global {
     playerStore?: PlayerStore;
     reviewStore?: ReviewStore;
     toastStore?: ToastStore;
-
-    setupMediaPlayback?: (segment: any, mode: boolean, paused: boolean) => void;
   }
 }
 
@@ -23,11 +21,7 @@ if (document.readyState === "loading") {
   initCarouselScroll();
 }
 
-// 2. Load media engine script
-const mediaEngineScript = document.createElement("script");
-mediaEngineScript.src = "/js/mediaInit.js";
-
-mediaEngineScript.onload = () => {
+function initApp(): void {
   // Read server-rendered segment data payload
   const segmentsDataEl = document.getElementById("studio-segments-data");
   let initialSegments: any[] = [];
@@ -58,10 +52,10 @@ mediaEngineScript.onload = () => {
   console.log(
     "🚀 [PrivateApp] Initialized with playerStore, reviewStore & mediaController.",
   );
-};
+}
 
-mediaEngineScript.onerror = () => {
-  console.error("Failed to load /js/mediaInit.js engine script.");
-};
-
-document.head.appendChild(mediaEngineScript);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initApp);
+} else {
+  initApp();
+}
