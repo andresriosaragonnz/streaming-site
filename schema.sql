@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS segments (
   performance TEXT NOT NULL,
   masterDuration TEXT NOT NULL,
   masterSize TEXT NOT NULL,
-  status TEXT DEFAULT 'private' CHECK(status IN ('public', 'private'))
+  status TEXT DEFAULT 'private' CHECK(status IN ('public', 'private')),
+  acknowledge INTEGER NOT NULL DEFAULT 0 CHECK (acknowledge IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS artists (

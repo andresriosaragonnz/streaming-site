@@ -55,6 +55,14 @@ export const usePrivatePerformance = async (c: any, next: any) => {
     );
   }
 
+  // The authorized artist is viewing this performance: acknowledge every
+  // segment that belongs to it.
+  await c.env.DB.prepare(
+    `UPDATE segments SET acknowledge = 1 WHERE performance = ?`,
+  )
+    .bind(performance)
+    .run();
+
   c.header("Cache-Control", "private, no-store");
   await next();
 };
