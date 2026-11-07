@@ -19,3 +19,5 @@ export { serveExpireToken } from "./serveExpireToken";
 export { serveDownload } from "./serveDownload";
 export { serveTech } from "./serveTech";
 export { serveAudit } from "./serveAudit";
+export { usePublicPerformance } from "./usePublicPerformance";
+export { usePublicPortfolio } from "./usePublicPortfolio";

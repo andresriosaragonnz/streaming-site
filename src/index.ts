@@ -20,6 +20,8 @@ import {
   serveDownload,
   serveTech,
   serveAudit,
+  usePublicPortfolio,
+  usePublicPerformance,
 } from "./server";
 
 type Bindings = {
@@ -85,6 +87,9 @@ app.get("/:file{.+\\.(?:png|ico|jpg|jpeg|svg|css|js)$}", (c) =>
 // ---------------------------------------------------------
 // 7. Catch-All Parametric Route (MUST BE ABSOLUTE LAST)
 // ---------------------------------------------------------
+app.use("/:slug", usePublicPortfolio);
+app.use("/:slug/:performance", usePublicPerformance);
+
 app.get("/:slug/:performance", servePublicPerformance);
 app.get("/:slug", servePublicPortfolio);
 

@@ -1,7 +1,6 @@
 import { PublicPortfolioLayout } from "./PublicPortfolioLayout";
 import { PendingLayout } from "../servePending";
 import { getIsAllowed } from "../getIsAllowed";
-import { isAdminRequest } from "../auth";
 import { getVideographers } from "../getVideographers";
 import { formatSegments } from "../../formatSegments";
 
@@ -22,10 +21,6 @@ export const servePublicPortfolio = async (c: any) => {
   }
   const artistId = results[0].artistId;
   const isAllowed = await getIsAllowed(artistId, c);
-  const isAdmin = isAdminRequest(c);
-  // if (!isAdmin && !isAllowed) {
-  //   return c.html("<!doctype html>\n" + <PendingLayout />);
-  // }
   const segmentCount = results?.length || 0;
   const lastUpdated =
     results?.reduce((max: any, item: any) => {
