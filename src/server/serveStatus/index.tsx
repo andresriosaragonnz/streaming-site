@@ -3,15 +3,22 @@ import { Favicon } from "../../components/Favicon";
 const EMPTY_GRAPH_DATA =
   '{"nodes":[],"edges":[],"artistClusters":{},"artistLookup":{}}';
 
+export interface StatusStats {
+  totalPerformances: number;
+  acknowledgedPerformances: number;
+  acknowledgeRate: number;
+}
+
 export interface StatusPageProps {
   graphDataJS: string;
+  stats: StatusStats;
 }
 
 /**
- * Public status page: a single heading and the full artist network.
+ * Public status page: status heading, acknowledgement stats and full artist network.
  * No navigation, no drawer, no preselected artist.
  */
-export const StatusPage = ({ graphDataJS }: StatusPageProps) => (
+export const StatusPage = ({ graphDataJS, stats }: StatusPageProps) => (
   <html lang="en">
     <head>
       <title>Status</title>
@@ -22,6 +29,20 @@ export const StatusPage = ({ graphDataJS }: StatusPageProps) => (
     <body>
       <main class="status-page">
         <h1>Status</h1>
+        <div class="grid-summary">
+          <div class="card">
+            <div class="card-title">Total Performances</div>
+            <div class="card-val">{stats.totalPerformances}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Acknowledged</div>
+            <div class="card-val text-ok">{stats.acknowledgedPerformances}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Acknowledge Rate</div>
+            <div class="card-val">{stats.acknowledgeRate.toFixed(1)}%</div>
+          </div>
+        </div>
         <section id="status-graph" class="status-graph-panel">
           <div id="graph"></div>
         </section>
@@ -36,6 +57,24 @@ export const StatusPage = ({ graphDataJS }: StatusPageProps) => (
 export const serveStatus = async (c: any) => {
   const graphData = await c.env.PAGE_CACHE.get("graphDataJsonString");
 
+  const statsResult = await c.env.DB.prepare(
+    `SELECT
+       COUNT(DISTINCT performance) AS totalPerformances,
+       COUNT(DISTINCT CASE WHEN acknowledge = 1 THEN performance END) AS acknowledgedPerformances
+     FROM segments`,
+  ).all();
+
+  const statsRow = statsResult?.results?.[0] ?? {};
+  const stats: StatusStats = {
+    totalPerformances: statsRow?.totalPerformances ?? 0,
+    acknowledgedPerformances: statsRow?.acknowledgedPerformances ?? 0,
+    acknowledgeRate: 0,
+  };
+  stats.acknowledgeRate =
+    stats.totalPerformances > 0
+      ? (stats.acknowledgedPerformances / stats.totalPerformances) * 100
+      : 0;
+
   c.header(
     "Cache-Control",
     "public, max-age=60, s-maxage=300, stale-while-revalidate=86400",
@@ -43,6 +82,6 @@ export const serveStatus = async (c: any) => {
 
   return c.html(
     "<!doctype html>\n" +
-      <StatusPage graphDataJS={graphData || EMPTY_GRAPH_DATA} />,
+      <StatusPage graphDataJS={graphData || EMPTY_GRAPH_DATA} stats={stats} />,
   );
 };
