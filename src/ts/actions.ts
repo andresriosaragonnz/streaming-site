@@ -114,8 +114,8 @@ export function initAppActions(): void {
       selectEl.value = customValue;
 
       // Reset custom input state
-      customInput.value = "";
-      customGroup.classList.add("hidden");
+      if (customInput) customInput.value = "";
+      if (customGroup) customGroup.classList.add("hidden");
       toggleBtn?.classList.remove("active");
     }
 
@@ -132,31 +132,15 @@ export function initAppActions(): void {
     }
   });
 
-  UI.registerAction("playlist-select-change", (trigger: HTMLElement) => {
-    const selectEl = trigger as HTMLSelectElement;
-    const isNew = selectEl.value === "+ New Playlist...";
+  UI.registerAction("toggle-custom-playlist", () => {
+    const inputGroup = document.getElementById("custom-playlist-group");
+    const input = document.getElementById(
+      "custom-playlist-name",
+    ) as HTMLInputElement | null;
+    if (!inputGroup) return;
 
-    window.playerStore?.setCustomPlaylistInput(isNew);
-  });
-
-  UI.registerAction("toggle-favorite-track", (trigger: HTMLElement) => {
-    const checkbox = trigger as HTMLInputElement;
-    if (window.playerStore) {
-      window.playerStore.toggleFavorite?.(checkbox.checked);
-    }
-  });
-
-  UI.registerAction("save-favorites", () => {
-    window.playlistStore?.addCurrentSegmentToPlaylist("Favorites");
-    window.toastStore?.trigger("Saved to Favorites", "success");
-
-    const dialogEl = document.getElementById(
-      "favorites-modal-dialog",
-    ) as HTMLDialogElement | null;
-    if (dialogEl && typeof dialogEl.close === "function") {
-      closeModalHooks["favorites-modal-dialog"]?.();
-      dialogEl.close("save");
-    }
+    const isHidden = inputGroup.classList.toggle("hidden");
+    if (!isHidden) input?.focus();
   });
 
   // ---------------------------------------------------------------------------
@@ -202,22 +186,8 @@ export function initAppActions(): void {
     }
   });
 
-  UI.registerAction("toggle-drawer", (trigger: HTMLElement) => {
-    const drawerId = trigger.dataset.drawerId || trigger.dataset.modalId;
-    if (!drawerId) return;
-
-    const drawer = document.getElementById(drawerId);
-    if (!drawer) return;
-
-    const isOpen = drawer.classList.toggle("is-open");
-    drawer.setAttribute("aria-hidden", String(!isOpen));
-    document.body.classList.toggle("modal-open", isOpen);
-
-    if (isOpen) {
-      openModalHooks[drawerId]?.();
-    } else {
-      closeModalHooks[drawerId]?.();
-    }
+  UI.registerAction("dismiss-toast", () => {
+    window.toastStore?.dismiss();
   });
 
   // ---------------------------------------------------------------------------
@@ -230,9 +200,6 @@ export function initAppActions(): void {
 
   UI.registerAction("close-graph-modal", () =>
     window.graphStore?.closeDrawer(),
-  );
-  UI.registerAction("toggle-graph-modal", () =>
-    window.graphStore?.toggleDrawer(),
   );
 
   UI.registerAction("reset-graph", (trigger, event) => {
@@ -247,13 +214,9 @@ export function initAppActions(): void {
 
     // 2. Clear node links WITHOUT closing the drawer/modal
     if (window.graphStore) {
-      if (typeof window.graphStore.setActiveNode === "function") {
-        window.graphStore.setActiveNode("");
-      } else {
-        window.graphStore.activeNodeLink = "";
-      }
+      window.graphStore.setActiveNode("");
       // Keep the graph view open
-      window.graphStore.isDrawerOpen = true;
+      window.graphStore.openDrawer();
     }
 
     // 3. Render full graph view
@@ -303,11 +266,12 @@ export function initAppActions(): void {
     }
   });
 
-  UI.registerAction("copy-share-url", async (trigger: HTMLElement) => {
+  UI.registerAction("copy-share-url", async () => {
     const store = window.playlistStore;
     const shareUrl =
       store?.shareUrl || store?.generateShareUrl() || window.location.href;
     try {
+      await navigator.clipboard.writeText(shareUrl);
       window.toastStore?.trigger("Copied to clipboard", "success");
     } catch (err) {
       console.error("Failed to copy share URL:", err);
@@ -329,7 +293,7 @@ export function initAppActions(): void {
 
   UI.registerAction(
     "delete-playlist-item",
-    (trigger: HTMLElement, event: MouseEvent) => {
+    (trigger: HTMLElement, event: Event) => {
       event.stopPropagation();
       const trackId =
         trigger.dataset.id ??

@@ -64,13 +64,7 @@ export const AddToPlaylistDialog = () => (
                 id="btn-toggle-new-playlist"
                 class="btn-public btn-icon-only"
                 title="Create new playlist"
-                onclick="
-                  const inputGroup = document.getElementById('custom-playlist-group');
-                  const input = document.getElementById('custom-playlist-name');
-                  const isHidden = inputGroup.classList.toggle('hidden');
-                  console.log({isHidden});
-                  if (!isHidden) input.focus();
-                "
+                data-action="toggle-custom-playlist"
               >
                 <span>+</span>
               </button>
