@@ -256,13 +256,14 @@ export class PlayerStore {
       if (videoEl) {
         const quality: VideoQuality = getTargetQuality();
         const videoSrc = getSegmentVideoSource(track, quality);
-        if (track.cardImage) {
-          const cardImage = track.cardImage.endsWith(".jpg")
-            ? track.cardImage
-            : `${track.cardImage}.jpg`;
-          const posterUrl = track.segmentToken
-            ? `${cardImage}?token=${encodeURIComponent(track.segmentToken)}`
-            : cardImage;
+        const { cardImage, segmentToken } = track;
+        if (cardImage) {
+          const safeCardImage = cardImage.endsWith(".jpg")
+            ? cardImage
+            : `${cardImage}.jpg`;
+          const posterUrl = segmentToken
+            ? `${safeCardImage}?token=${encodeURIComponent(segmentToken)}`
+            : safeCardImage;
           videoEl.setAttribute("poster", posterUrl);
           videoEl.poster = posterUrl;
         }
