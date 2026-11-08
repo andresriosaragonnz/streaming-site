@@ -64,9 +64,12 @@ export default {
         status: 403,
       });
     }
-
+    const isDownload = url.searchParams.get("download") === "1";
+    const selectedBucket = isDownload
+      ? env.DOWNLOAD_BUCKET
+      : env.VIDEOGRAPHER_BUCKET;
     // 6. Fetch object directly from R2 bucket
-    const object = await env.VIDEOGRAPHER_BUCKET.get(objectKey);
+    const object = await selectedBucket.get(objectKey);
     if (!object) {
       return new Response("Not Found", { status: 404 });
     }
@@ -85,7 +88,6 @@ export default {
     headers.set("Accept-Ranges", "bytes");
 
     // Handle direct master video downloads vs standard asset streaming
-    const isDownload = url.searchParams.get("download") === "1";
     if (isDownload) {
       const filename = objectKey.split("/").pop() || "master.mp4";
       headers.set("Content-Disposition", `attachment; filename="${filename}"`);

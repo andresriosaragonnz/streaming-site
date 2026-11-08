@@ -79,7 +79,7 @@ export const serveStatus = async (c: any) => {
     `SELECT * FROM segments WHERE status = 'public'`,
   ).all();
   const allSegments = graphResult?.results ?? [];
-
+  console.log({ allSegments });
   const artistMap = new Map<string, { name: string; rawArtist: string }>();
   const groupedByArtist: Record<string, any[]> = {};
   const len = allSegments.length;
@@ -113,6 +113,11 @@ export const serveStatus = async (c: any) => {
 
   return c.html(
     "<!doctype html>\n" +
-      <StatusPage graphDataJS={graphDataJsonString || EMPTY_GRAPH_DATA} stats={stats} />,
+    (
+      <StatusPage
+        graphDataJS={graphDataJsonString || EMPTY_GRAPH_DATA}
+        stats={stats}
+      />
+    ),
   );
 };
