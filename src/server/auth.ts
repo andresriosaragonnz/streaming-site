@@ -92,5 +92,8 @@ export const useAdmin = async (c: any, next: any) => {
   if (!isAdminRequest(c)) {
     return c.text("Unauthorized", 401);
   }
+
+  c.header("Cache-Control", "private, no-store");
+
   await next();
 };

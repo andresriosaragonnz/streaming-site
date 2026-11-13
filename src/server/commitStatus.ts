@@ -89,7 +89,7 @@ const parseCommitPayload = (body: unknown): ParseResult => {
 };
 
 export const commitStatus = async (c: any) => {
-  c.header("Cache-Control", "no-store");
+  c.header("Cache-Control", "private, no-store");
 
   const admin = isAdminRequest(c);
   const payload = admin ? null : await getAuthPayload(c);

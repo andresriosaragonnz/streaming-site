@@ -5,5 +5,10 @@ export const serveOptions = async (c: any) => {
   const { results } = await c.env.DB.prepare(sql).all();
 
   const artistNames = results.map((row: any) => row.artistName);
+  c.header(
+    "Cache-Control",
+    "public, max-age=0, s-maxage=31536000, must-revalidate",
+  );
+  c.header("Cache-Tag", "public-feed");
   return c.json(artistNames);
 };

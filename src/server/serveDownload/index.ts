@@ -54,6 +54,6 @@ export const serveDownload = async (c: any) => {
     hmacToken,
   )}&download=1`;
 
-  c.header("Cache-Control", "no-store");
+  c.header("Cache-Control", "private, no-store");
   return c.redirect(downloadUrl, 302);
 };

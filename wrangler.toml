@@ -5,6 +5,9 @@ compatibility_date = "2026-07-29"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 
+[cache]
+enabled = true
+
 # Top-Level / Production Environment Variables
 [vars]
 APP_URL = "https://iknowthatband.org"

@@ -42,6 +42,8 @@ const parseAllowedClaims = (allowed: string[]): ParseClaimsResult => {
 };
 
 export const serveClaim = async (c: any) => {
+  c.header("Cache-Control", "private, no-store");
+
   try {
     const incomingToken = c.req.query("token");
     if (!incomingToken) return c.text("Missing token", 400);

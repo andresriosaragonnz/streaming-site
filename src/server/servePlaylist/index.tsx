@@ -95,11 +95,20 @@ export const servePlaylist = async (c: any) => {
     );
 
     // 6. Set defensive headers (Cache-Control & Content Security Policy)
-    c.header("Cache-Control", "private, no-store, max-age=0");
-    return c.html(
+    c.header(
+      "Cache-Control",
+      "public, max-age=0, s-maxage=31536000, must-revalidate",
+    );
+    c.header("Cache-Tag", "public-feed");
+    const response = c.html(
       "<!doctype html>\n" +
       <PlaylistPageLayout pageTitle={nameParam} segments={sanitizedSegments} />,
     );
+    const playlistCacheKey =
+      new URL(c.req.url).pathname + new URL(c.req.url).search;
+    const cache = await caches.open("default");
+    await cache.put(playlistCacheKey, response.clone());
+    return response;
   } catch (err) {
     console.error("Failed to load playlist:", err);
     return c.text("Failed to load playlist", 500);

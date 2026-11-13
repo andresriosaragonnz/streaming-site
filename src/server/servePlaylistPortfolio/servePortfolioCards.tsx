@@ -118,7 +118,11 @@ export const servePlaylistPortfolioCards = async (c: Context) => {
     }
 
     const rendered = renderPortfolioGrid({ items });
-    c.header("Cache-Control", "no-store");
+    c.header(
+      "Cache-Control",
+      "public, max-age=0, s-maxage=31536000, must-revalidate",
+    );
+    c.header("Cache-Tag", "public-feed");
     return c.json(rendered);
   } catch (err) {
     console.error("Failed to load playlist portfolio:", err);

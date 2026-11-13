@@ -35,6 +35,11 @@ const app = new Hono<{ Bindings: Bindings }>();
 // 1. Root Endpointa
 // ---------------------------------------------------------
 app.get("/", (c) => {
+  c.header(
+    "Cache-Control",
+    "public, max-age=0, s-maxage=31536000, must-revalidate",
+  );
+  c.header("Cache-Tag", "public-feed");
   return c.html("<h1>Archive Engine Server Running</h1>");
 });
 
