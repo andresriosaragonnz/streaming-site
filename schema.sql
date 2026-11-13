@@ -20,6 +20,18 @@ CREATE TABLE IF NOT EXISTS segments (
   acknowledge INTEGER NOT NULL DEFAULT 0 CHECK (acknowledge IN (0, 1))
 );
 
+CREATE INDEX IF NOT EXISTS idx_segments_artist_status_id
+  ON segments (artistName, status, artistId);
+
+CREATE INDEX IF NOT EXISTS idx_segments_performance_status
+  ON segments (performance, status);
+
+CREATE INDEX IF NOT EXISTS idx_segments_status_artist_name
+  ON segments (status, artistName);
+
+CREATE INDEX IF NOT EXISTS idx_segments_status_id
+  ON segments (status, id);
+
 CREATE TABLE IF NOT EXISTS artists (
   id TEXT PRIMARY KEY,
   token_version INTEGER NOT NULL DEFAULT 1
