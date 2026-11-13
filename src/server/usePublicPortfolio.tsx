@@ -24,6 +24,11 @@ export const usePublicPortfolio = async (c: any, next: any) => {
   }
 
   if (!isAdmin && !isAllowed) {
+    c.header(
+      "Cache-Control",
+      "public, max-age=0, s-maxage=31536000, must-revalidate",
+    );
+    c.header("Cache-Tag", `artist:${c.req.path.split("/").filter(Boolean)[0]}`);
     return c.html("<!doctype html>\n" + <PendingLayout />);
   }
 

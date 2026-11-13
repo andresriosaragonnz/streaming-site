@@ -17,6 +17,11 @@ export const servePublicPortfolio = async (c: any) => {
       .all(),
   ]);
   if (!results || results.length === 0) {
+    c.header(
+      "Cache-Control",
+      "public, max-age=0, s-maxage=31536000, must-revalidate",
+    );
+    c.header("Cache-Tag", `artist:${slug}`);
     return c.html("<!doctype html>\n" + <PendingLayout />);
   }
   const artistId = results[0].artistId;
