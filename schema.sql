@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS segments (
 CREATE INDEX IF NOT EXISTS idx_segments_artist_status_id
   ON segments (artistName, status, artistId);
 
+CREATE INDEX IF NOT EXISTS idx_segments_artist_id
+  ON segments (artistId);
+
 CREATE INDEX IF NOT EXISTS idx_segments_performance_status
   ON segments (performance, status);
 
