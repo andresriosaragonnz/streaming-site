@@ -9,7 +9,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Playlists</title>
-    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/app.css?v=2" />
+    <link rel="stylesheet" href="/css/main.css?v=2" />
   </head>
   <body>
     <div class="menu-container"><div class="menu">
@@ -200,7 +201,7 @@
           </picture>
 
           <div class="card-metadata">
-            <h3 class="capitalize-words h3" x-text="story.artistName"></h3>
+            <h3 class="capitalize-words heading-3" x-text="story.artistName"></h3>
             <p
               class="amount"
               x-text="`${story.artistName} ${story.count} new`"

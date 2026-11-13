@@ -31,7 +31,8 @@ export const PendingLayout = ({}) => {
         />
         <link rel="manifest" href="/site.webmanifest?v=1" />
 
-        <link rel="stylesheet" href="/css/main.css?v=1" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/main.css?v=2" />
       </head>
       <body>
         <div class="menu-container">

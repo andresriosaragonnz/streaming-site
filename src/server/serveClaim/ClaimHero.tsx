@@ -23,7 +23,7 @@ export const ClaimHero = ({
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>
       <h3>You are authorized in this machine</h3>
-      <a href={`/${link}`} class="btn-back">
+      <a href={`/${link}`} class="back-link">
         See public profile
       </a>
       <p class="performance-count">{count} Documented</p>

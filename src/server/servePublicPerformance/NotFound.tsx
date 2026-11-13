@@ -10,8 +10,9 @@ export const NotFound = () => {
 
         <Favicon />
 
-        <link rel="stylesheet" href="/css/review-studio.css" />
-        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/review-studio.css?v=2" />
+        <link rel="stylesheet" href="/css/main.css?v=2" />
       </head>
       <body>
         <div class="studio-container">

@@ -16,23 +16,23 @@ export function PublicPerformanceCard({
   return (
     <a
       href={`/${link}`}
-      class="card"
+      class="card u-link-reset"
       data-bg={altImage}
-      style="text-decoration: none; color: inherit"
     >
       <picture class="card-thumbnail">
         <source srcset={`${cardImage}.avif`} type="image/avif" />
         <source srcset={`${cardImage}.webp`} type="image/webp" />
         <img
+          class="u-cover"
           src={`${cardImage}/card.jpg`}
           alt={`${formattedVenueName} - ${formattedDate}`}
           loading="lazy"
-          style="width: 100%; height: 100%; object-fit: cover; display: block"
+
         />
       </picture>
 
       <div class="card-metadata">
-        <h3 class="capitalize-words h3">{formattedVenueName}</h3>
+        <h3 class="capitalize-words heading-3">{formattedVenueName}</h3>
         <p class="date">{formattedDate}</p>
       </div>
     </a>

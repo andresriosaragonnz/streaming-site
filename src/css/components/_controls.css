@@ -2,14 +2,6 @@
    Public Player Controls & Playlist Selector
    ============================================================================= */
 
-#public-player-controls .studio-controls-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  width: 100%;
-}
-
 /* Playlist Dropdown */
 .playlist-select-group {
   display: flex;
@@ -42,46 +34,47 @@
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--accent-blue-subtle);
 }
-.hidden {
-  display: none !important;
-}
 /* Dynamic Custom Input */
 .custom-playlist-group {
   min-width: 180px;
   flex: 1;
 }
 
-.input-public {
-  width: 100%;
-  padding: 8px 12px;
-  background-color: var(--bg-input);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
+/* =============================================================================
+   Button Base
+   ============================================================================= */
+
+.btn {
+  cursor: pointer;
   border-radius: 6px;
-  font-size: 0.875rem;
-  outline: none;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease;
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    filter 0.15s ease;
 }
 
-.input-public:focus {
-  border-color: var(--border-focus);
+/* Primary (brand) button */
+.btn-public {
+  background: var(--accent-brand);
+  color: var(--text-main);
+  border: 1px solid var(--button-border);
+}
+
+.btn-public:hover {
+  background: var(--accent-blue-hover);
 }
 
 /* Add to Playlist Button */
 .btn-save-segment {
   white-space: nowrap;
   padding: 8px 16px;
-  background: var(--accent-brand);
-  color: var(--text-main);
-  border: 1px solid var(--button-border);
-  border-radius: 6px;
   font-weight: 600;
   font-size: 0.875rem;
-  cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    filter 0.15s ease;
 }
 
 .btn-save-segment:hover {
@@ -91,4 +84,57 @@
 
 .btn-save-segment:active {
   transform: translateY(1px);
+}
+
+/* Transparent icon buttons */
+.btn-icon-favorite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: currentColor;
+}
+
+/* -----------------------------------------------------------------------------
+   Download buttons
+   ----------------------------------------------------------------------------- */
+
+.download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--button-border);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.download-button:hover {
+  background: var(--bg-surface-hover);
+}
+
+.download-button--inline {
+  flex-direction: row;
+}
+
+.download-button--stacked {
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.download-button__label {
+  display: block;
+}
+
+.download-icon {
+  display: block;
+  flex-shrink: 0;
 }

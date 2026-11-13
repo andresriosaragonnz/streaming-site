@@ -1,0 +1,10 @@
+/* src/css/utilities/_states.css — canonical runtime state primitives */
+
+.is-hidden {
+  display: none !important;
+}
+
+.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

@@ -75,25 +75,6 @@
   pointer-events: auto;
 }
 
-#see-videos-wrapper {
-  position: relative;
-  z-index: 10002;
-  margin-top: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  flex-shrink: 0; /* Guarantees footer never gets squeezed or pushed off-screen */
-  pointer-events: auto;
-  background: #040714;
-}
-
-/* Respect UI Binder hidden class toggles */
-#see-videos-wrapper.is-hidden,
-#see-videos-wrapper[style*="display: none"] {
-  display: none !important;
-}
-
 .graph-action-link {
   text-decoration: none;
   padding: 14px 0;

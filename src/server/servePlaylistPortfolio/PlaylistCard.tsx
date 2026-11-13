@@ -30,7 +30,7 @@ export const PlaylistCard = ({
         href="#"
         data-card-link
         data-bind-href={shareGetter}
-        style="text-decoration: none; color: inherit; display: block;"
+        class="u-link-reset u-block"
       >
         <ItemThumbnail
           cardImage={cardImage}
@@ -47,20 +47,19 @@ export const PlaylistCard = ({
           data-card-link
           rel="prefetch"
           data-bind-href={shareGetter}
-          style="text-decoration: none; color: inherit; display: block;"
+          class="u-link-reset u-block"
         >
-          <h3 class="capitalize-words h3">{playlistName}</h3>
+          <h3 class="capitalize-words heading-3">{playlistName}</h3>
           <p class="date">{playlistLength} tracks</p>
         </a>
 
         {/* Share Action Trigger */}
         <button
           type="button"
-          class="share-btn"
+          class="share-btn u-bare u-pointer"
           data-action="copy-portfolio-share-link"
           data-playlist-name={playlistName}
-          style="background: none; border: none; padding: 0; cursor: pointer; color: inherit;"
-          aria-label={`Share ${playlistName} playlist`}
+            aria-label={`Share ${playlistName} playlist`}
         >
           <ShareIcon />
         </button>

@@ -1,4 +1,4 @@
-.h3 {
+.heading-3 {
   font-size: 1.6rem;
   margin-bottom: 6px;
   letter-spacing: -0.2px;
@@ -6,7 +6,7 @@
 }
 
 @media (min-width: 640px) {
-  .h3 {
+  .heading-3 {
     font-size: 1.3rem;
   }
 }

@@ -8,10 +8,6 @@
   overflow: hidden;
 }
 
-.playlist-sidebar .sidebar-header {
-  border-bottom: 1px solid var(--bg-card);
-}
-
 .playlist-sidebar h3 {
   margin: 0;
   font-size: 0.95rem;
@@ -54,9 +50,8 @@
   padding: 0.5rem;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.5rem;
   border-radius: 6px;
-  cursor: pointer;
+  cursor: grab;
   transition: all 0.2s;
   flex: 0 0 240px;
   scroll-snap-align: center;
@@ -65,10 +60,6 @@
 
 .item-active-highlight {
   background: var(--bg-selected);
-}
-
-.item-private-red {
-  background: var(--bg-private);
 }
 
 .sidebar-item-card .item-thumbnail {
@@ -87,18 +78,15 @@
 
 .sidebar-item-card .title-text {
   font-size: 1.5rem;
-  white-space: nowrap;
   overflow: hidden;
   text-transform: capitalize;
-  white-space: normal;
   color: var(--text-main);
   text-overflow: ellipsis;
   display: flex;
   flex-direction: column;
 }
-.justified-line {
-  display: flex;
-  justify-content: space-between;
+.segment-duration {
+  display: block;
 }
 
 .sidebar-item-card .status-text {
@@ -199,10 +187,6 @@
     max-height: 85vh;
   }
 
-  .playlist-sidebar .sidebar-header {
-    padding: 1.25rem;
-  }
-
   .playlist-sidebar h3 {
     font-size: 1.1rem;
   }
@@ -235,7 +219,11 @@
   .sidebar-item-card .title-text {
     font-size: 2rem;
   }
-  .sidebar-item-card .status-text {
+  .segment-duration {
+  display: block;
+}
+
+.sidebar-item-card .status-text {
     font-size: 1.6rem;
   }
 
@@ -251,16 +239,6 @@
     flex: 0 0 180px;
   }
 }
-/* Disable snap behavior during drag operations so dragging is smooth */
-.sidebar-scroll-list.is-dragging {
-  scroll-snap-type: none !important;
-}
-
-/* Card drag styling */
-.sidebar-item-card {
-  cursor: grab;
-}
-
 .sidebar-item-card:active {
   cursor: grabbing;
 }

@@ -25,7 +25,7 @@ export const StatusPage = ({ graphDataJS, stats }: StatusPageProps) => (
       <title>Status</title>
       <Favicon />
 
-      <link rel="stylesheet" href="/css/status.css" />
+      <link rel="stylesheet" href="/css/status.css?v=2" />
     </head>
     <body>
       <main class="status-page">

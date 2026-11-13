@@ -1,0 +1,72 @@
+/* src/css/utilities/_layout.css — tiny, single-purpose layout helpers */
+
+.u-flex {
+  display: flex;
+}
+
+.u-col {
+  flex-direction: column;
+}
+
+.u-row {
+  flex-direction: row;
+}
+
+.u-center {
+  align-items: center;
+}
+
+.u-start {
+  align-items: flex-start;
+}
+
+.u-flex-between {
+  justify-content: space-between;
+}
+
+.u-flex-between {
+  justify-content: space-between;
+}
+
+.u-full {
+  width: 100%;
+}
+
+.u-w-70 {
+  width: 70%;
+}
+
+.u-block {
+  display: block;
+}
+
+.u-gap-sm {
+  gap: 8px;
+}
+
+.u-gap-md {
+  gap: 12px;
+}
+
+.u-link-reset {
+  text-decoration: none;
+  color: inherit;
+}
+
+.u-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.u-bare {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+
+.u-pointer {
+  cursor: pointer;
+}

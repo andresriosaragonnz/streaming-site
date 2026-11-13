@@ -46,7 +46,8 @@ export const PlaylistPageLayout = ({
       <head>
         <Favicon />
         <title>Playlist</title>
-        <link rel="stylesheet" href="/css/review-studio.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/review-studio.css?v=2" />
       </head>
       <body>
         <Toast />

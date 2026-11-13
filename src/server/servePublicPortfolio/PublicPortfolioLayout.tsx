@@ -73,7 +73,8 @@ export const PublicPortfolioLayout = ({
 
           return <link rel="prefetch" key={href} href={href} as="document" />;
         })} */}
-        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/main.css?v=2" />
 
         {/* Image data payload for client-side scripts */}
         <script type="application/json" id="page-images">

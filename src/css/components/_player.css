@@ -1,14 +1,4 @@
 /* =============================================================================
-   State Visibility Utilities
-   ============================================================================= */
-.is-hidden,
-.video-player-container.is-hidden,
-.audio-player-container.is-hidden,
-.video-play-overlay.is-hidden {
-  display: none !important;
-}
-
-/* =============================================================================
    Player Layout & Canvas Setup (CLS Prevention)
    ============================================================================= */
 .video-player-mock {
@@ -28,6 +18,12 @@
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.video-container {
+  width: 100%;
+  height: 100%;
+  background: #000;
 }
 
 .video-player-container video {
@@ -76,14 +72,33 @@
 /* =============================================================================
    Typography & Titles
    ============================================================================= */
-.performance-title {
+.performance-heading {
   text-transform: capitalize;
   font-size: larger;
   color: var(--text-main);
-  padding: 0.8rem;
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+  margin-right: 1rem;
 }
 
-.performance-title-big {
+.performance-heading-icon {
+  text-transform: capitalize;
+  font-size: larger;
+  color: var(--text-main);
+  padding-top: 0.2rem;
+  padding-bottom: 0.8rem;
+  margin-right: 1rem;
+}
+
+.performance-heading-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.performance-heading-big {
   text-transform: capitalize;
   font-size: x-large;
 }
@@ -105,46 +120,35 @@
 /* =============================================================================
    Player Overlays & Icons
    ============================================================================= */
-.player-overlay {
+.video-play-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
-  display: grid;
-  place-items: center;
-  background: var(--overlay-dim);
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
   cursor: pointer;
-  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  transition: opacity 0.2s ease;
 }
 
-.player-icon_container {
-  position: absolute;
-  top: 20%;
-  left: 30%;
+.play-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(24, 24, 27, 0.55);
+  border: 1px solid var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
 }
 
-/* Base size for mobile */
-.play-icon {
-  width: 80px;
-  height: 80px;
-  filter: drop-shadow(0px 6px 20px rgba(0, 0, 0, 0.6));
-  pointer-events: none;
-  transition:
-    width 0.2s ease,
-    height 0.2s ease;
-}
-
-@media (min-width: 1536px) {
-  .play-icon {
-    width: 340px;
-    height: 340px;
-  }
-  .player-icon_container {
-    position: absolute;
-    top: 50%;
-    left: 35%;
-  }
+.play-icon-wrapper svg {
+  margin-left: 3px;
 }
 
 /* =============================================================================
@@ -293,4 +297,21 @@
   justify-content: space-between;
   gap: 1rem;
   display: flex;
+}
+
+.meta-title-card-left,
+.meta-title-card-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.performance-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.toggle-container {
+  display: inline-flex;
+  align-items: center;
 }

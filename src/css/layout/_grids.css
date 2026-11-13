@@ -67,3 +67,17 @@
     flex: 0 0 70%;
   }
 }
+
+@media (min-width: 1536px) {
+  .studio-container {
+    max-width: 95%;
+    margin: 2rem auto;
+    flex-direction: row;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .player-column {
+    flex: 0 0 70%;
+  }
+}

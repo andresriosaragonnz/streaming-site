@@ -24,11 +24,12 @@ export const ItemThumbnail = ({
         type="image/webp"
       />
       <img
+        class="u-cover"
         src={`${cardImage}.jpg${tokenQuery}`}
         alt={title}
         loading="lazy"
         decoding="async"
-        style="width: 100%; height: 100%; object-fit: cover; display: block"
+
       />
     </picture>
   );

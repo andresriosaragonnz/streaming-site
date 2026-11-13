@@ -29,3 +29,24 @@
   display: flex;
   justify-content: space-between;
 }
+
+.portfolio-empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* -----------------------------------------------------------------------------
+   Share buttons
+   ----------------------------------------------------------------------------- */
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-icon {
+  display: block;
+}

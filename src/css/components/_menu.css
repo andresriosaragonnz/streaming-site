@@ -34,14 +34,14 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background-color: #1f2937;
-  color: #ffffff;
+  background-color: var(--section-border);
+  color: var(--text-main);
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
-  border: 1px solid #374151;
+  border: 1px solid var(--bg-surface-hover);
   transition: background-color 0.2s ease;
   user-select: none;
 
@@ -50,7 +50,7 @@
   z-index: 30; /* Keeps it above content, but below the dark overlay (40) */
 }
 .drawer-trigger:hover {
-  background-color: #374151;
+  background-color: var(--bg-surface-hover);
 }
 
 /* 3. The dark background overlay */
@@ -60,7 +60,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--overlay-dark);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   opacity: 0;
@@ -109,19 +109,19 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 /* Close button inside the drawer */
 .drawer-close {
-  color: #9ca3af;
+  color: var(--text-subtle);
   font-size: 1.5rem;
   line-height: 1;
   cursor: pointer;
   transition: color 0.2s ease;
 }
 .drawer-close:hover {
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 /* Link list styling */
@@ -144,14 +144,14 @@
   transition: all 0.2s ease;
 }
 .drawer-link:hover {
-  background-color: #1f2937;
-  color: #ffffff;
+  background-color: var(--section-border);
+  color: var(--text-main);
 }
 
 /* Nested Private Links */
 .drawer-section {
   margin-top: 16px;
-  border-top: 1px solid #27272a;
+  border-top: 1px solid var(--border-subtle);
   padding-top: 16px;
 }
 
@@ -191,34 +191,18 @@
   border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #f4f4f5;
-  background-color: #27272a;
-  border: 1px solid #3f3f46;
+  color: var(--text-main);
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--bg-surface-active);
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease;
   user-select: none;
 }
 
-.share-trigger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #f4f4f5;
-  user-select: none;
-  border: none;
-  background-color: var(--bg-deep);
-}
-
 .search-trigger:hover {
-  background-color: #3f3f46;
-  border-color: #52525b;
+  background-color: var(--bg-surface-active);
+  border-color: var(--border-hover);
 }
 
 /* 2. Backdrop Overlay */
@@ -228,7 +212,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.65);
+  background-color: var(--overlay-dark);
   backdrop-filter: blur(4px);
   opacity: 0;
   pointer-events: none;
@@ -256,8 +240,8 @@
   transform: translate(-50%, -16px);
   width: calc(100% - 32px);
   max-width: 540px;
-  background-color: #18181b;
-  border: 1px solid #27272a;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 16px;
   z-index: 100;
@@ -279,9 +263,9 @@
 
 #search-input {
   flex: 1;
-  background-color: #27272a;
-  border: 1px solid #3f3f46;
-  color: #ffffff;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--bg-surface-active);
+  color: var(--text-main);
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -292,17 +276,17 @@
 }
 
 #search-input:focus {
-  border-color: #71717a;
+  border-color: var(--text-dim);
   box-shadow: 0 0 0 2px rgba(113, 113, 122, 0.25);
 }
 
 #search-input::placeholder {
-  color: #71717a;
+  color: var(--text-dim);
 }
 
 .search-close {
   font-size: 22px;
-  color: #a1a1aa;
+  color: var(--text-subtle);
   cursor: pointer;
   line-height: 1;
   padding: 4px;
@@ -313,8 +297,8 @@
 }
 
 .search-close:hover {
-  color: #ffffff;
-  background-color: #27272a;
+  color: var(--text-main);
+  background-color: var(--bg-surface-elevated);
 }
 
 /* 4. Autocomplete Dropdown List */
@@ -339,12 +323,12 @@
 }
 
 .autocomplete-list::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.16);
+  background-color: var(--scrollbar-thumb);
   border-radius: 9999px;
 }
 
 .autocomplete-list::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.32);
+  background-color: var(--scrollbar-thumb-hover);
 }
 
 /* Item Links */
@@ -352,7 +336,7 @@
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  color: #d4d4d8;
+  color: var(--text-dark);
   text-decoration: none;
   font-size: 0.9rem;
   border-radius: 6px;
@@ -362,6 +346,6 @@
 }
 
 .autocomplete-item:hover {
-  background-color: #27272a;
-  color: #ffffff;
+  background-color: var(--bg-surface-elevated);
+  color: var(--text-main);
 }

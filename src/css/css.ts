@@ -39,32 +39,24 @@ export function compileStylesheets(): void {
     const srcCssDir = join(projectRoot, "src/css");
     mkdirSync(outputDir, { recursive: true });
 
-    // 1. Compile the main public portfolio styles
-    console.log(` -> Processing: ${join(srcCssDir, "main.css")}`);
-    const flatMainCss = crossCompileManifest(join(srcCssDir, "main.css"));
-    const mainResult = transform({
-      filename: "main.css",
-      code: Buffer.from(flatMainCss),
-      minify: true,
-      sourceMap: false,
-    });
-    writeFileSync(join(outputDir, "main.css"), mainResult.code);
+    // Shared base + page layers. Every page loads app.css plus at most one
+    // page layer (public pages may also load review-studio.css for the
+    // shared sidebar/playlist UI).
+    const entries = ["app.css", "main.css", "review-studio.css", "status.css"];
 
-    // 2. Compile the full private review dashboard styles
-    const flatStudioCss = crossCompileManifest(
-      join(srcCssDir, "review-studio.css"),
-    );
-    const studioResult = transform({
-      filename: "review-studio.css",
-      code: Buffer.from(flatStudioCss),
-      minify: true,
-      sourceMap: false,
-    });
-    writeFileSync(join(outputDir, "review-studio.css"), studioResult.code);
+    for (const entry of entries) {
+      console.log(` -> Processing: ${join(srcCssDir, entry)}`);
+      const flatCss = crossCompileManifest(join(srcCssDir, entry));
+      const result = transform({
+        filename: entry,
+        code: Buffer.from(flatCss),
+        minify: true,
+        sourceMap: false,
+      });
+      writeFileSync(join(outputDir, entry), result.code);
+    }
 
-    console.log(
-      "✨ Both production CSS entry points successfully flattened and minified!",
-    );
+    console.log("✨ All production CSS entry points flattened and minified!");
   } catch (error) {
     console.error("❌ CSS Compilation failed:", error);
     throw error;

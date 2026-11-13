@@ -36,7 +36,7 @@
     -apple-system,
     sans-serif;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--button-border);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -44,25 +44,25 @@
 
 /* Toast Color Variants */
 .toast-content.toast-success {
-  background-color: #15803d;
-  color: #ffffff;
+  background-color: var(--toast-success);
+  color: var(--text-main);
 }
 
 .toast-content.toast-info {
-  background-color: #ca8a04;
-  color: #ffffff;
+  background-color: var(--toast-warning);
+  color: var(--text-main);
 }
 
 .toast-content.toast-error {
-  background-color: #b91c1c;
-  color: #ffffff;
+  background-color: var(--toast-error);
+  color: var(--text-main);
 }
 
 /* Dismiss Button */
 .toast-dismiss {
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: var(--text-main);
   font-size: 18px;
   font-weight: 700;
   line-height: 1;

@@ -9,7 +9,8 @@ export function AuditDashboard({ data }: { data: AuditDataResult }) {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>R2 Folder Audit | iknowthatband</title>
-        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/main.css?v=2" />
         <style>{`
           .audit-container { padding: 2rem; max-width: 1200px; margin: 0 auto; font-family: monospace; }
           .grid-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }

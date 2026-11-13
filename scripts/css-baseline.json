@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-11-13T06:50:56.364Z",
+  "css": {
+    "app.css": {
+      "rules": 113,
+      "classes": 68,
+      "dupes": 0
+    },
+    "main.css": {
+      "rules": 15,
+      "classes": 6,
+      "dupes": 0
+    },
+    "review-studio.css": {
+      "rules": 148,
+      "classes": 83,
+      "dupes": 0
+    },
+    "status.css": {
+      "rules": 15,
+      "classes": 8,
+      "dupes": 0
+    },
+    "archflow.css": {
+      "rules": 65,
+      "classes": 57,
+      "dupes": 0
+    }
+  },
+  "totalRules": 356,
+  "usedClasses": 218,
+  "definedClasses": 220,
+  "usedButUndefined": [
+    "audit-container",
+    "audit-table",
+    "badge-err",
+    "badge-ok",
+    "color",
+    "date",
+    "leaflet-control-layers",
+    "leaflet-control-layers-selector",
+    "leaflet-control-scale",
+    "leaflet-disabled",
+    "leaflet-marker-",
+    "leaflet-pane",
+    "lvml",
+    "pipeline-container",
+    "pipeline-header",
+    "pipeline-row",
+    "pipeline-stages",
+    "stage-content",
+    "stateClass",
+    "status-badge",
+    "text-err"
+  ],
+  "definedButUnused": [
+    "active-amber",
+    "active-green",
+    "amber",
+    "approval-pill",
+    "color-amber",
+    "color-cyan",
+    "color-green",
+    "color-purple",
+    "connector-line",
+    "drawer-close",
+    "drawer-header",
+    "fragment-cell",
+    "green",
+    "item-active-highlight",
+    "mp4-card",
+    "orb-node-label",
+    "state-dimmed",
+    "state-processing",
+    "state-success",
+    "toast-error",
+    "toast-info",
+    "toast-success",
+    "vertical-approval-list"
+  ],
+  "unexpectedUndefined": []
+}

@@ -20,10 +20,11 @@ export function CardThumbnail({
         type="image/webp"
       />
       <img
+        class="u-cover"
         src={`${cardImage}.jpg?token=${segmentToken}`}
         alt={altText}
         loading="lazy"
-        style="width: 100%; height: 100%; object-fit: cover; display: block"
+
       />
     </picture>
   );

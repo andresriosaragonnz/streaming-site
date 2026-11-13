@@ -25,9 +25,8 @@ export const PublicPortfolioHero = ({
       <h1 class="capitalize-words">{title}</h1>
       <button
         type="button"
-        class="btn-back"
+        class="back-link u-pointer"
         data-action="open-graph-modal"
-        style="cursor: pointer;"
       >
         See network
       </button>

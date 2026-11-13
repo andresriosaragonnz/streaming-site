@@ -41,7 +41,6 @@ export const PublicPerformancePageLayout = ({
     artistName,
     performance,
   } = firstSegment;
-
   const posterImage = firstSegment.segmentToken
     ? `${cardImage}.jpg?token=${encodeURIComponent(firstSegment.segmentToken)}`
     : `${cardImage}.jpg`;
@@ -75,8 +74,9 @@ export const PublicPerformancePageLayout = ({
           />
         )}
 
-        <link rel="stylesheet" href="/css/review-studio.css" />
-        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/review-studio.css?v=2" />
+        <link rel="stylesheet" href="/css/main.css?v=2" />
       </head>
       <body>
         <Toast />

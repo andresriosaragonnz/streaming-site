@@ -1,4 +1,6 @@
 import { CommitModal } from "./CommitModal";
+import { GlobeIcon } from "./GlobeIcon";
+import { LockIcon } from "../servePublicPerformance/LockIcon";
 
 export interface PrivatePlayerControlsProps {
   segments: any[];
@@ -22,10 +24,19 @@ export const PrivatePlayerControls = ({
         {/* Current Segment Public/Private Toggle */}
         <button
           type="button"
-          class="btn-status"
+          class="btn btn-status"
           data-action="toggle-segment-status"
           data-bind-class="{ 'btn-public-green': review.isCurrentPublic, 'btn-private-red': !review.isCurrentPublic }"
         >
+          <span class="btn-status-icon" data-bind-show="review.isCurrentPublic">
+            <GlobeIcon />
+          </span>
+          <span
+            class="btn-status-icon"
+            data-bind-show="!review.isCurrentPublic"
+          >
+            <LockIcon />
+          </span>
           <span data-bind-text="review.isCurrentPublic ? 'Public' : 'Private'">
             Public
           </span>
@@ -42,7 +53,7 @@ export const PrivatePlayerControls = ({
         <button
           data-bind-class="{ 'is-hidden': !review.hasUncommittedChanges }"
           type="button"
-          class="btn-status btn-public-green"
+          class="btn btn-status btn-public-green"
           data-action="open-commit-dialog"
         >
           <span>Commit</span>

@@ -28,6 +28,7 @@ export const PrivatePerformancePageLayout = ({
     eventDate,
     masterSize,
     segmentToken,
+    formattedVenue,
   } = formattedSegments[0];
   const posterImage = segmentToken
     ? `${cardImage}.jpg?token=${encodeURIComponent(segmentToken)}`
@@ -50,13 +51,14 @@ export const PrivatePerformancePageLayout = ({
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Performance</title>
-        <link rel="stylesheet" href="/css/review-studio.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/review-studio.css?v=2" />
       </head>
       <body>
         <Toast />
         <div class="studio-container">
           <PrivateViewPlayer
-            studioTitle={`${formattedArtist}-${venueName}-${formattedDate}`}
+            studioTitle={`${formattedArtist}-${formattedVenue}-${formattedDate}`}
             artistName={artistName}
             posterImage={posterImage}
             segments={formattedSegments}

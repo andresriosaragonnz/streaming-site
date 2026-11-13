@@ -6,8 +6,8 @@ import { escapeHtml } from "../server/escapeHtml";
 export const formatSegment = (segment: any, videographers: any) => {
   const media = getMediaSource(segment.id, segment.videographer, videographers);
   const formattedDate = dateFromString(segment.eventDate).formated;
-  const formattedArtist = escapeHtml(segment.artistName.replaceAll("_", " "));
-  const formattedVenue = escapeHtml(segment.venueName.replaceAll("_", " "));
+  const formattedArtist = escapeHtml(segment.artistName).replaceAll("_", " ");
+  const formattedVenue = escapeHtml(segment.venueName).replaceAll("_", " ");
   const formattedPerformance = escapeHtml(
     `${formattedArtist}-${formattedVenue}-${formattedDate}`,
   );

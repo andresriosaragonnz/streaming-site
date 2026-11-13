@@ -23,11 +23,10 @@ export const PublicPerformanceCard = ({
 }: PublicPerformanceCardProps) => (
   <a
     href={`${artistName}/${venueName}-${eventDate}`}
-    class="card"
+    class="card u-link-reset"
     // rel="prefetch"
     data-bg={altImage}
     data-image-token={segmentToken}
-    style="text-decoration: none; color: inherit"
   >
     <CardThumbnail
       cardImage={cardImage}
@@ -36,7 +35,7 @@ export const PublicPerformanceCard = ({
     />
 
     <div class="card-metadata">
-      <h3 class="capitalize-words h3">{formattedVenueName}</h3>
+      <h3 class="capitalize-words heading-3">{formattedVenueName}</h3>
     </div>
     <div class="card-metadata">
       <p class="date">{formattedDate}</p>

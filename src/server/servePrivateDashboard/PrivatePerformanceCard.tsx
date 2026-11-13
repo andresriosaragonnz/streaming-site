@@ -24,8 +24,7 @@ export const PrivatePerformanceCard = ({
 }: PrivatePerformanceCardProps) => (
   <a
     href={`/private/performance/${performance}`}
-    class="card"
-    style="text-decoration: none; color: inherit"
+    class="card u-link-reset"
   >
     <ItemThumbnail
       cardImage={cardImage}

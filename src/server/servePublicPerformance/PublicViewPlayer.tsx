@@ -3,6 +3,7 @@ import { VideoPlayer } from "../../components/VideoPlayer";
 import { AudioPlayer } from "../../components/AudioPlayer";
 import { ConstellationBtn } from "../../components/ConstellationBtn";
 import { AddToPlaylist } from "../../components/AddToPlaylist";
+import { LockIcon } from "./LockIcon";
 
 export interface PublicViewPlayerProps {
   studioTitle: string;
@@ -32,14 +33,24 @@ export const PublicViewPlayer = ({
     {/* Metadata Information Section */}
     <header class="player-metadata">
       <div class="artist-title">
-        <a
-          class="sidebar-artist-button"
-          href={`/${artistLink}`}
-          id="artist-name"
-          data-artist={artistLink}
-        >
-          {artistName}
-        </a>
+        <div class="u-flex u-gap-md">
+          <a
+            class="sidebar-artist-button"
+            href={`/${artistLink}`}
+            id="artist-name"
+            data-artist={artistLink}
+          >
+            {artistName}
+          </a>
+          {isAllowed && (
+            <a class="" href={`/private/performance/${performanceLink}`}>
+              <span class="download-button download-button--stacked">
+                <LockIcon />
+                <span class="download-button__label">Private</span>
+              </span>
+            </a>
+          )}
+        </div>
         <button
           id="reset-btn"
           class="search-trigger"
@@ -47,19 +58,12 @@ export const PublicViewPlayer = ({
           title="Show Network"
           aria-label="Show Network"
           data-action="open-graph-modal"
-          style="cursor: pointer;"
         >
           <ConstellationBtn />
         </button>
       </div>
-      <h2 class="performance-title break-hyphens">{studioTitle}</h2>
-      {isAllowed && (
-        <div id="performance-link" data-performance={artistLink}>
-          <a href={`/private/performance/${performanceLink}`}>
-            Private version
-          </a>
-        </div>
-      )}
+      <h2 class="performance-heading break-hyphens">{studioTitle}</h2>
+
       <h3
         class="performance-subtitle break-hyphens"
         data-bind-text="player.currentTitle"

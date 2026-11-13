@@ -3,7 +3,7 @@ export interface ModalTermsTextProps {}
 export const ModalTermsText = () => (
   <div
     class="contract-body"
-    data-bind-style-display="review.state.isTermsExpanded ? 'block' : 'none'"
+    data-bind-show="review.state.isTermsExpanded"
   >
     <h4>DIRECT SYNCHRONISATION AND ONLINE STREAMING LICENCE AGREEMENT</h4>
 

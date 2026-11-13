@@ -2,15 +2,15 @@ export const AddToPlaylist = () => (
   <div class="meta-workspace-card" id="public-player-controls">
     <div class="studio-controls-group">
       {/* Playlist Selector Dropdown */}
-      <div class="input-field-group playlist-select-group">
-        <div style="display:flex;flex-direction:column;width:70%">
+      <div class="playlist-select-group">
+        <div class="u-flex u-col u-w-70">
           <select id="playlist-select" class="select-public">
             {/* Dynamically populated client-side by PlayerStore */}
           </select>
           {/* Custom Playlist Name Input (Hidden by default) */}
           <div
             id="custom-playlist-group"
-            class="input-field-group custom-playlist-group hidden"
+            class="custom-playlist-group is-hidden"
           >
             <input
               type="text"
@@ -30,7 +30,7 @@ export const AddToPlaylist = () => (
         <button
           type="button"
           id="btn-toggle-new-playlist"
-          class="btn-public btn-icon-only"
+          class="btn btn-public btn-icon-only"
           title="Create new playlist"
           data-action="toggle-custom-playlist"
         >
@@ -42,7 +42,7 @@ export const AddToPlaylist = () => (
       <button
         type="button"
         id="btn-add-to-playlist"
-        class="btn-public btn-save-segment"
+        class="btn btn-public btn-save-segment btn-add-to-playlist"
         data-action="add-current-segment-to-playlist"
       >
         <span>Add to playlist</span>

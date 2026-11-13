@@ -24,24 +24,6 @@ body {
 }
 
 /* Background Dynamic Canvas */
-#dynamic-body-bg {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  background: no-repeat center / cover;
-  opacity: 0;
-  transition:
-    opacity 0.3s ease,
-    background-image 0.3s ease;
-  pointer-events: none;
-}
-
-body.has-hover-bg #dynamic-body-bg {
-  opacity: 0.35;
-}
-
 /* WebKit Scrollbars */
 ::-webkit-scrollbar {
   width: 8px;

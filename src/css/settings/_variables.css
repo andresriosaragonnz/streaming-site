@@ -33,13 +33,34 @@
   --text-subtle: #8b949e;
   --text-dim: #71717a;
   --text-dark: #d4d4d8;
+  --text-soft: #d1d5db;
 
   /* Borders & Dividers */
   --border-color: #30363d;
   --border-subtle: #27272a;
+  --border-faint: rgba(255, 255, 255, 0.08);
+  --border-hairline: rgba(255, 255, 255, 0.04);
+  --border-hover: #52525b;
   --border-focus: #58a6ff;
   --section-border: #1f2937;
   --button-border: rgba(255, 255, 255, 0.15);
+
+  /* Translucent Surfaces */
+  --surface-translucent: rgba(255, 255, 255, 0.05);
+  --surface-translucent-hover: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.3);
+
+  /* Status Tags */
+  --bg-public-subtle: rgba(16, 185, 129, 0.15);
+  --bg-public-border: rgba(16, 185, 129, 0.3);
+  --bg-private-subtle: rgba(239, 68, 68, 0.15);
+  --bg-private-border: rgba(239, 68, 68, 0.3);
+
+  /* Feedback & Destructive */
+  --bg-danger: #b91c1c;
+  --toast-success: #15803d;
+  --toast-warning: #ca8a04;
+  --toast-error: #b91c1c;
 
   /* Overlays & Shadows */
   --overlay-dark: rgba(0, 0, 0, 0.6);

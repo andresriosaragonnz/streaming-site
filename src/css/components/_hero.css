@@ -29,7 +29,7 @@
   opacity: 1;
 }
 
-.btn-back {
+.back-link {
   font-size: 2.25rem;
   font-weight: 700;
   color: var(--text-muted, #9ca3af);
@@ -160,4 +160,14 @@
   .performance-count {
     font-size: 1.1rem;
   }
+}
+
+.hero-container {
+  width: 100%;
+}
+
+.hero-placeholder {
+  width: 100%;
+  min-height: 50dvh;
+  background: var(--bg-card);
 }

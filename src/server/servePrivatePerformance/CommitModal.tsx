@@ -64,7 +64,7 @@ export const CommitModal = ({ segments }: CommitModalProps) => (
 
           {/* Native HTML Expandable Details Element */}
           <details class="contract-terms-details">
-            <summary class="btn-toggle-terms">View Terms</summary>
+            <summary class="btn btn-toggle-terms">View Terms</summary>
 
             <div class="contract-body">
               <h4>
@@ -129,14 +129,14 @@ export const CommitModal = ({ segments }: CommitModalProps) => (
       <footer class="dialog-footer">
         <button
           type="button"
-          class="btn-modal btn-modal-cancel"
+          class="btn btn-modal btn-modal-cancel"
           data-action="close-commit-dialog"
         >
           Cancel
         </button>
         <button
           type="button"
-          class="btn-modal btn-modal-confirm"
+          class="btn btn-modal btn-modal-confirm"
           data-action="submit-review-commit"
           disabled
         >

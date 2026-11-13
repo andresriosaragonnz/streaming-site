@@ -32,7 +32,7 @@ export function ArchStagePage() {
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>ArchFlow Engine</title>
-        <link rel="stylesheet" href="/css/archflow.css" />
+        <link rel="stylesheet" href="/css/archflow.css?v=2" />
 
         <script>{scriptContent}</script>
         <script src="/js/engine.js" defer></script>

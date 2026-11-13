@@ -91,7 +91,7 @@ export function initAppActions(): void {
     if (!selectEl) return;
 
     const isCustomVisible =
-      customGroup && !customGroup.classList.contains("hidden");
+      customGroup && !customGroup.classList.contains("is-hidden");
     const customValue = customInput?.value.trim();
 
     let targetPlaylistName = selectEl.value;
@@ -114,7 +114,7 @@ export function initAppActions(): void {
 
       // Reset custom input state
       if (customInput) customInput.value = "";
-      if (customGroup) customGroup.classList.add("hidden");
+      if (customGroup) customGroup.classList.add("is-hidden");
       toggleBtn?.classList.remove("active");
     }
 
@@ -138,7 +138,7 @@ export function initAppActions(): void {
     ) as HTMLInputElement | null;
     if (!inputGroup) return;
 
-    const isHidden = inputGroup.classList.toggle("hidden");
+    const isHidden = inputGroup.classList.toggle("is-hidden");
     if (!isHidden) input?.focus();
   });
 

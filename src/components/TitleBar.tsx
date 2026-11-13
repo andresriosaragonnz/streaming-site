@@ -1,8 +1,11 @@
 import { Menu } from "./Menu";
+import { LockIcon } from "../server/servePublicPerformance/LockIcon";
 
 export interface TitleBarProps {
   /** Optional flag to render player controls on the right */
   player?: boolean;
+  isAllowed?: boolean;
+  performanceLink?: string;
 }
 
 export const AddToPlaylistDialog = () => (
@@ -20,20 +23,13 @@ export const AddToPlaylistDialog = () => (
 
       <main class="dialog-body">
         <div
-          class="meta-workspace-card"
+          class="meta-workspace-card dialog-workspace"
           id="public-player-controls"
-          style="padding: 8px 0; background: transparent; border: none;"
         >
-          <div
-            class="studio-controls-group"
-            style="display: flex; flex-direction: column; gap: 12px; width: 100%;"
-          >
+          <div class="studio-controls-group dialog-controls-group">
             {/* Playlist Selector Dropdown & Toggle Group */}
-            <div
-              class="input-field-group playlist-select-group"
-              style="display: flex; gap: 8px; align-items: flex-start; width: 100%;"
-            >
-              <div style="display: flex; flex-direction: column; width: 100%; gap: 8px;">
+            <div class="playlist-select-group dialog-playlist-group">
+              <div class="u-flex u-col u-full u-gap-sm">
                 <select id="playlist-select" class="select-public">
                   {/* Dynamically populated client-side by PlayerStore */}
                 </select>
@@ -41,7 +37,7 @@ export const AddToPlaylistDialog = () => (
                 {/* Custom Playlist Name Input (Hidden by default) */}
                 <div
                   id="custom-playlist-group"
-                  class="input-field-group custom-playlist-group hidden"
+                  class="custom-playlist-group is-hidden"
                 >
                   <input
                     type="text"
@@ -62,7 +58,7 @@ export const AddToPlaylistDialog = () => (
               <button
                 type="button"
                 id="btn-toggle-new-playlist"
-                class="btn-public btn-icon-only"
+                class="btn btn-public btn-icon-only"
                 title="Create new playlist"
                 data-action="toggle-custom-playlist"
               >
@@ -76,7 +72,7 @@ export const AddToPlaylistDialog = () => (
       <footer class="dialog-footer">
         <button
           type="button"
-          class="btn-modal btn-modal-cancel"
+          class="btn btn-modal btn-modal-cancel"
           data-action="close-favorites-dialog"
         >
           Cancel
@@ -84,7 +80,7 @@ export const AddToPlaylistDialog = () => (
         <button
           type="button"
           id="btn-add-to-playlist"
-          class="btn-modal btn-modal-confirm"
+          class="btn btn-modal btn-modal-confirm btn-add-to-playlist"
           data-action="add-current-segment-to-playlist"
         >
           Add to playlist
@@ -94,24 +90,34 @@ export const AddToPlaylistDialog = () => (
   </dialog>
 );
 
-export const TitleBar = ({ player }: TitleBarProps) => (
+export const TitleBar = ({
+  player,
+  isAllowed,
+  performanceLink,
+}: TitleBarProps) => (
   <div class="meta-title-card">
     <div class="meta-title-card-left">
       <Menu />
     </div>
-    {player && (
-      <div
-        class="meta-title-card-right"
-        style="display: flex; align-items: center; gap: 12px;"
+    {isAllowed && (
+      <a
+        class="performance-heading-icon"
+        href={`/private/performance/${performanceLink}`}
       >
+        <span class="download-button ">
+          <LockIcon />
+        </span>
+      </a>
+    )}
+    {player && (
+      <div class="meta-title-card-right u-flex u-center u-gap-md">
         {/* Favorites Trigger Button */}
         <button
           type="button"
-          class="btn-icon-favorite"
+          class="btn btn-icon-favorite"
           data-action="open-favorites-dialog"
           aria-label="Add to Favorites"
           title="Add to Favorites"
-          style="background: transparent; border: none; cursor: pointer; color: currentColor; display: flex; align-items: center; justify-content: center; padding: 4px;"
         >
           <svg
             width="18"
@@ -128,10 +134,7 @@ export const TitleBar = ({ player }: TitleBarProps) => (
         </button>
 
         {/* Audio/Video Mode Switcher */}
-        <div
-          class="toggle-container"
-          style="display: flex; align-items: center;"
-        >
+        <div class="toggle-container u-flex u-center">
           <div class="toggle">
             <input
               type="checkbox"

@@ -1,17 +1,16 @@
 /* Delete Button Base */
 .btn-delete-icon {
-  border: 1px solid #ffffff;
-  color: #ffffff;
-  cursor: pointer;
-  background-color: #18181b;
-  color: #ffffff;
-  border: 1px solid #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--text-main);
   border-radius: 0;
   padding: 6px 10px;
   font-family: monospace;
   font-size: 12px;
   font-weight: 600;
-  cursor: pointer;
   height: fit-content;
   align-self: center;
   transition:
@@ -21,11 +20,16 @@
 
 /* Hover & Focus States */
 .btn-delete-icon:hover {
-  background-color: #b91c1c !important; /* Flat Red */
-  color: #ffffff !important;
-  border-color: #ffffff !important;
+  background-color: var(--bg-danger) !important; /* Flat Red */
+  color: var(--text-main) !important;
+  border-color: var(--text-main) !important;
 }
 
 .btn-delete-icon:active {
   transform: translateY(1px);
+}
+
+.btn-delete-icon svg {
+  display: block;
+  flex-shrink: 0;
 }

@@ -22,7 +22,8 @@ export const PlaylistPortfolioLayout = () => {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>My Playlists</title>
-        <link rel="stylesheet" href="/css/main.css" />
+        <link rel="stylesheet" href="/css/app.css?v=2" />
+        <link rel="stylesheet" href="/css/main.css?v=2" />
       </head>
       <body>
         <Toast />

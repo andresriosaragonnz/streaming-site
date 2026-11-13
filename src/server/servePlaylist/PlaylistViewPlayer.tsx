@@ -22,8 +22,8 @@ export const PlaylistViewPlayer = ({
 }: PlaylistViewPlayerProps) => (
   <section class="player-column" id="publicPlayerColumn">
     <TitleBar player />
-    <div class="performance-title-big">{pageTitle}</div>
-    <div style="display:flex;flex-direction:row;gap:8px">
+    <div class="performance-heading-big">{pageTitle}</div>
+    <div class="u-flex u-row u-gap-sm">
       <a
         class="sidebar-artist-button"
         href={artistLink ? `/${artistLink}` : "#"}
@@ -33,15 +33,14 @@ export const PlaylistViewPlayer = ({
         {artistName}
       </a>
       <div
-        class="performance-title break-hyphens"
+        class="performance-heading break-hyphens"
         data-bind-text="player.currentTrack ? player.currentTrack.title : ''"
       >
         {firstTitle}
       </div>
       <button
         type="button"
-        class="share-btn"
-        style="background: none; border: none; padding: 0; cursor: pointer; color: inherit;"
+        class="share-btn u-bare u-pointer"
         data-action="copy-share-url"
       >
         <span>

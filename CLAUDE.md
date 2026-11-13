@@ -58,7 +58,38 @@ Global Action Delegation (data-action): Elements use data-action="action-name" a
 
 Custom Event Triggers: Store changes dispatch native custom events (e.g., player-track-changed, graph-state-changed) which trigger UI.requestSync().
 
-5. Audit Tasks for OpenCode / Claude CLI
+5. CSS Organization
+
+Full guide: `src/css/README.md`. Read its “For agents” block before editing styles or template classes; section 4 is the hard rules and section 8 lists anti-patterns with codebase examples.
+
+Source lives in `src/css/`; `bun run pages:build` flattens it into `public/css/` via lightningcss. Never edit `public/css/*.css` directly.
+
+Layer order (imports flow downward only):
+
+```
+settings/_variables.css   tokens
+base/_reset.css           element defaults
+layout/_grids.css         page scaffolding
+components/*.css          menus, cards, player, dialogs…
+utilities/*.css           .is-hidden, .u-* helpers
+```
+
+Entry points compose layers; every page loads `app.css` plus at most one page layer:
+
+- `app.css` — tokens, reset, grids, hero, typography, cards, menu, toast, utilities.
+- `main.css` — public graph drawer.
+- `review-studio.css` — carousel/sidebar, controls, dialog, player, delete button.
+
+Naming rules:
+
+- One owner per class; no redefining a selector later in the cascade.
+- Variant = modifier class (`btn-public`, `btn-modal-cancel`); state = `is-*` (`is-hidden`, `is-loading`); helper = `u-*` (`u-row`, `u-gap-sm`).
+- Buttons share the `.btn` base and add modifiers. Visibility uses `.is-hidden` only — do not add another hide mechanism.
+- Use tokens for palette values; no hard-coded colors outside `_variables.css`.
+
+Run `bun run css:check` after template/CSS edits. It fails when a class used in markup has no CSS rule; dynamic/third-party classes are listed in the script's ignore list.
+
+6. Audit Tasks for OpenCode / Claude CLI
 
 When running static analysis, code audit, or refactoring passes on this codebase, prioritize the following goals:
 

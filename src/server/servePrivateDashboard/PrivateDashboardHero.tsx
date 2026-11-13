@@ -23,7 +23,7 @@ export const PrivateDashboardHero = ({
     <div class="hero-overlay">
       <h1 class="capitalize-words">{title}</h1>
 
-      <a href={`/${link}?t=${Date.now()}`} class="btn-back">
+      <a href={`/${link}?t=${Date.now()}`} class="back-link">
         See public profile
       </a>
       <p class="performance-count">{count} Documented</p>
