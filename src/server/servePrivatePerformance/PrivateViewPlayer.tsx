@@ -1,6 +1,7 @@
 import { Menu } from "../../components/Menu";
 import { VideoPlayer } from "../../components/VideoPlayer";
 import { PrivatePlayerControls } from "./PrivatePlayerControls";
+import { DownloadIcon } from "./DownloadIcon";
 
 export interface PrivateViewPlayerProps {
   studioTitle: string;
@@ -37,12 +38,30 @@ export const PrivateViewPlayer = ({
     >
       Public Version
     </a>
+    {/* Layout A: download icon stacked on top of the label */}
     <a
       class="performance-title"
       href={`/download/${artistName}-${performance}`}
       target="_blank"
     >
-      Download full video {masterSize} Gb
+      <span class="download-button download-button--stacked">
+        <DownloadIcon />
+        <span class="download-button__label">
+          Download full video {masterSize} Gb
+        </span>
+      </span>
+    </a>
+
+    {/* Layout B: download icon with the size label inline */}
+    <a
+      class="performance-title"
+      href={`/download/${artistName}-${performance}`}
+      target="_blank"
+    >
+      <span class="download-button download-button--inline">
+        <DownloadIcon />
+        <span class="download-button__label">{masterSize} Gb</span>
+      </span>
     </a>
     <div class="video-player-mock">
       <div
