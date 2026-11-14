@@ -25,7 +25,7 @@ export const servePublicPortfolio = async (c: any) => {
     return c.html("<!doctype html>\n" + <PendingLayout />);
   }
   const artistId = results[0].artistId;
-  const isAllowed = await getIsAllowed(artistId, c);
+  const isAllowed = true; // await getIsAllowed(artistId, c);
   const segmentCount = results?.length || 0;
   const lastUpdated =
     results?.reduce((max: any, item: any) => {

@@ -71,6 +71,7 @@ app.get("/admin/audit", serveAudit);
 app.post("/api/commit-status", commitStatus);
 app.get("/api/playlists/portfolio-components", servePlaylistPortfolioCards);
 app.get("/api/search-options", serveOptions);
+app.get("/api/purgeStale", serveOptions);
 
 // ---------------------------------------------------------
 // 5. Private Auth Middlewares (must precede the routes they protect)

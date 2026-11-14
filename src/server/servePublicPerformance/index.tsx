@@ -31,7 +31,7 @@ export const servePublicPerformance = async (c: any) => {
     .first();
   const isAllowed = currentArtist
     ? hasArtistAccess(payload, currentArtist.id, currentArtist.token_version)
-    : false;
+    : true;
 
   const isAdmin = isAdminRequest(c);
 

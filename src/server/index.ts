@@ -22,3 +22,4 @@ export { serveTech } from "./serveTech";
 export { serveAudit } from "./serveAudit";
 export { usePublicPerformance } from "./usePublicPerformance";
 export { usePublicPortfolio } from "./usePublicPortfolio";
+export { purgeStalePages } from "./purgeStalePages";
