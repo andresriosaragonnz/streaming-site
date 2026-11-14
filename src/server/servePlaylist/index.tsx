@@ -112,7 +112,7 @@ export const servePlaylist = async (c: any) => {
     const playlistCacheKey =
       new URL(c.req.url).pathname + new URL(c.req.url).search;
     const cache = await caches.open("default");
-    await cache.put(playlistCacheKey, response.clone());
+    // await cache.put(playlistCacheKey, response.clone());
     return response;
   } catch (err) {
     console.error("Failed to load playlist:", err);
