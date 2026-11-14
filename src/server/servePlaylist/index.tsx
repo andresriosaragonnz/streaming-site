@@ -42,7 +42,10 @@ const parseShareIds = (shareParam: string): ParseShareResult => {
   );
 
   if (ids.length === 0 || ids.length > MAX_SHARE_IDS) {
-    return { ok: false, message: "Invalid playlist IDs or count exceeds limit" };
+    return {
+      ok: false,
+      message: "Invalid playlist IDs or count exceeds limit",
+    };
   }
 
   return { ok: true, value: ids };
@@ -73,8 +76,10 @@ export const servePlaylist = async (c: any) => {
     const sql = `SELECT * FROM segments WHERE id IN (${placeholders}) AND status = 'public'`;
 
     // 3. Query D1
-    const { results } = await c.env.DB.prepare(sql).bind(...ids).all();
-
+    const { results } = await c.env.DB.prepare(sql)
+      .bind(...ids)
+      .all();
+    console.log({ results });
     // 4. Fast O(1) lookup map instead of O(N * M) .find()
     const resultMap = new Map(results.map((r: any) => [r.id, r]));
     const found = ids.map((id) => resultMap.get(id)).filter(Boolean); // Cleanly drop missing IDs
