@@ -55,15 +55,12 @@ export const servePublicPerformance = async (c: any) => {
       "Cache-Control": "public, max-age=0, must-revalidate",
     });
   }
-  const { formattedSegments, totalDuration } = formatSegments(
-    results,
-    videographers,
-  );
+  const { formattedSegments } = formatSegments(results, videographers);
 
   // 3. Set Edge CDN & Browser Cache Headers
   c.header(
     "Cache-Control",
-    "public, max-age=0, s-maxage=31536000, must-revalidate",
+    "public, max-age=0, s-maxage=3600, must-revalidate",
   );
   c.header("Cache-Tag", `artist:${slug}`);
   c.header("ETag", etag);

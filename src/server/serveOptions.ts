@@ -7,7 +7,7 @@ export const serveOptions = async (c: any) => {
   const artistNames = results.map((row: any) => row.artistName);
   c.header(
     "Cache-Control",
-    "public, max-age=0, s-maxage=31536000, must-revalidate",
+    "public, max-age=0, s-maxage=3600, must-revalidate",
   );
   c.header("Cache-Tag", "public-feed");
   return c.json(artistNames);

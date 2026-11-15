@@ -69,7 +69,6 @@ export const servePlaylist = async (c: any) => {
 
   const ids = parsed.value;
   const videographers = await getVideographers(c);
-
   try {
     // 2. Construct SQL statement with parameterized placeholders
     const placeholders = ids.map(() => "?").join(", ");
@@ -79,7 +78,6 @@ export const servePlaylist = async (c: any) => {
     const { results } = await c.env.DB.prepare(sql)
       .bind(...ids)
       .all();
-    console.log({ results });
     // 4. Fast O(1) lookup map instead of O(N * M) .find()
     const resultMap = new Map(results.map((r: any) => [r.id, r]));
     const found = ids.map((id) => resultMap.get(id)).filter(Boolean); // Cleanly drop missing IDs
@@ -102,17 +100,20 @@ export const servePlaylist = async (c: any) => {
     // 6. Set defensive headers (Cache-Control & Content Security Policy)
     c.header(
       "Cache-Control",
-      "public, max-age=0, s-maxage=31536000, must-revalidate",
+      "public, max-age=0, s-maxage=3600, must-revalidate",
     );
     c.header("Cache-Tag", "public-feed");
     const response = c.html(
       "<!doctype html>\n" +
       <PlaylistPageLayout pageTitle={nameParam} segments={sanitizedSegments} />,
     );
-    const playlistCacheKey =
-      new URL(c.req.url).pathname + new URL(c.req.url).search;
+    // const playlistCacheKey =
+    //   new URL(c.req.url).pathname + new URL(c.req.url).search;
+    const playlistCacheKey = new URL(c.req.url).toString();
     const cache = await caches.open("default");
-    // await cache.put(playlistCacheKey, response.clone());
+    console.log({ cache, playlistCacheKey, response });
+    //here is the error
+    await cache.put(playlistCacheKey, response.clone());
     return response;
   } catch (err) {
     console.error("Failed to load playlist:", err);

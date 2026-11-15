@@ -4,7 +4,6 @@ import { PublicSegmentCard } from "./PublicSegmentCard";
 import { Toast } from "../../components/ToastContainer";
 import { Favicon } from "../../components/Favicon";
 import type { Segment } from "../../ts/types";
-import { formatSegments } from "../../formatSegments";
 import { GraphModal } from "../../components/GraphModal";
 
 export interface PublicPerformancePageLayoutProps {

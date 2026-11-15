@@ -19,7 +19,7 @@ export const servePublicPortfolio = async (c: any) => {
   if (!results || results.length === 0) {
     c.header(
       "Cache-Control",
-      "public, max-age=0, s-maxage=31536000, must-revalidate",
+      "public, max-age=0, s-maxage=3600, must-revalidate",
     );
     c.header("Cache-Tag", `artist:${slug}`);
     return c.html("<!doctype html>\n" + <PendingLayout />);
@@ -46,7 +46,7 @@ export const servePublicPortfolio = async (c: any) => {
   // 3. Set Edge CDN & Browser Cache Headers
   c.header(
     "Cache-Control",
-    "public, max-age=0, s-maxage=31536000, must-revalidate",
+    "public, max-age=0, s-maxage=3600, must-revalidate",
   );
   c.header("Cache-Tag", `artist:${slug}`);
   c.header("ETag", etag);
