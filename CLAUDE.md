@@ -1,5 +1,23 @@
 Project Context & Architecture Guidelines (CLAUDE.md)
 
+0. How To Work Here (read first)
+
+Ask before exploring. This project's storage layout, media pipeline, encoders and deployment are mostly OUTSIDE this repository and are not inferable from it. When a question depends on something you cannot see in the repo — where masters are stored, how a performance was encoded, which bucket/domain is live, what tool produced a file, what the user's observed symptom is — STOP and ask the user a direct question instead of guessing.
+
+Do not:
+- Do not `ls`, `find`, `du` or otherwise probe the filesystem/media directories to discover what might exist. Ask which path exists.
+- Do not assume a config from a `.env`, `.dev.vars`, `wrangler.toml`, `storageAccount.txt`, or a database column is the current truth. Ask.
+- Do not chain speculative investigations ("maybe the master is in X, let me look") — one clarifying question is cheaper than ten exploratory commands.
+- Do not present an inferred setup as fact. Label assumptions as assumptions, or ask.
+
+Do:
+- Ask one focused question with the discriminating options when you are blocked.
+- Verify claims that ARE checkable in the repo (read the code, run the tests) — that is not exploring, that is doing the work.
+- Only inspect files the user named or that the task already points at.
+- When a user says "stop", stop immediately and change approach; do not continue the line of investigation.
+
+Rationale: the user is the only operator of this project and already knows the answers. Guessing burns time and produces confident, wrong conclusions.
+
 1. Project Objective & Core Architectural Vision
 
 This project is a high-performance, lightweight video streaming and portfolio platform built with a strict zero-bloat / minimal dependency philosophy.

@@ -22,7 +22,8 @@
     "db:resetremote": "rm -rf .wrangler/state/v3/d1 && bunx wrangler d1 execute DB --remote --file=./schema.sql && bunx wrangler d1 execute DB --remote --file=./seed.sql",
     "compile-js": "bun run scripts/build.ts",
     "css:check": "bun scripts/css-check.ts",
-    "cache:purge": "bun scripts/purge-cache.ts"
+    "cache:purge": "bun scripts/purge-cache.ts",
+    "segments:check": "bun scripts/find-broken-segments.ts"
   },
   "type": "module",
   "devDependencies": {

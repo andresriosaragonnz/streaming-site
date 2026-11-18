@@ -15,7 +15,9 @@ export const getMediaSource = (
   // Single HMAC calculation per segment
 
   const config = videographers[videographer];
-  const { worker, segmentToken } = config;
+  const { segmentToken } = config;
+  console.log({});
+  const worker = "http://192.168.1.189:8787";
   return {
     heroImage: `${worker}/${id}`,
     segmentToken,
