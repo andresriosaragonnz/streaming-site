@@ -23,8 +23,14 @@ export const PlaylistPageLayout = ({
     segmentToken: "",
   };
 
-  const { cardImage, sourceMp3, formattedTitle, artistLink, formattedArtist, segmentToken } =
-    firstSegment;
+  const {
+    cardImage,
+    sourceMp3,
+    formattedTitle,
+    artistLink,
+    formattedArtist,
+    segmentToken,
+  } = firstSegment;
 
   const posterImage = segmentToken
     ? `${cardImage}.jpg?token=${encodeURIComponent(segmentToken)}`
@@ -45,7 +51,7 @@ export const PlaylistPageLayout = ({
     <html lang="en">
       <head>
         <Favicon />
-        <title>Playlist</title>
+        <title>Playlists</title>
         <link rel="stylesheet" href="/css/app.css?v=2" />
         <link rel="stylesheet" href="/css/review-studio.css?v=2" />
       </head>
