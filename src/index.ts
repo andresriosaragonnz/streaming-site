@@ -89,7 +89,7 @@ app.get("/download/:slug", serveDownload);
 app.get("/tech", serveTech);
 
 // Explicit extension guard for missing static assets
-app.get("/:file{.+\\.(?:png|ico|jpg|jpeg|svg|css|js)$}", (c) =>
+app.get("/:file{.+\\.(?:png|ico|jpeg|svg|css|js)$}", (c) =>
   c.text("Asset Not Found", 404),
 );
 // ---------------------------------------------------------
