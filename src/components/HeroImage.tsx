@@ -3,9 +3,13 @@ export interface HeroImageProps {
   segmentToken?: string;
 }
 
+const FALLBACK_HERO = "/images/playlist_2_desktop.jpg";
+
 export const HeroImage = ({ heroImage, segmentToken }: HeroImageProps) => {
   const withToken = (url: string) =>
     segmentToken ? `${url}?token=${encodeURIComponent(segmentToken)}` : url;
+
+  const fallbackHandler = `this.onerror=null; this.closest('picture')?.querySelectorAll('source').forEach(s => s.remove()); this.src='${FALLBACK_HERO}';`;
 
   return (
     <>
@@ -24,13 +28,14 @@ export const HeroImage = ({ heroImage, segmentToken }: HeroImageProps) => {
           srcset={withToken(`${heroImage}/desktop.avif`)}
         />
 
-        {/* Legacy Fallback JPG */}
+        {/* Legacy Fallback JPG + Hardcoded Local Fallback */}
         <img
           id="hero-img"
           src={withToken(`${heroImage}/desktop.jpg`)}
           alt="My Playlists"
           class="hero-img"
           loading="eager"
+          onerror={fallbackHandler}
         />
       </picture>
 
