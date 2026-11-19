@@ -37,8 +37,7 @@
  *   --performance <a,b> only these performance slugs
  *   --limit <n>         stop after n segments
  *   --concurrency <n>   parallel file scans (default: 8)
- *   --out <path>        where to write the JSON list
- *                       (default: /tmp/opencode/defective-segments.json)
+ *   --out <path>        where to write the JSON list (default: ./defective.json)
  *   --no-out            don't write a JSON file
  *   --confirm           re-decode each candidate with ffmpeg and keep only the
  *                       ones where the decode really reports a timestamp
@@ -56,7 +55,7 @@ import path from "node:path";
 import { Database } from "bun:sqlite";
 
 const DEFAULT_ROOT = "/media/work/fragments/target";
-const DEFAULT_OUT = "/home/andres/code/web/defective-segments.json";
+const DEFAULT_OUT = "defective.json";
 const D1_DIR = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
 
 const TS_PACKET_SIZE = 188;
@@ -183,6 +182,9 @@ function parseArgs(argv: string[]): Options {
     }
   }
 
+  // relative --out and the default are resolved against the current directory
+  if (opts.out) opts.out = path.resolve(opts.out);
+
   return opts;
 }
 
@@ -205,6 +207,8 @@ interface SegmentRow {
   id: string;
   title: string;
   performance: string;
+  startTime: number;
+  duration: number;
 }
 
 function resolveDb(explicit?: string): string {
@@ -239,7 +243,7 @@ function loadSegments(dbPath: string): SegmentRow[] {
   const db = new Database(dbPath, { readonly: true });
   try {
     const sql =
-      "SELECT id, title, performance FROM segments ORDER BY performance, title";
+      "SELECT id, title, performance, startTime, duration FROM segments ORDER BY performance, title";
     return db.query(sql).all() as SegmentRow[];
   } finally {
     db.close();
@@ -535,6 +539,8 @@ interface Defective {
   performance: string;
   title: string;
   id: string;
+  startTime: number;
+  duration: number;
   reasons: string[];
 }
 
@@ -555,7 +561,13 @@ async function main(): Promise<void> {
     const found = new Set(rows.map((row) => row.id));
     for (const id of opts.ids) {
       if (!found.has(id))
-        rows.push({ id, title: "(not in db)", performance: "(not in db)" });
+        rows.push({
+          id,
+          title: "(not in db)",
+          performance: "(not in db)",
+          startTime: 0,
+          duration: 0,
+        });
     }
   } else if (opts.performances.length > 0) {
     const wanted = new Set(opts.performances);
@@ -589,6 +601,8 @@ async function main(): Promise<void> {
           performance: row.performance,
           title: row.title,
           id: row.id,
+          startTime: row.startTime,
+          duration: row.duration,
           reasons: verdict.reasons,
         });
       } else if (verdict.reasons.length > 0) {
@@ -596,6 +610,8 @@ async function main(): Promise<void> {
           performance: row.performance,
           title: row.title,
           id: row.id,
+          startTime: row.startTime,
+          duration: row.duration,
           reasons: verdict.reasons,
         };
 
@@ -673,12 +689,16 @@ async function main(): Promise<void> {
   }
 
   if (opts.out) {
-    const payload = defective.map(({ performance, title, id, reasons }) => ({
-      performance,
-      title,
-      id,
-      reasons,
-    }));
+    const payload = defective.map(
+      ({ performance, title, id, startTime, duration, reasons }) => ({
+        performance,
+        title,
+        id,
+        startTime,
+        duration,
+        reasons,
+      }),
+    );
     fs.mkdirSync(path.dirname(opts.out), { recursive: true });
     fs.writeFileSync(opts.out, JSON.stringify(payload, null, 2) + "\n");
     console.log(

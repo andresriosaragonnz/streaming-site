@@ -40,7 +40,7 @@ export const PendingLayout = ({}) => {
         </div>
 
         <div class="artist-hero">
-          <HeroImage heroImage={getHeroImage("playlists")} />
+          <HeroImage heroImage={"/images/playlist_2_desktop"} />
           <div class="hero-overlay">
             <div class="studio-container">
               <h3 class="capitalize-words">Coming soon</h3>

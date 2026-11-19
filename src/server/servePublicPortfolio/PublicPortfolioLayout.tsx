@@ -47,8 +47,9 @@ export const PublicPortfolioLayout = ({
   // Pick a random hero image from available segments
   const heroSegment =
     formattedSegments[getRandomIndex(formattedSegments)] ?? ({} as Segment);
-  const heroImage = heroSegment.heroImage || "";
-
+  const heroImage =
+    heroSegment.heroImage || "https://mainsite.storage-4f8.workers.dev/278dST";
+  console.log({ heroImage, heroSegment });
   return (
     <html lang="en">
       <head>

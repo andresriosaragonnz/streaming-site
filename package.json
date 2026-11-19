@@ -23,7 +23,8 @@
     "compile-js": "bun run scripts/build.ts",
     "css:check": "bun scripts/css-check.ts",
     "cache:purge": "bun scripts/purge-cache.ts",
-    "segments:check": "bun scripts/find-broken-segments.ts"
+    "segments:check": "bun scripts/find-broken-segments.ts",
+    "segments:repair": "bun scripts/repair-segments.ts"
   },
   "type": "module",
   "devDependencies": {

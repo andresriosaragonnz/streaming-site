@@ -16,8 +16,7 @@ export const getMediaSource = (
 
   const config = videographers[videographer];
   const { segmentToken } = config;
-  console.log({});
-  const worker = "http://192.168.1.189:8787";
+  const worker = "http://192.168.1.222:8787";
   return {
     heroImage: `${worker}/${id}`,
     segmentToken,

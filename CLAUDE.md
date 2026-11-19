@@ -15,6 +15,7 @@ Do:
 - Verify claims that ARE checkable in the repo (read the code, run the tests) — that is not exploring, that is doing the work.
 - Only inspect files the user named or that the task already points at.
 - When a user says "stop", stop immediately and change approach; do not continue the line of investigation.
+- When asking a question, suggest the Linux command the user could run to answer it (e.g. `ls -la /path`, `find /path -name '*.mov' -maxdepth 2`). The user is NOT proficient with Linux command line tools and is using this project to practise, so give the exact command, say what it does in one line, and tell them what to paste back. Prefer read-only commands that cannot delete or overwrite anything.
 
 Rationale: the user is the only operator of this project and already knows the answers. Guessing burns time and produces confident, wrong conclusions.
 
