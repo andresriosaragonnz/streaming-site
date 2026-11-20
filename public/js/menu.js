@@ -1,7 +1,36 @@
 document.addEventListener("DOMContentLoaded", () => {
+  renderMyPlaylistsLink();
   renderPrivateBands();
   initSearchAutocomplete();
+
+  // Keep the link in sync with playlist changes (same tab) and other tabs.
+  window.addEventListener("playlist-state-changed", renderMyPlaylistsLink);
+  window.addEventListener("storage", (e) => {
+    if (e.key === "user_playlists" || e.key === null) renderMyPlaylistsLink();
+  });
 });
+
+function hasSavedPlaylists() {
+  try {
+    const rawData = localStorage.getItem("user_playlists");
+    if (!rawData) return false;
+
+    const playlists = JSON.parse(rawData);
+    return Object.values(playlists).some(
+      (ids) => Array.isArray(ids) && ids.length > 0,
+    );
+  } catch (e) {
+    console.error("Failed to read user_playlists from localStorage:", e);
+    return false;
+  }
+}
+
+function renderMyPlaylistsLink() {
+  const section = document.getElementById("my-playlists-section");
+  if (!section) return;
+
+  section.classList.toggle("is-hidden", !hasSavedPlaylists());
+}
 
 function getPrivateBands() {
   const rawData = localStorage.getItem("allowed_bands");

@@ -18,7 +18,6 @@ interface UserPayload {
    * String values are still accepted at runtime for older cookies.
    */
   allowed: string[];
-  v?: number;
   exp?: number; // Expiration timestamp (optional)
 }
 

@@ -20,7 +20,7 @@ export const usePublicPortfolio = async (c: any, next: any) => {
       .all();
 
     const artistId = (results || [])[0]?.artistId;
-    isAllowed = true; // artistId ? await getIsAllowed(artistId, c) : false;
+    isAllowed = artistId ? await getIsAllowed(artistId, c) : false;
   }
 
   if (!isAdmin && !isAllowed) {

@@ -83,7 +83,8 @@ export const Menu = () => (
     {/* Drawer Panel */}
     <aside class="drawer-panel">
       <ul id="drawer-target" class="drawer-links">
-        <li>
+        {/* Revealed by menu.js when user_playlists has saved playlists */}
+        <li id="my-playlists-section" class="is-hidden">
           <a href="/myplaylists" class="drawer-link" id="my-playlists">
             My playlists
           </a>

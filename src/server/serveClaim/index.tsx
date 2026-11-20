@@ -23,19 +23,19 @@ const parseAllowedClaims = (allowed: string[]): ParseClaimsResult => {
   const pairs: ClaimPair[] = [];
 
   for (const claim of allowed) {
-    const separator = claim.indexOf("_");
-    if (separator === -1) {
+    const separatorIndex = claim.indexOf("_");
+    if (separatorIndex === -1) {
+      return { ok: false, message: "Invalid or tampered token" };
+    }
+    const [artistId, tokenVersion] = claim.split("_");
+
+    const tokenVersionNumber = Number(tokenVersion);
+
+    if (!artistId || !Number.isFinite(tokenVersionNumber)) {
       return { ok: false, message: "Invalid or tampered token" };
     }
 
-    const artistId = claim.slice(0, separator);
-    const tokenVersion = Number(claim.slice(separator + 1));
-
-    if (!artistId || !Number.isFinite(tokenVersion)) {
-      return { ok: false, message: "Invalid or tampered token" };
-    }
-
-    pairs.push({ artistId, tokenVersion });
+    pairs.push({ artistId, tokenVersion: tokenVersionNumber });
   }
 
   return { ok: true, value: pairs };
@@ -56,21 +56,15 @@ export const serveClaim = async (c: any) => {
     if (incomingPayload.exp && Date.now() / 1000 > incomingPayload.exp) {
       return c.text("Token expired", 403);
     }
-    const incomingAllowed = getAllowedClaims(incomingPayload);
-    console.log({ incomingPayload, incomingAllowed });
-    if (incomingAllowed.length === 0) {
-      return c.text("Invalid or tampered token", 403);
-    }
-
-    const parsedClaims = parseAllowedClaims(incomingAllowed);
+    const parsedClaims = parseAllowedClaims(incomingPayload.allowed);
     if (!parsedClaims.ok) {
       return c.text(parsedClaims.message, 403);
     }
-
     const incomingPairs = parsedClaims.value;
     const incomingArtistIds = Array.from(
       new Set(incomingPairs.map(({ artistId }) => artistId)),
     );
+    console.log({ incomingPairs, incomingArtistIds });
 
     // Reject revoked claims before rendering any private segment data.
     const incomingPlaceholders = incomingArtistIds.map(() => "?").join(", ");
@@ -79,7 +73,6 @@ export const serveClaim = async (c: any) => {
     )
       .bind(...incomingArtistIds)
       .all();
-
     const currentVersions = new Map(
       (
         (incomingArtists || []) as Array<{
@@ -94,6 +87,12 @@ export const serveClaim = async (c: any) => {
         currentVersions.get(artistId) !== tokenVersion,
     );
 
+    console.log({
+      incomingArtists,
+      currentVersions,
+      incomingPairs,
+      incomingArtistIds,
+    });
     if (isRevoked) {
       return c.text("Token revoked", 403);
     }
@@ -101,7 +100,7 @@ export const serveClaim = async (c: any) => {
     const cookies = parseCookies(c.req.header("Cookie"));
     const existingToken = cookies["auth_token"];
 
-    let mergedAllowed = [...incomingAllowed];
+    let mergedAllowed = [...incomingPayload.allowed];
     if (existingToken) {
       const existingPayload = await verifyAuthToken<UserPayload>(
         existingToken,
@@ -113,7 +112,10 @@ export const serveClaim = async (c: any) => {
           !existingPayload.exp || Date.now() / 1000 <= existingPayload.exp;
         if (notExpired) {
           mergedAllowed = Array.from(
-            new Set([...getAllowedClaims(existingPayload), ...incomingAllowed]),
+            new Set([
+              ...getAllowedClaims(existingPayload),
+              ...incomingPayload.allowed,
+            ]),
           );
         }
       }
