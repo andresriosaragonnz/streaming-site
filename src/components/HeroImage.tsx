@@ -3,8 +3,8 @@ export interface HeroImageProps {
   segmentToken?: string;
 }
 
-const FALLBACK_HERO = "/images/playlist_2_desktop.jpg";
-
+const FALLBACK_HERO =
+  "https://mainsite.storage-4f8.workers.dev/playlist_2_desktop.jpg";
 export const HeroImage = ({ heroImage, segmentToken }: HeroImageProps) => {
   const withToken = (url: string) =>
     segmentToken ? `${url}?token=${encodeURIComponent(segmentToken)}` : url;
