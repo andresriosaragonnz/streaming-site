@@ -9,7 +9,7 @@ export const HeroImage = ({ heroImage, segmentToken }: HeroImageProps) => {
   const withToken = (url: string) =>
     segmentToken ? `${url}?token=${encodeURIComponent(segmentToken)}` : url;
 
-  const fallbackHandler = `this.onerror=null; this.closest('picture')?.querySelectorAll('source').forEach(s => s.remove()); this.src='${FALLBACK_HERO}';`;
+  const fallbackHandler = `this.onerror=null; this.closest('picture')?.querySelectorAll('source').forEach(s => s.remove()); this.src='${withToken(FALLBACK_HERO)}';`;
 
   return (
     <>
