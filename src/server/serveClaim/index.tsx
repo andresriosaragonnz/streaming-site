@@ -53,13 +53,10 @@ export const serveClaim = async (c: any) => {
       c.env.AUTH_SECRET,
     );
     if (!incomingPayload) return c.text("Invalid or tampered token", 403);
-    if (
-      incomingPayload.exp &&
-      Date.now() / 1000 > incomingPayload.exp
-    ) {
+    if (incomingPayload.exp && Date.now() / 1000 > incomingPayload.exp) {
       return c.text("Token expired", 403);
     }
-
+    console.log({ incomingPayload });
     const incomingAllowed = getAllowedClaims(incomingPayload);
     if (incomingAllowed.length === 0) {
       return c.text("Invalid or tampered token", 403);
@@ -84,10 +81,12 @@ export const serveClaim = async (c: any) => {
       .all();
 
     const currentVersions = new Map(
-      ((incomingArtists || []) as Array<{
-        id: string;
-        token_version: number;
-      }>).map((artist) => [artist.id, artist.token_version]),
+      (
+        (incomingArtists || []) as Array<{
+          id: string;
+          token_version: number;
+        }>
+      ).map((artist) => [artist.id, artist.token_version]),
     );
 
     const isRevoked = incomingPairs.some(
@@ -164,14 +163,14 @@ export const serveClaim = async (c: any) => {
     c.header("Cache-Control", "private, no-store");
     return c.html(
       "<!doctype html>\n" +
-        (
-          <ClaimLayout
-            segments={segments}
-            artists={artistNames}
-            formattedSegments={formattedSegments}
-            totalDuration={totalDuration}
-          />
-        ),
+      (
+        <ClaimLayout
+          segments={segments}
+          artists={artistNames}
+          formattedSegments={formattedSegments}
+          totalDuration={totalDuration}
+        />
+      ),
     );
   } catch (error) {
     console.error(
