@@ -61,7 +61,6 @@ export async function verifyAuthToken<T = any>(
   const parts = token.split(".");
   if (parts.length !== 3) return null;
 
-  console.log({ secret, parts });
   const [encodedHeader, encodedPayload, encodedSignature] = parts;
   const dataToVerify = `${encodedHeader}.${encodedPayload}`;
   const key = await getCryptoKey(secret);

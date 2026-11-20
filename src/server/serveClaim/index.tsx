@@ -56,8 +56,8 @@ export const serveClaim = async (c: any) => {
     if (incomingPayload.exp && Date.now() / 1000 > incomingPayload.exp) {
       return c.text("Token expired", 403);
     }
-    console.log({ incomingPayload });
     const incomingAllowed = getAllowedClaims(incomingPayload);
+    console.log({ incomingPayload, incomingAllowed });
     if (incomingAllowed.length === 0) {
       return c.text("Invalid or tampered token", 403);
     }

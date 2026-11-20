@@ -12,6 +12,7 @@ import type { UserPayload } from "./types";
 export function getAllowedClaims(
   payload: UserPayload | null | undefined,
 ): string[] {
+  console.log({ payload });
   const raw: unknown = (payload as any)?.allowed;
   const version = (payload as any)?.v;
   const values = Array.isArray(raw)
