@@ -52,5 +52,13 @@ CREATE TABLE IF NOT EXISTS tk (
   id TEXT PRIMARY KEY
 );
 
+CREATE TABLE IF NOT EXISTS approvals (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  segment_id TEXT NOT NULL,
+  artist_id TEXT NOT NULL,
+  new_status TEXT CHECK(new_status IN ('public', 'private'))
+);
 
-INSERT INTO videographers (id, name, encrypted_credentials, iv)VALUES ('v1','splinnermann','/3dPxeTWZO2rH8huCQx6wuOuh8kMFiflK/utkw0dLBHP3jtSYVIPXWUEpJfNmw0YdCtACrRlpM9ta8aszMPvlWEykgO9NKMKE6FopJB99atoUEH7hgQ9pI9JfN8CJu5H5NMgur4XYT+C7pVIcLKe0ncp6u00NLYvaobwW7khNHVIKHc6DA5a57n8a3wEAzulue1PD5ywQh5GTgxilC+fxGnOuX46W2BflZy6g5O+77Clrs+vmBmTpkQsKU1HzMB7NMUvS5DooNCslBzbx1KpGRjPD6EfeLzWHAibZu4ZZ6sQEA==','C0fNjLHPRTqYSEIo');
+
+-- INSERT INTO videographers (id, name, encrypted_credentials, iv)VALUES ('v1','splinnermann','/3dPxeTWZO2rH8huCQx6wuOuh8kMFiflK/utkw0dLBHP3jtSYVIPXWUEpJfNmw0YdCtACrRlpM9ta8aszMPvlWEykgO9NKMKE6FopJB99atoUEH7hgQ9pI9JfN8CJu5H5NMgur4XYT+C7pVIcLKe0ncp6u00NLYvaobwW7khNHVIKHc6DA5a57n8a3wEAzulue1PD5ywQh5GTgxilC+fxGnOuX46W2BflZy6g5O+77Clrs+vmBmTpkQsKU1HzMB7NMUvS5DooNCslBzbx1KpGRjPD6EfeLzWHAibZu4ZZ6sQEA==','C0fNjLHPRTqYSEIo');

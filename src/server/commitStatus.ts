@@ -1,7 +1,6 @@
 import { rebuildPages } from "./rebuildPages";
 import { getAuthPayload, hasArtistAccess, isAdminRequest } from "./auth";
 
-const THIRTY_DAYS_SEC = 2_592_000;
 const D1_BATCH_LIMIT = 80; // Hard limit safety threshold (D1 max is 100)
 const MAX_SEGMENTS_PER_COMMIT = 100;
 const MAX_TITLE_LENGTH = 200;
@@ -109,7 +108,7 @@ export const commitStatus = async (c: any) => {
     return c.json({ status: "error", message: parsed.message }, 400);
   }
 
-  const { segments, changedStatus } = parsed.value;
+  const { segments } = parsed.value;
   const ids = Array.from(new Set(segments.map((segment) => segment.id)));
   const placeholders = ids.map(() => "?").join(", ");
 
@@ -140,22 +139,13 @@ export const commitStatus = async (c: any) => {
   if (!admin) {
     const forbidden = ids.some((id) => {
       const row = rowsById.get(id);
-      return (
-        !row || !hasArtistAccess(payload, row.artistId, row.token_version)
-      );
+      return !row || !hasArtistAccess(payload, row.artistId, row.token_version);
     });
 
     if (forbidden) {
       return c.text("Forbidden: segment does not belong to this artist", 403);
     }
   }
-
-  const allowedIds = new Set(ids);
-  const changedIds = Array.from(new Set(changedStatus)).filter((id) =>
-    allowedIds.has(id),
-  );
-
-  const now = Math.floor(Date.now() / 1000);
 
   try {
     // 1. Prepare segment status and title updates
@@ -165,23 +155,18 @@ export const commitStatus = async (c: any) => {
       ).bind(segment.status, segment.title, segment.id),
     );
 
-    // 2. Update published_at if NULL, 0, or older than 30 days
-    const publishStatements = changedIds.map((id) =>
+    // 2. Record an approval row for each committed segment
+    const approvalStatements = segments.map((segment) =>
       c.env.DB.prepare(
-        `
-        UPDATE segments 
-        SET published_at = ?
-        WHERE id = ? 
-          AND (
-            published_at IS NULL 
-            OR published_at = 0 
-            OR (? - published_at) >= ?
-          )
-        `,
-      ).bind(now, id, now, THIRTY_DAYS_SEC),
+        `INSERT INTO approvals (segment_id, artist_id, new_status) VALUES (?, ?, ?)`,
+      ).bind(
+        segment.id,
+        rowsById.get(segment.id)?.artistId,
+        segment.status,
+      ),
     );
 
-    const statements = [...updateStatements, ...publishStatements];
+    const statements = [...updateStatements, ...approvalStatements];
 
     // 3. Safely process statements in chunks under D1 batch limits
     for (let i = 0; i < statements.length; i += D1_BATCH_LIMIT) {
